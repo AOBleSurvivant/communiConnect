@@ -1,0 +1,22 @@
+# Configuration Django
+SECRET_KEY=your-secret-key-here
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1
+
+# Configuration Redis
+REDIS_URL=redis://127.0.0.1:6379
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+
+# Configuration Cloudinary CDN
+CLOUDINARY_CLOUD_NAME=your-cloud-name
+CLOUDINARY_API_KEY=your-api-key
+CLOUDINARY_API_SECRET=your-api-secret
+USE_CLOUDINARY=False
+
+# Configuration Google Cloud Vision (optionnel)
+GOOGLE_CLOUD_VISION_API_KEY=your-vision-api-key
+
+# Configuration Live Streaming
+RTMP_SERVER_URL=rtmp://localhost/live
+HLS_SERVER_URL=http://localhost:8080/hls 

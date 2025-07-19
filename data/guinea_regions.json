@@ -1,0 +1,1744 @@
+{
+  "regions": [
+    {
+      "nom": "Conakry",
+      "prefectures": [
+        {
+          "nom": "Conakry",
+          "communes": [
+            {
+              "nom": "Kaloum",
+              "type": "commune urbaine",
+              "quartiers": []
+            },
+            {
+              "nom": "Dixinn",
+              "type": "commune urbaine",
+              "quartiers": []
+            },
+            {
+              "nom": "Matam",
+              "type": "commune urbaine",
+              "quartiers": []
+            },
+            {
+              "nom": "Matoto",
+              "type": "commune urbaine",
+              "quartiers": []
+            },
+            {
+              "nom": "Ratoma",
+              "type": "commune urbaine",
+              "quartiers": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "nom": "Kindia",
+      "prefectures": [
+        {
+          "nom": "Coyah",
+          "communes": [
+            {
+              "nom": "Coyah Centre",
+              "type": "commune urbaine",
+              "quartiers": []
+            },
+            {
+              "nom": "Kouriya",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Maneah",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Wonkifong",
+              "type": "commune rurale",
+              "quartiers": []
+            }
+          ]
+        },
+        {
+          "nom": "Dubreka",
+          "communes": [
+            {
+              "nom": "Dubreka Centre",
+              "type": "commune urbaine",
+              "quartiers": []
+            },
+            {
+              "nom": "Badi",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Falessade",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Khorira",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Ouassou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Tanene",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Tondon",
+              "type": "commune rurale",
+              "quartiers": []
+            }
+          ]
+        },
+        {
+          "nom": "Forecariah",
+          "communes": [
+            {
+              "nom": "Forecariah Centre",
+              "type": "commune urbaine",
+              "quartiers": []
+            },
+            {
+              "nom": "Alassoya",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Benty",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Farmoriah",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Kaback",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Kakossa",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Kallia",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Maferenya",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Moussaya",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Sikhourou",
+              "type": "commune rurale",
+              "quartiers": []
+            }
+          ]
+        },
+        {
+          "nom": "Kindia",
+          "communes": [
+            {
+              "nom": "Kindia Centre",
+              "type": "commune urbaine",
+              "quartiers": []
+            },
+            {
+              "nom": "Bangouyah",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Damankanyah",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Friguiagbe",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Kolente",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Lynsan",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Madina Oula",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Mambiya",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Molota",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Samayah",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Sougueta",
+              "type": "commune rurale",
+              "quartiers": []
+            }
+          ]
+        },
+        {
+          "nom": "Telimele",
+          "communes": [
+            {
+              "nom": "Telimele Centre",
+              "type": "commune urbaine",
+              "quartiers": []
+            },
+            {
+              "nom": "Bourouwal",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Daramagnaky",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Gougoudje",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Koba",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Kollet",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Konsotamy",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Missira",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Santou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Sarekaly",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Sinta",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Sogolon",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Tarihoye",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Thionthian",
+              "type": "commune rurale",
+              "quartiers": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "nom": "Mamou",
+      "prefectures": [
+        {
+          "nom": "Mamou",
+          "communes": [
+            {
+              "nom": "Mamou Centre",
+              "type": "commune urbaine",
+              "quartiers": []
+            },
+            {
+              "nom": "Bouliwel",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Dounet",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Gongoret",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Kegneko",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Konkoure",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Nyagara",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Oure Kaba",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Poredaka",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Saramoussaya",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Soyah",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Teguereya",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Timbo",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Tolo",
+              "type": "commune rurale",
+              "quartiers": []
+            }
+          ]
+        },
+        {
+          "nom": "Dalaba",
+          "communes": [
+            {
+              "nom": "Dalaba Centre",
+              "type": "commune urbaine",
+              "quartiers": []
+            },
+            {
+              "nom": "Bodie",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Ditinn",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Kaalan",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Kankalabe",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Kebali",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Koba",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Mafara",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Mitty",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Mombeya",
+              "type": "commune rurale",
+              "quartiers": []
+            }
+          ]
+        },
+        {
+          "nom": "Pita",
+          "communes": [
+            {
+              "nom": "Pita Centre",
+              "type": "commune urbaine",
+              "quartiers": []
+            },
+            {
+              "nom": "Bantignel",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Bourouwal Tappe",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Dongol Touma",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Gongore",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Ley-Miro",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Maci",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Ninguelande",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Sangareah",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Sintaly",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Timbi-Madina",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Timbi-Touny",
+              "type": "commune rurale",
+              "quartiers": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "nom": "Labé",
+      "prefectures": [
+        {
+          "nom": "Labé",
+          "communes": [
+            {
+              "nom": "Labé Centre",
+              "type": "commune urbaine",
+              "quartiers": []
+            },
+            {
+              "nom": "Dalein",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Daralabe",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Diari",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Dionfo",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Garambe",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Hafia",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Kaalan",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Kouramangui",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Noussy",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Popodara",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Sannoun",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Taranbaly",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Tountouroun",
+              "type": "commune rurale",
+              "quartiers": []
+            }
+          ]
+        },
+        {
+          "nom": "Koubia",
+          "communes": [
+            {
+              "nom": "Koubia Centre",
+              "type": "commune urbaine",
+              "quartiers": []
+            },
+            {
+              "nom": "Fafaya",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Gadha Woundou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Matakaou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Missira",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Pilimini",
+              "type": "commune rurale",
+              "quartiers": []
+            }
+          ]
+        },
+        {
+          "nom": "Lélouma",
+          "communes": [
+            {
+              "nom": "Lélouma Centre",
+              "type": "commune urbaine",
+              "quartiers": []
+            },
+            {
+              "nom": "Balaya",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Djountou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Herico",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Korbe",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Lafou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Linsansaran",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Manda",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Parawol",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Sagale",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Tyanguel-Bori",
+              "type": "commune rurale",
+              "quartiers": []
+            }
+          ]
+        },
+        {
+          "nom": "Mali",
+          "communes": [
+            {
+              "nom": "Mali Centre",
+              "type": "commune urbaine",
+              "quartiers": []
+            },
+            {
+              "nom": "Balaki",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Donghol Sigon",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Dougountouny",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Fougou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Gayah",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Hidayatou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Lebekere",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Madina Wora",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Salambande",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Telire",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Touba",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Yembereng",
+              "type": "commune rurale",
+              "quartiers": []
+            }
+          ]
+        },
+        {
+          "nom": "Tougué",
+          "communes": [
+            {
+              "nom": "Tougué Centre",
+              "type": "commune urbaine",
+              "quartiers": []
+            },
+            {
+              "nom": "Fatako",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Fello Koundoua",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Kansangui",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Kolangui",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Kollet",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Konah",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Kouratongo",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Koyin",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Tangaly",
+              "type": "commune rurale",
+              "quartiers": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "nom": "Faranah",
+      "prefectures": [
+        {
+          "nom": "Faranah",
+          "communes": [
+            {
+              "nom": "Faranah Centre",
+              "type": "commune urbaine",
+              "quartiers": []
+            },
+            {
+              "nom": "Ballaya",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Bambaya",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Bantoun",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Banian",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Beindou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Dantiliya",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Gnaleah",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Heremakonon",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Kobikoro",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Maréla",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Passayah",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Sandeniah",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Songoyah",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Tindo",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Tiro",
+              "type": "commune rurale",
+              "quartiers": []
+            }
+          ]
+        },
+        {
+          "nom": "Dabola",
+          "communes": [
+            {
+              "nom": "Dabola Centre",
+              "type": "commune urbaine",
+              "quartiers": []
+            },
+            {
+              "nom": "Arfamoussaya",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Banko",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Bissikrima",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Dogomet",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Kankama",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Kindoye",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Konindou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "N'Dema",
+              "type": "commune rurale",
+              "quartiers": []
+            }
+          ]
+        },
+        {
+          "nom": "Dinguiraye",
+          "communes": [
+            {
+              "nom": "Dinguiraye Centre",
+              "type": "commune urbaine",
+              "quartiers": []
+            },
+            {
+              "nom": "Banora",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Dialakoro",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Diatifere",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Gagnakali",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Kalinko",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Lansanya",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Selouma",
+              "type": "commune rurale",
+              "quartiers": []
+            }
+          ]
+        },
+        {
+          "nom": "Kissidougou",
+          "communes": [
+            {
+              "nom": "Kissidougou Centre",
+              "type": "commune urbaine",
+              "quartiers": []
+            },
+            {
+              "nom": "Albadariah",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Banama",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Bardou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Beindou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Fermessadou-Pombo",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Firawa",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Gbangbadou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Koundiatou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Manfran",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Sangardo",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Yende-Millimou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Yombiro",
+              "type": "commune rurale",
+              "quartiers": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "nom": "Kankan",
+      "prefectures": [
+        {
+          "nom": "Kankan",
+          "communes": [
+            {
+              "nom": "Kankan Centre",
+              "type": "commune urbaine",
+              "quartiers": []
+            },
+            {
+              "nom": "Balandougou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Bate-Nafadji",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Boula",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Gberedou-Baranama",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Karifamoriyah",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Koumban",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Mamouroudou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Missamana",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Moribayah",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Sabadou-Baranama",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Tinti-Oulen",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Tokounou",
+              "type": "commune rurale",
+              "quartiers": []
+            }
+          ]
+        },
+        {
+          "nom": "Kérouané",
+          "communes": [
+            {
+              "nom": "Kérouané Centre",
+              "type": "commune urbaine",
+              "quartiers": []
+            },
+            {
+              "nom": "Banankoro",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Damaro",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Komodou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Kounsankoro",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Linko",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Sibiribaro",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Soromaya",
+              "type": "commune rurale",
+              "quartiers": []
+            }
+          ]
+        },
+        {
+          "nom": "Kouroussa",
+          "communes": [
+            {
+              "nom": "Kouroussa Centre",
+              "type": "commune urbaine",
+              "quartiers": []
+            },
+            {
+              "nom": "Babila",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Balato",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Banfélé",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Baro",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Cissela",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Douako",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Doura",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Kiniéro",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Komola-Koura",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Koumana",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Sanguiana",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Kouroukoro",
+              "type": "commune rurale",
+              "quartiers": []
+            }
+          ]
+        },
+        {
+          "nom": "Mandiana",
+          "communes": [
+            {
+              "nom": "Mandiana Centre",
+              "type": "commune urbaine",
+              "quartiers": []
+            },
+            {
+              "nom": "Balandougouba",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Dialakoro",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Faralako",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Kantoumanina",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Kinieran",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Kondianakoro",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Koundian",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Morodou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Niantania",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Saladou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Sansando",
+              "type": "commune rurale",
+              "quartiers": []
+            }
+          ]
+        },
+        {
+          "nom": "Siguiri",
+          "communes": [
+            {
+              "nom": "Siguiri Centre",
+              "type": "commune urbaine",
+              "quartiers": []
+            },
+            {
+              "nom": "Bankon",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Doko",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Franwalia",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Kiniebakoura",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Kintinian",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Malea",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Naboun",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Niagassola",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Niandankoro",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Norassoba",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Nounkounkan",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Siguirini",
+              "type": "commune rurale",
+              "quartiers": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "nom": "Nzérékoré",
+      "prefectures": [
+        {
+          "nom": "Nzérékoré",
+          "communes": [
+            {
+              "nom": "Nzérékoré Centre",
+              "type": "commune urbaine",
+              "quartiers": []
+            },
+            {
+              "nom": "Bounouma",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Gouécké",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Kobéla",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Koropara",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Koulé",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Palé",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Samoé",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Soulouta",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Womey",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Yalenzou",
+              "type": "commune rurale",
+              "quartiers": []
+            }
+          ]
+        },
+        {
+          "nom": "Beyla",
+          "communes": [
+            {
+              "nom": "Beyla Centre",
+              "type": "commune urbaine",
+              "quartiers": []
+            },
+            {
+              "nom": "Boola",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Diarraguerela",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Diassadou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Fouala",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Gbackédou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Gbéssoba",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Karala",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Koumandou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Mousadou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Nionsomoridou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Samana",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Sinko",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Sokourala",
+              "type": "commune rurale",
+              "quartiers": []
+            }
+          ]
+        },
+        {
+          "nom": "Guéckédou",
+          "communes": [
+            {
+              "nom": "Guéckédou Centre",
+              "type": "commune urbaine",
+              "quartiers": []
+            },
+            {
+              "nom": "Bolodou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Fangamadou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Guéndembou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Kassadou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Koundou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Nongoa",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Ouendé Kénéma",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Tékoulo",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Termessadou Djibo",
+              "type": "commune rurale",
+              "quartiers": []
+            }
+          ]
+        },
+        {
+          "nom": "Lola",
+          "communes": [
+            {
+              "nom": "Lola Centre",
+              "type": "commune urbaine",
+              "quartiers": []
+            },
+            {
+              "nom": "Bossou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Foumbadou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Gama Berema",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Guéassou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Kokota",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Laine",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "N'Zoo",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Tounkarata",
+              "type": "commune rurale",
+              "quartiers": []
+            }
+          ]
+        },
+        {
+          "nom": "Macenta",
+          "communes": [
+            {
+              "nom": "Macenta Centre",
+              "type": "commune urbaine",
+              "quartiers": []
+            },
+            {
+              "nom": "Balizia",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Binikala",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Bofossou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Daro",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Fassankoni",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Kouankan",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Koyama",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "N'Zébéla",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Orémaï",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Panziazou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Semgbédou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Sérédou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Vasérédou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Watanka",
+              "type": "commune rurale",
+              "quartiers": []
+            }
+          ]
+        },
+        {
+          "nom": "Yomou",
+          "communes": [
+            {
+              "nom": "Yomou Centre",
+              "type": "commune urbaine",
+              "quartiers": []
+            },
+            {
+              "nom": "Banié",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Bheta",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Bignamou",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Bowé",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Diécké",
+              "type": "commune rurale",
+              "quartiers": []
+            },
+            {
+              "nom": "Péla",
+              "type": "commune rurale",
+              "quartiers": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+} 

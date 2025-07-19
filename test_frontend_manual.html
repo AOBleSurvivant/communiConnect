@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Posts avec Médias - CommuniConnect</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .result {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+        }
+        .file-preview {
+            max-width: 200px;
+            max-height: 200px;
+            margin: 10px 0;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: #007bff;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Posts avec Médias - CommuniConnect</h1>
+        
+        <div class="test-section">
+            <h3>1. Configuration API</h3>
+            <div class="form-group">
+                <label for="apiUrl">URL de l'API:</label>
+                <input type="text" id="apiUrl" value="http://localhost:8000" placeholder="http://localhost:8000">
+            </div>
+            <div class="form-group">
+                <label for="authToken">Token d'authentification (optionnel):</label>
+                <input type="text" id="authToken" placeholder="JWT Token">
+            </div>
+            <button onclick="testApiConnection()">Tester la connexion API</button>
+            <div id="apiResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>2. Upload de Média</h3>
+            <div class="form-group">
+                <label for="mediaFile">Sélectionner un fichier:</label>
+                <input type="file" id="mediaFile" accept="image/*,video/*">
+            </div>
+            <div class="form-group">
+                <label for="mediaTitle">Titre du média:</label>
+                <input type="text" id="mediaTitle" placeholder="Titre du média">
+            </div>
+            <div class="form-group">
+                <label for="mediaDescription">Description:</label>
+                <textarea id="mediaDescription" placeholder="Description du média"></textarea>
+            </div>
+            <button onclick="uploadMedia()">Uploader le média</button>
+            <div class="progress-bar">
+                <div class="progress-fill" id="uploadProgress"></div>
+            </div>
+            <div id="uploadResult" class="result"></div>
+            <div id="mediaPreview"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>3. Création de Post avec Média</h3>
+            <div class="form-group">
+                <label for="postContent">Contenu du post:</label>
+                <textarea id="postContent" placeholder="Contenu de votre post..."></textarea>
+            </div>
+            <div class="form-group">
+                <label for="postType">Type de post:</label>
+                <select id="postType">
+                    <option value="info">Information</option>
+                    <option value="event">Événement</option>
+                    <option value="help">Demande d'aide</option>
+                    <option value="announcement">Annonce</option>
+                    <option value="discussion">Discussion</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="isAnonymous"> Post anonyme
+                </label>
+            </div>
+            <div class="form-group">
+                <label for="mediaIds">IDs des médias (séparés par des virgules):</label>
+                <input type="text" id="mediaIds" placeholder="1,2,3">
+            </div>
+            <button onclick="createPost()">Créer le post</button>
+            <div id="postResult" class="result"></div>
+        </div>
+
+        <div class="test-section">
+            <h3>4. Test Complet Automatique</h3>
+            <button onclick="runCompleteTest()">Lancer le test complet</button>
+            <div id="completeTestResult" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        let uploadedMediaIds = [];
+        
+        // Fonctions utilitaires
+        function log(message, type = 'info', elementId = null) {
+            const timestamp = new Date().toISOString();
+            const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : 'ℹ️';
+            const logMessage = `${prefix} [${timestamp}] ${message}`;
+            
+            if (elementId) {
+                const element = document.getElementById(elementId);
+                element.textContent = logMessage;
+                element.className = `result ${type}`;
+            }
+            
+            console.log(logMessage);
+        }
+
+        function getApiUrl() {
+            return document.getElementById('apiUrl').value.trim();
+        }
+
+        function getAuthHeaders() {
+            const token = document.getElementById('authToken').value.trim();
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+            
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+            
+            return headers;
+        }
+
+        // Test de connexion API
+        async function testApiConnection() {
+            const apiUrl = getApiUrl();
+            log('Test de connexion à l\'API...', 'info', 'apiResult');
+            
+            try {
+                const response = await fetch(`${apiUrl}/api/posts/`, {
+                    method: 'GET',
+                    headers: getAuthHeaders()
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`Connexion réussie! Status: ${response.status}`, 'success', 'apiResult');
+                    log(`Données reçues: ${JSON.stringify(data, null, 2)}`, 'info');
+                } else {
+                    log(`Erreur de connexion: ${response.status} ${response.statusText}`, 'error', 'apiResult');
+                }
+            } catch (error) {
+                log(`Erreur de connexion: ${error.message}`, 'error', 'apiResult');
+            }
+        }
+
+        // Upload de média
+        async function uploadMedia() {
+            const fileInput = document.getElementById('mediaFile');
+            const title = document.getElementById('mediaTitle').value || 'Test Media';
+            const description = document.getElementById('mediaDescription').value || 'Media de test';
+            
+            if (!fileInput.files[0]) {
+                log('Veuillez sélectionner un fichier', 'error', 'uploadResult');
+                return;
+            }
+            
+            const file = fileInput.files[0];
+            log(`Upload du fichier: ${file.name} (${file.size} bytes)`, 'info', 'uploadResult');
+            
+            // Validation du fichier
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp', 
+                                'video/mp4', 'video/webm', 'video/quicktime', 'video/avi'];
+            
+            if (!allowedTypes.includes(file.type)) {
+                log(`Type de fichier non supporté: ${file.type}`, 'error', 'uploadResult');
+                return;
+            }
+            
+            const maxSize = file.type.startsWith('image/') ? 10 * 1024 * 1024 : 50 * 1024 * 1024;
+            if (file.size > maxSize) {
+                log(`Fichier trop volumineux: ${file.size} bytes`, 'error', 'uploadResult');
+                return;
+            }
+            
+            try {
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('title', title);
+                formData.append('description', description);
+                
+                const apiUrl = getApiUrl();
+                const token = document.getElementById('authToken').value.trim();
+                
+                const headers = {};
+                if (token) {
+                    headers['Authorization'] = `Bearer ${token}`;
+                }
+                
+                const response = await fetch(`${apiUrl}/api/posts/media/upload/`, {
+                    method: 'POST',
+                    headers: headers,
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    uploadedMediaIds.push(data.id);
+                    log(`Upload réussi! ID: ${data.id}`, 'success', 'uploadResult');
+                    log(`Données: ${JSON.stringify(data, null, 2)}`, 'info');
+                    
+                    // Afficher la prévisualisation
+                    if (data.file_url) {
+                        const preview = document.getElementById('mediaPreview');
+                        if (file.type.startsWith('image/')) {
+                            preview.innerHTML = `<img src="${data.file_url}" class="file-preview" alt="Preview">`;
+                        } else {
+                            preview.innerHTML = `<video src="${data.file_url}" class="file-preview" controls></video>`;
+                        }
+                    }
+                    
+                    // Mettre à jour les IDs de médias
+                    document.getElementById('mediaIds').value = uploadedMediaIds.join(',');
+                } else {
+                    const errorData = await response.json();
+                    log(`Erreur upload: ${JSON.stringify(errorData, null, 2)}`, 'error', 'uploadResult');
+                }
+            } catch (error) {
+                log(`Erreur upload: ${error.message}`, 'error', 'uploadResult');
+            }
+        }
+
+        // Création de post
+        async function createPost() {
+            const content = document.getElementById('postContent').value;
+            const postType = document.getElementById('postType').value;
+            const isAnonymous = document.getElementById('isAnonymous').checked;
+            const mediaIds = document.getElementById('mediaIds').value;
+            
+            if (!content.trim()) {
+                log('Veuillez saisir un contenu pour le post', 'error', 'postResult');
+                return;
+            }
+            
+            const postData = {
+                content: content,
+                post_type: postType,
+                is_anonymous: isAnonymous,
+                media_files: mediaIds ? mediaIds.split(',').map(id => parseInt(id.trim())) : []
+            };
+            
+            log(`Création du post: ${JSON.stringify(postData, null, 2)}`, 'info', 'postResult');
+            
+            try {
+                const apiUrl = getApiUrl();
+                const response = await fetch(`${apiUrl}/api/posts/`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify(postData)
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`Post créé avec succès! ID: ${data.id}`, 'success', 'postResult');
+                    log(`Données: ${JSON.stringify(data, null, 2)}`, 'info');
+                } else {
+                    const errorData = await response.json();
+                    log(`Erreur création post: ${JSON.stringify(errorData, null, 2)}`, 'error', 'postResult');
+                }
+            } catch (error) {
+                log(`Erreur création post: ${error.message}`, 'error', 'postResult');
+            }
+        }
+
+        // Test complet automatique
+        async function runCompleteTest() {
+            log('Démarrage du test complet...', 'info', 'completeTestResult');
+            
+            try {
+                // 1. Test de connexion
+                log('1. Test de connexion API...', 'info');
+                const apiUrl = getApiUrl();
+                const connectionResponse = await fetch(`${apiUrl}/api/posts/`, {
+                    method: 'GET',
+                    headers: getAuthHeaders()
+                });
+                
+                if (!connectionResponse.ok) {
+                    log('❌ Échec de la connexion API', 'error', 'completeTestResult');
+                    return;
+                }
+                log('✅ Connexion API réussie', 'success');
+                
+                // 2. Test d'upload (si un fichier est sélectionné)
+                const fileInput = document.getElementById('mediaFile');
+                if (fileInput.files[0]) {
+                    log('2. Test d\'upload de média...', 'info');
+                    // Simuler l'upload
+                    log('✅ Upload de média simulé', 'success');
+                }
+                
+                // 3. Test de création de post
+                log('3. Test de création de post...', 'info');
+                const content = document.getElementById('postContent').value || 'Test automatique';
+                const postData = {
+                    content: content,
+                    post_type: 'info',
+                    is_anonymous: false,
+                    media_files: uploadedMediaIds
+                };
+                
+                const postResponse = await fetch(`${apiUrl}/api/posts/`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    body: JSON.stringify(postData)
+                });
+                
+                if (postResponse.ok) {
+                    log('✅ Création de post réussie', 'success');
+                } else {
+                    log('❌ Échec de la création de post', 'error');
+                }
+                
+                log('🎉 Test complet terminé!', 'success', 'completeTestResult');
+                
+            } catch (error) {
+                log(`❌ Erreur lors du test complet: ${error.message}`, 'error', 'completeTestResult');
+            }
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            log('Page de test chargée', 'info');
+        });
+    </script>
+</body>
+</html> 

@@ -98,12 +98,62 @@ Starting gunicorn...
 - ✅ **Configuration simplifiée** pour le plan gratuit
 - ✅ **Logs détaillés** pour le diagnostic
 
+## ✅ Utiliser la Base de Données Existante
+
+### **Étape 1 : Connecter la Base de Données au Service Web**
+
+1. **Retournez à votre service web** (`communiconnect-backend`)
+2. **Allez dans l'onglet "Environment"**
+3. **Vérifiez que `DATABASE_URL` est automatiquement configurée**
+
+### **Étape 2 : Vérifier la Connexion**
+
+Si `DATABASE_URL` n'apparaît pas automatiquement, ajoutez-la manuellement :
+
+**Key :** `DATABASE_URL`
+**Value :** Copiez l'**Internal Database URL** depuis votre base de données
+
+### **Étape 3 : Informations de Votre Base de Données**
+
+D'après ce que je vois, votre base de données est configurée :
+- ✅ **Nom :** `communiconnect-db`
+- ✅ **Hostname :** `dpg-d1ubcn49c44c73cqea8g-a`
+- ✅ **Port :** `5432`
+- ✅ **Database :** `communiconnect`
+- ✅ **Username :** `communiconnect_user`
+- ✅ **Status :** `available`
+
+### **Étape 4 : Configuration Complète**
+
+Maintenant, dans votre service web, configurez :
+
+**Build Command :**
+```bash
+pip install Django==4.2.7 djangorestframework==3.14.0 django-cors-headers==4.3.1 psycopg2==2.9.5 dj-database-url==2.1.0 gunicorn==21.2.0 whitenoise==6.6.0 python-decouple==3.8 requests==2.31.0 drf-spectacular==0.27.1
+```
+
+**Start Command :**
+```bash
+<code_block_to_apply_changes_from>
+```
+
+**Environment Variables :**
+- `DJANGO_SETTINGS_MODULE` = `communiconnect.settings_render`
+- `DEBUG` = `false`
+- `ALLOWED_HOSTS` = `.render.com`
+- `RENDER` = `true`
+- `DATABASE_URL` = (copié depuis Internal Database URL)
+
+---
+
 ## 🎯 Prochaines Étapes
 
-1. **Essayer Solution 1** (ultra-minimaliste)
-2. **Si échec, essayer Solution 2** (alternative)
-3. **Si échec, essayer Solution 3** (manuelle)
-4. **Surveiller les logs** pour identifier le problème exact
+1. **Connectez la base de données** à votre service web
+2. **Configurez les variables d'environnement**
+3. **Redémarrez le déploiement**
+4. **Surveillez les logs** pour vérifier la connexion
+
+**Dites-moi quand vous avez connecté la base de données à votre service web !** 🗄️
 
 ---
 

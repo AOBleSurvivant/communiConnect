@@ -1,13 +1,13 @@
-# Requirements pour Render - CommuniConnect
-# Version ultra-minimaliste pour éviter les problèmes de compilation
+# Requirements pour Render - CommuniConnect (Alternative)
+# Version avec psycopg2 au lieu de psycopg2-binary
 
 # Django et extensions essentielles
 Django==4.2.7
 djangorestframework==3.14.0
 django-cors-headers==4.3.1
 
-# Base de données (version la plus stable)
-psycopg2-binary==2.9.5
+# Base de données (version alternative)
+psycopg2==2.9.5
 dj-database-url==2.1.0
 
 # Serveur de production

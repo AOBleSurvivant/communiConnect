@@ -3,7 +3,7 @@ services:
     name: communiconnect-backend
     env: python
     plan: free
-    buildCommand: pip install -r requirements_render.txt
+    buildCommand: pip install Django==4.2.7 djangorestframework==3.14.0 django-cors-headers==4.3.1 psycopg==3.1.18 dj-database-url==2.1.0 gunicorn==21.2.0 whitenoise==6.6.0 python-decouple==3.8 requests==2.31.0 drf-spectacular==0.27.1 djangorestframework-simplejwt==5.3.0 setuptools geoip2==4.8.0 Pillow==10.4.0
     startCommand: cd backend && python manage.py migrate && python manage.py collectstatic --noinput && gunicorn communiconnect.wsgi:application --bind 0.0.0.0:$PORT
     envVars:
       - key: PYTHON_VERSION

@@ -9,6 +9,7 @@ def home(request):
     return JsonResponse({
         'message': 'CommuniConnect API',
         'version': '1.0.0',
+        'status': 'running',
         'endpoints': {
             'health': '/api/health/',
             'docs': '/api/docs/',
@@ -18,8 +19,16 @@ def home(request):
         }
     })
 
+def test_api(request):
+    return JsonResponse({
+        'status': 'ok',
+        'message': 'API test endpoint working',
+        'timestamp': '2025-01-19'
+    })
+
 urlpatterns = [
     path('', home, name='home'),
+    path('test/', test_api, name='test'),
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
     

@@ -2,9 +2,24 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.http import JsonResponse
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 
+def home(request):
+    return JsonResponse({
+        'message': 'CommuniConnect API',
+        'version': '1.0.0',
+        'endpoints': {
+            'health': '/api/health/',
+            'docs': '/api/docs/',
+            'admin': '/admin/',
+            'posts': '/api/posts/',
+            'users': '/api/users/'
+        }
+    })
+
 urlpatterns = [
+    path('', home, name='home'),
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
     

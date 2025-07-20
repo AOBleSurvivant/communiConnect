@@ -13,7 +13,7 @@ services:
       - key: DEBUG
         value: false
       - key: ALLOWED_HOSTS
-        value: .render.com
+        value: .render.com,communiconnect-13.onrender.com,communiconnect-14.onrender.com,*
       - key: SECRET_KEY
         generateValue: true
       - key: DATABASE_URL

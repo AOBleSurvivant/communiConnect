@@ -23,6 +23,16 @@ services:
       - key: RENDER
         value: true
 
+  - type: web
+    name: communiconnect-frontend
+    env: static
+    plan: free
+    buildCommand: cd frontend && npm install && npm run build
+    startCommand: cd frontend && npx serve -s build -l $PORT
+    envVars:
+      - key: REACT_APP_API_URL
+        value: https://communiconnect-backend.onrender.com/api
+
 databases:
   - name: communiconnect-db
     plan: free

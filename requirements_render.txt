@@ -1,54 +1,30 @@
 # Requirements pour Render - CommuniConnect
-# Optimisé pour l'environnement gratuit Render
+# Version simplifiée et stable pour Render
 
 # Django et extensions
 Django==4.2.7
 djangorestframework==3.14.0
-djangorestframework-simplejwt==5.3.0
 django-cors-headers==4.3.1
 django-filter==23.3
 
-# Base de données
-psycopg2-binary==2.9.7
+# Base de données (version stable)
+psycopg2-binary==2.9.6
 dj-database-url==2.1.0
 
 # Serveur de production
 gunicorn==21.2.0
 whitenoise==6.6.0
 
-# Sécurité et authentification
-PyJWT==2.8.0
-
-# Utilitaires
+# Utilitaires essentiels
 python-decouple==3.8
 Pillow==10.0.1
 
 # API et communication
 requests==2.31.0
-urllib3==2.0.7
 
-# Logging et monitoring
-sentry-sdk==1.38.0
+# Cache (version stable)
+redis==4.6.0
 
-# Cache et performance (optimisé pour Render gratuit)
-redis==5.0.1
-
-# Géolocalisation
-geopy==2.4.0
-
-# Validation et sérialisation
-marshmallow==3.20.1
-
-# Tests
+# Tests (optionnel)
 pytest==7.4.3
-pytest-django==4.7.0
-
-# Optimisations pour Render
-# Désactivé pour économiser les ressources gratuites
-# psutil==5.9.6
-# scikit-learn==1.3.2
-# cryptography==41.0.7
-# pyotp==2.9.0
-# qrcode==7.4.2
-# geoip2==4.7.0
-# user-agents==2.2.0 
+pytest-django==4.7.0 

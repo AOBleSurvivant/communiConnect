@@ -1,0 +1,21 @@
+# Requirements pour Render - CommuniConnect (Ultra-Minimaliste)
+# Version sans Pillow pour éviter les problèmes de compilation
+
+# Django et extensions essentielles
+Django==4.2.7
+djangorestframework==3.14.0
+django-cors-headers==4.3.1
+
+# Base de données (version stable)
+psycopg2==2.9.5
+dj-database-url==2.1.0
+
+# Serveur de production
+gunicorn==21.2.0
+whitenoise==6.6.0
+
+# Utilitaires essentiels
+python-decouple==3.8
+
+# API et communication
+requests==2.31.0 

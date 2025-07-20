@@ -1,6 +1,6 @@
 """
 Settings pour Render - CommuniConnect
-Optimisé pour l'environnement gratuit Render
+Optimisé pour l'environnement gratuit Render (sans Pillow)
 """
 
 import os
@@ -49,7 +49,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-    'django_filters',
     'users',
     'geography',
     'api',
@@ -106,7 +105,7 @@ STATICFILES_DIRS = [
 # Configuration WhiteNoise pour les fichiers statiques
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-# Configuration des médias
+# Configuration des médias (sans Pillow)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
@@ -181,9 +180,6 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
-    'DEFAULT_FILTER_BACKENDS': [
-        'django_filters.rest_framework.DjangoFilterBackend',
-    ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
 }
@@ -206,7 +202,7 @@ STATICFILES_FINDERS = [
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 
-# Configuration des médias (optimisée pour Render)
+# Configuration des médias (optimisée pour Render - sans Pillow)
 DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 # Configuration des emails (désactivée pour Render gratuit)

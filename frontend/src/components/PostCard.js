@@ -1,39 +1,34 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { postsAPI, sharePost, repostPost, unsharePost, sharePostExternal, generateShareLinks, getPostAnalytics, updatePost } from '../services/postsAPI';
+import { postsAPI, sharePost, repostPost, sharePostExternal, generateShareLinks, getPostAnalytics } from '../services/postsAPI';
 import MediaGallery from './MediaGallery';
-import EditPostModal from './EditPostModal';
-import { 
-  Heart, 
-  MessageCircle, 
-  Eye, 
-  MoreVertical,
-  Calendar,
-  HelpCircle,
-  AlertCircle,
-  Users,
-  MessageCircle as DiscussionIcon,
-  Video,
-  Image,
-  Play,
-  Globe,
-  Users as UsersIcon,
-  Lock,
-  EyeOff,
-  Share,
-  Repeat,
-  ExternalLink,
-  Copy,
-  Mail,
-  MessageSquare,
-  BarChart3,
-  Flame,
-  Zap,
-  TrendingUp,
-  Edit,
-  Trash2,
-  AlertTriangle
-} from 'lucide-react';
+  import { 
+    Heart, 
+    MessageCircle, 
+    Eye, 
+    MoreVertical,
+    Calendar,
+    HelpCircle,
+    AlertCircle,
+    Users,
+    MessageCircle as DiscussionIcon,
+    Video,
+    Globe,
+    Users as UsersIcon,
+    Lock,
+    Share,
+    ExternalLink,
+    Copy,
+    Mail,
+    MessageSquare,
+    BarChart3,
+    Flame,
+    Zap,
+    TrendingUp,
+    Edit,
+    Trash2,
+    AlertTriangle
+  } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 // Fonction utilitaire pour vérifier si un post peut être modifié
@@ -68,19 +63,18 @@ const PostCard = ({ post, onUpdate }) => {
   const [postAnalytics, setPostAnalytics] = useState(null);
   const [loadingAnalytics, setLoadingAnalytics] = useState(false);
   
-  // États pour la modification
-  const [isEditing, setIsEditing] = useState(false);
-  const [editContent, setEditContent] = useState(post.content || '');
-  const [editTitle, setEditTitle] = useState(post.title || '');
-  const [editPostType, setEditPostType] = useState(post.post_type || 'info');
-  const [isSavingEdit, setIsSavingEdit] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
+
 
   // États pour la suppression
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef(null);
+
+  // Fonction pour l'édition (placeholder)
+  const handleEditPost = () => {
+    toast.info('Fonctionnalité d\'édition en cours de développement');
+  };
 
   // Gestion des clics en dehors du menu
   useEffect(() => {
@@ -108,49 +102,9 @@ const PostCard = ({ post, onUpdate }) => {
     );
   }
 
-  // Fonctions pour la modification
-  const handleEditPost = () => {
-    setEditContent(post.content || '');
-    setEditTitle(post.title || '');
-    setEditPostType(post.post_type || 'info');
-    setShowEditModal(true);
-  };
 
-  const handleSaveEdit = async () => {
-    if (!editContent.trim() || !post?.id) return;
-    
-    setIsSavingEdit(true);
-    try {
-      const updatedPost = await postsAPI.updatePost(post.id, {
-        content: editContent,
-        title: editTitle,
-        post_type: editPostType
-      });
-      
-      toast.success('Post modifié avec succès !');
-      setShowEditModal(false);
-      
-      if (onUpdate) {
-        onUpdate();
-      }
-    } catch (error) {
-      console.error('Erreur lors de la modification:', error);
-      if (error.response?.data?.detail) {
-        toast.error(error.response.data.detail);
-      } else {
-        toast.error('Erreur lors de la modification du post');
-      }
-    } finally {
-      setIsSavingEdit(false);
-    }
-  };
 
-  const handleCancelEdit = () => {
-    setShowEditModal(false);
-    setEditContent(post.content || '');
-    setEditTitle(post.title || '');
-    setEditPostType(post.post_type || 'info');
-  };
+
 
   // Fonctions pour la suppression
   const handleDeletePost = () => {
@@ -340,24 +294,7 @@ const PostCard = ({ post, onUpdate }) => {
     }
   };
 
-  const handleUnshare = async () => {
-    if (isSharing || !post?.id) return;
-    
-    setIsSharing(true);
-    try {
-      await unsharePost(post.id);
-      toast.success('Partage supprimé !');
-      
-      if (onUpdate) {
-        onUpdate();
-      }
-    } catch (error) {
-      console.error('Erreur lors de la suppression du partage:', error);
-      toast.error('Erreur lors de la suppression du partage');
-    } finally {
-      setIsSharing(false);
-    }
-  };
+
 
   const handleExternalShare = async (platform) => {
     if (isSharingExternal || !post?.id) return;

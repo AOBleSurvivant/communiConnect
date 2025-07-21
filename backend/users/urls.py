@@ -7,10 +7,10 @@ urlpatterns = [
     # Inscription et authentification
     path('register/', views.UserRegistrationView.as_view(), name='register'),
     path('login/', views.UserLoginView.as_view(), name='login'),
-    path('logout/', views.logout_view, name='logout'),
+    path('logout/', views.LogoutView.as_view(), name='logout'),
     
     # Profils utilisateurs
-    path('profile/', views.UserProfileView.as_view(), name='profile'),
+    path('my-profile/', views.UserProfileView.as_view(), name='my-profile'),
     path('profile/<int:pk>/', views.UserDetailView.as_view(), name='user-detail'),
     
     # Recherche et suggestions
@@ -33,7 +33,7 @@ urlpatterns = [
     path('unblock/', views.UnblockUserView.as_view(), name='unblock-user'),
     
     # Statut des relations
-    path('relationship-status/<int:user_id>/', views.user_relationships_status, name='relationship-status'),
+    path('relationship-status/<int:user_id>/', views.UserRelationshipsStatusView.as_view(), name='relationship-status'),
     
     # Statistiques
     path('stats/<int:user_id>/', views.UserStatsView.as_view(), name='user-stats'),
@@ -41,5 +41,5 @@ urlpatterns = [
     # Données géographiques et tableau de bord
     path('geographic-data/', views.GeographicDataView.as_view(), name='geographic-data'),
     path('verify-geographic/', views.GeographicVerificationView.as_view(), name='verify-geographic'),
-    path('dashboard/', views.user_dashboard_data, name='dashboard'),
+    path('dashboard/', views.UserDashboardDataView.as_view(), name='dashboard'),
 ] 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Users, MapPin, Shield, MessageCircle, Heart } from 'lucide-react';
+import { Users, MapPin, MessageCircle, Heart } from 'lucide-react';
 
 const Home = () => {
   return (

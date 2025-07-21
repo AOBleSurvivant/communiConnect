@@ -10,8 +10,7 @@ import {
   Save, 
   X,
   Camera,
-  Shield,
-  Settings
+  Shield
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -160,7 +159,7 @@ const Profile = () => {
                 {user?.profile_picture ? (
                   <img 
                     src={user.profile_picture} 
-                    alt="Photo de profil" 
+                    alt="Profil" 
                     className="w-24 h-24 rounded-full object-cover"
                   />
                 ) : (

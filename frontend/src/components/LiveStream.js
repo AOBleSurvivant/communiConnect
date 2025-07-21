@@ -2,23 +2,16 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { mediaAPI } from '../services/mediaAPI';
 import { 
-  Video, 
-  VideoOff, 
   Mic, 
   MicOff, 
   Camera, 
   CameraOff,
   Play,
   Square,
-  Settings,
-  Users,
   MessageCircle,
   Send,
   X,
   Volume2,
-  VolumeX,
-  Share,
-  MoreVertical,
   Sliders,
   Monitor,
   Wifi,
@@ -37,7 +30,7 @@ const LiveStream = ({ isOpen, onClose, onLiveStarted }) => {
   const [showChat, setShowChat] = useState(true);
   const [isMuted, setIsMuted] = useState(false);
   const [isVideoEnabled, setIsVideoEnabled] = useState(true);
-  const [viewersCount, setViewersCount] = useState(0);
+  const [viewersCount] = useState(0);
   const [chatMessages, setChatMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   
@@ -81,26 +74,9 @@ const LiveStream = ({ isOpen, onClose, onLiveStarted }) => {
         URL.revokeObjectURL(recordedVideo);
       }
     };
-  }, [isOpen, recordedVideo]);
+  }, [isOpen, recordedVideo, stream]);
 
-  // Effet pour le chronomètre du live
-  useEffect(() => {
-    let interval;
-    
-    if (isLive && liveStartTime) {
-      interval = setInterval(() => {
-        const now = Date.now();
-        const duration = Math.floor((now - liveStartTime) / 1000);
-        setLiveDuration(duration);
-      }, 1000);
-    }
-    
-    return () => {
-      if (interval) {
-        clearInterval(interval);
-      }
-    };
-  }, [isLive, liveStartTime]);
+
 
   const startCamera = async () => {
     // Vérifier que l'API getUserMedia est disponible
@@ -256,7 +232,7 @@ const LiveStream = ({ isOpen, onClose, onLiveStarted }) => {
         mediaRecorderRef.current.stop();
       }
 
-      const response = await mediaAPI.stopLive(liveData.live_id);
+      await mediaAPI.stopLive(liveData.live_id);
       setIsLive(false);
       setLiveData(null);
       setLiveStartTime(null); // Arrêter le chronomètre

@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from drf_spectacular.utils import extend_schema_field
+from drf_spectacular.types import OpenApiTypes
 from .models import User, UserProfile, GeographicVerification, UserRelationship
 
 User = get_user_model()
@@ -7,12 +9,12 @@ User = get_user_model()
 
 class UserSerializer(serializers.ModelSerializer):
     """Sérialiseur pour les utilisateurs"""
-    full_name = serializers.ReadOnlyField()
-    location_info = serializers.ReadOnlyField()
-    is_ambassador = serializers.ReadOnlyField()
-    is_admin = serializers.ReadOnlyField()
-    followers_count = serializers.ReadOnlyField()
-    following_count = serializers.ReadOnlyField()
+    full_name = serializers.SerializerMethodField()
+    location_info = serializers.SerializerMethodField()
+    is_ambassador = serializers.SerializerMethodField()
+    is_admin = serializers.SerializerMethodField()
+    followers_count = serializers.SerializerMethodField()
+    following_count = serializers.SerializerMethodField()
     is_following = serializers.SerializerMethodField()
     can_follow = serializers.SerializerMethodField()
     
@@ -31,6 +33,39 @@ class UserSerializer(serializers.ModelSerializer):
             'followers_count', 'following_count', 'is_following', 'can_follow'
         ]
     
+    @extend_schema_field(OpenApiTypes.STR)
+    def get_full_name(self, obj):
+        """Retourne le nom complet de l'utilisateur"""
+        return f"{obj.first_name} {obj.last_name}".strip()
+    
+    @extend_schema_field(OpenApiTypes.STR)
+    def get_location_info(self, obj):
+        """Retourne les informations de localisation"""
+        if obj.quartier:
+            return f"{obj.quartier.nom}, {obj.quartier.commune.nom}"
+        return "Non spécifié"
+    
+    @extend_schema_field(OpenApiTypes.BOOL)
+    def get_is_ambassador(self, obj):
+        """Indique si l'utilisateur est ambassadeur"""
+        return obj.role == 'ambassador'
+    
+    @extend_schema_field(OpenApiTypes.BOOL)
+    def get_is_admin(self, obj):
+        """Indique si l'utilisateur est administrateur"""
+        return obj.role == 'admin'
+    
+    @extend_schema_field(OpenApiTypes.INT)
+    def get_followers_count(self, obj):
+        """Retourne le nombre de followers"""
+        return obj.followers.count()
+    
+    @extend_schema_field(OpenApiTypes.INT)
+    def get_following_count(self, obj):
+        """Retourne le nombre d'utilisateurs suivis"""
+        return obj.following.count()
+    
+    @extend_schema_field(OpenApiTypes.BOOL)
     def get_is_following(self, obj):
         """Vérifie si l'utilisateur connecté suit cet utilisateur"""
         request = self.context.get('request')
@@ -38,6 +73,7 @@ class UserSerializer(serializers.ModelSerializer):
             return request.user.is_following(obj)
         return False
     
+    @extend_schema_field(OpenApiTypes.BOOL)
     def get_can_follow(self, obj):
         """Vérifie si l'utilisateur connecté peut suivre cet utilisateur"""
         request = self.context.get('request')
@@ -93,7 +129,6 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     """Sérialiseur pour le profil utilisateur"""
     user = UserSerializer(read_only=True)
-    connections_count = serializers.ReadOnlyField()
     
     class Meta:
         model = UserProfile
@@ -102,7 +137,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
             'show_phone', 'show_email', 'show_location',
             'posts_count', 'connections_count', 'created_at', 'updated_at'
         ]
-        read_only_fields = ['id', 'user', 'posts_count', 'connections_count', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'user', 'created_at', 'updated_at']
 
 
 class UserRelationshipSerializer(serializers.ModelSerializer):
@@ -148,7 +183,7 @@ class UnfollowUserSerializer(serializers.Serializer):
 
 class UserSearchSerializer(serializers.ModelSerializer):
     """Sérialiseur pour la recherche d'utilisateurs"""
-    full_name = serializers.ReadOnlyField()
+    full_name = serializers.SerializerMethodField()
     is_following = serializers.SerializerMethodField()
     can_follow = serializers.SerializerMethodField()
     
@@ -159,6 +194,12 @@ class UserSearchSerializer(serializers.ModelSerializer):
             'profile_picture', 'quartier', 'is_following', 'can_follow'
         ]
     
+    @extend_schema_field(OpenApiTypes.STR)
+    def get_full_name(self, obj):
+        """Retourne le nom complet de l'utilisateur"""
+        return f"{obj.first_name} {obj.last_name}".strip()
+    
+    @extend_schema_field(OpenApiTypes.BOOL)
     def get_is_following(self, obj):
         """Vérifie si l'utilisateur connecté suit cet utilisateur"""
         request = self.context.get('request')
@@ -166,6 +207,7 @@ class UserSearchSerializer(serializers.ModelSerializer):
             return request.user.is_following(obj)
         return False
     
+    @extend_schema_field(OpenApiTypes.BOOL)
     def get_can_follow(self, obj):
         """Vérifie si l'utilisateur connecté peut suivre cet utilisateur"""
         request = self.context.get('request')
@@ -176,7 +218,7 @@ class UserSearchSerializer(serializers.ModelSerializer):
 
 class SuggestedFriendsSerializer(serializers.ModelSerializer):
     """Sérialiseur pour les suggestions d'amis"""
-    full_name = serializers.ReadOnlyField()
+    full_name = serializers.SerializerMethodField()
     quartier_name = serializers.CharField(source='quartier.nom', read_only=True)
     commune_name = serializers.CharField(source='quartier.commune.nom', read_only=True)
     
@@ -186,6 +228,11 @@ class SuggestedFriendsSerializer(serializers.ModelSerializer):
             'id', 'username', 'first_name', 'last_name', 'full_name',
             'profile_picture', 'quartier_name', 'commune_name'
         ]
+    
+    @extend_schema_field(OpenApiTypes.STR)
+    def get_full_name(self, obj):
+        """Retourne le nom complet de l'utilisateur"""
+        return f"{obj.first_name} {obj.last_name}".strip()
 
 
 class GeographicVerificationSerializer(serializers.ModelSerializer):
@@ -203,10 +250,10 @@ class GeographicVerificationSerializer(serializers.ModelSerializer):
 
 class UserStatsSerializer(serializers.ModelSerializer):
     """Sérialiseur pour les statistiques utilisateur"""
-    followers_count = serializers.ReadOnlyField()
-    following_count = serializers.ReadOnlyField()
-    posts_count = serializers.ReadOnlyField()
-    connections_count = serializers.ReadOnlyField()
+    followers_count = serializers.SerializerMethodField()
+    following_count = serializers.SerializerMethodField()
+    posts_count = serializers.SerializerMethodField()
+    connections_count = serializers.SerializerMethodField()
     
     class Meta:
         model = User
@@ -214,3 +261,23 @@ class UserStatsSerializer(serializers.ModelSerializer):
             'id', 'username', 'followers_count', 'following_count',
             'posts_count', 'connections_count'
         ] 
+    
+    @extend_schema_field(OpenApiTypes.INT)
+    def get_followers_count(self, obj):
+        """Retourne le nombre de followers"""
+        return obj.followers.count()
+    
+    @extend_schema_field(OpenApiTypes.INT)
+    def get_following_count(self, obj):
+        """Retourne le nombre d'utilisateurs suivis"""
+        return obj.following.count()
+    
+    @extend_schema_field(OpenApiTypes.INT)
+    def get_posts_count(self, obj):
+        """Retourne le nombre de posts"""
+        return obj.posts.count()
+    
+    @extend_schema_field(OpenApiTypes.INT)
+    def get_connections_count(self, obj):
+        """Retourne le nombre de connexions"""
+        return obj.get_followers_count() + obj.get_following_count() 

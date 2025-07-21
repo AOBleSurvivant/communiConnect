@@ -3,7 +3,7 @@ services:
     name: communiconnect-backend
     env: python
     plan: free
-    buildCommand: pip install -r backend/requirements.txt
+    buildCommand: pip install -r requirements_render.txt
     startCommand: cd backend && python manage.py migrate && python manage.py collectstatic --noinput && gunicorn communiconnect.wsgi:application --bind 0.0.0.0:$PORT
     envVars:
       - key: PYTHON_VERSION

@@ -19,28 +19,30 @@ export const AuthProvider = ({ children }) => {
 
   // Vérifier l'authentification au chargement
   useEffect(() => {
+    const checkAuthStatus = () => {
+      try {
+        const token = tokenService.getAccessToken();
+        const savedUser = userService.getUser();
+        
+        if (token && savedUser) {
+          setUser(savedUser);
+          setIsAuthenticated(true);
+        } else {
+          // Nettoyer les données si pas de token
+          logout();
+        }
+      } catch (error) {
+        console.error('Erreur lors de la vérification de l\'authentification:', error);
+        logout();
+      } finally {
+        setLoading(false);
+      }
+    };
+    
     checkAuthStatus();
   }, []);
 
-  const checkAuthStatus = () => {
-    try {
-      const token = tokenService.getAccessToken();
-      const savedUser = userService.getUser();
-      
-      if (token && savedUser) {
-        setUser(savedUser);
-        setIsAuthenticated(true);
-      } else {
-        // Nettoyer les données si pas de token
-        logout();
-      }
-    } catch (error) {
-      console.error('Erreur lors de la vérification de l\'authentification:', error);
-      logout();
-    } finally {
-      setLoading(false);
-    }
-  };
+
 
   const register = async (userData) => {
     try {

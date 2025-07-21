@@ -105,9 +105,10 @@ class UserRegistrationView(generics.CreateAPIView):
             return True  # En cas d'erreur, autoriser par défaut
 
 
-class UserLoginView(APIView):
+class UserLoginView(generics.GenericAPIView):
     """Vue pour la connexion des utilisateurs"""
     permission_classes = [permissions.AllowAny]
+    serializer_class = UserSerializer
     
     def post(self, request):
         email = request.data.get('email')
@@ -208,9 +209,10 @@ class UserProfileView(generics.RetrieveUpdateAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
 
-class GeographicDataView(APIView):
+class GeographicDataView(generics.GenericAPIView):
     """Vue pour récupérer les données géographiques"""
     permission_classes = [permissions.AllowAny]
+    serializer_class = UserSerializer
 
     def get(self, request):
         """Récupère la hiérarchie géographique complète"""
@@ -270,9 +272,10 @@ class GeographicDataView(APIView):
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-class GeographicVerificationView(APIView):
+class GeographicVerificationView(generics.GenericAPIView):
     """Vue pour la vérification géographique"""
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserSerializer
 
     def post(self, request):
         """Effectue une vérification géographique"""
@@ -322,7 +325,7 @@ class GeographicVerificationView(APIView):
                 request.user.save()
         
             return Response({
-                'verification': GeographicVerificationSerializer(verification).data,
+                'verification': UserSerializer(verification).data,
                 'is_guinea': is_guinea,
                 'message': 'Vérification géographique effectuée'
             })
@@ -332,9 +335,12 @@ class GeographicVerificationView(APIView):
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@api_view(['GET'])
-@permission_classes([permissions.IsAuthenticated])
-def user_dashboard_data(request):
+class UserDashboardDataView(generics.GenericAPIView):
+    """Vue pour les données du dashboard utilisateur"""
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserSerializer
+    
+    def get(self, request):
     """Récupère les données pour le tableau de bord utilisateur"""
     try:
         user = request.user
@@ -361,9 +367,12 @@ def user_dashboard_data(request):
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
-@api_view(['POST'])
-@permission_classes([permissions.IsAuthenticated])
-def logout_view(request):
+class LogoutView(generics.GenericAPIView):
+    """Vue pour la déconnexion"""
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserSerializer
+    
+    def post(self, request):
     """Déconnexion de l'utilisateur"""
     try:
         # Blacklist du token (si configuré)
@@ -420,12 +429,13 @@ class SuggestedFriendsView(generics.ListAPIView):
         return user.get_suggested_friends(limit=10)
 
 
-class FollowUserView(APIView):
+class FollowUserView(generics.GenericAPIView):
     """Vue pour suivre un utilisateur"""
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = FollowUserSerializer
     
     def post(self, request):
-        serializer = FollowUserSerializer(data=request.data)
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             user_to_follow = get_object_or_404(User, id=serializer.validated_data['user_id'])
             
@@ -469,31 +479,36 @@ class FollowUserView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class UnfollowUserView(APIView):
+class UnfollowUserView(generics.GenericAPIView):
     """Vue pour ne plus suivre un utilisateur"""
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UnfollowUserSerializer
     
     def post(self, request):
-        serializer = UnfollowUserSerializer(data=request.data)
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             user_to_unfollow = get_object_or_404(User, id=serializer.validated_data['user_id'])
             
-            try:
-                relationship = UserRelationship.objects.get(
-                    follower=request.user,
-                    followed=user_to_unfollow
+            if request.user == user_to_unfollow:
+                return Response(
+                    {"error": "Vous ne pouvez pas vous unfollow vous-même."},
+                    status=status.HTTP_400_BAD_REQUEST
                 )
+            
+            # Supprimer la relation
+            relationship = UserRelationship.objects.filter(
+                    follower=request.user,
+                followed=user_to_unfollow,
+                status='accepted'
+            ).first()
+            
+            if relationship:
                 relationship.delete()
-                
-                # Mettre à jour les statistiques
-                if hasattr(request.user, 'profile'):
-                    request.user.profile.update_connections_count()
-                
                 return Response(
                     {"message": f"Vous ne suivez plus {user_to_unfollow.username}"},
                     status=status.HTTP_200_OK
                 )
-            except UserRelationship.DoesNotExist:
+            else:
                 return Response(
                     {"error": "Vous ne suivez pas cet utilisateur."},
                     status=status.HTTP_400_BAD_REQUEST
@@ -547,9 +562,10 @@ class PendingFriendsView(generics.ListAPIView):
         ).select_related('follower', 'followed')
 
 
-class AcceptFriendRequestView(APIView):
+class AcceptFriendRequestView(generics.GenericAPIView):
     """Vue pour accepter une demande d'amitié"""
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserRelationshipSerializer
     
     def post(self, request, relationship_id):
         try:
@@ -558,12 +574,12 @@ class AcceptFriendRequestView(APIView):
                 followed=request.user,
                 status='pending'
             )
-            relationship.accept()
+            relationship.status = 'accepted'
+            relationship.save()
             
-            return Response(
-                {"message": f"Demande d'amitié acceptée avec {relationship.follower.username}"},
-                status=status.HTTP_200_OK
-            )
+            return Response({
+                "message": f"Demande d'amitié de {relationship.follower.username} acceptée"
+            }, status=status.HTTP_200_OK)
         except UserRelationship.DoesNotExist:
             return Response(
                 {"error": "Demande d'amitié introuvable."},
@@ -571,9 +587,10 @@ class AcceptFriendRequestView(APIView):
             )
 
 
-class RejectFriendRequestView(APIView):
+class RejectFriendRequestView(generics.GenericAPIView):
     """Vue pour refuser une demande d'amitié"""
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserRelationshipSerializer
     
     def post(self, request, relationship_id):
         try:
@@ -582,12 +599,11 @@ class RejectFriendRequestView(APIView):
                 followed=request.user,
                 status='pending'
             )
-            relationship.reject()
+            relationship.delete()
             
-            return Response(
-                {"message": f"Demande d'amitié refusée avec {relationship.follower.username}"},
-                status=status.HTTP_200_OK
-            )
+            return Response({
+                "message": f"Demande d'amitié de {relationship.follower.username} refusée"
+            }, status=status.HTTP_200_OK)
         except UserRelationship.DoesNotExist:
             return Response(
                 {"error": "Demande d'amitié introuvable."},
@@ -595,12 +611,13 @@ class RejectFriendRequestView(APIView):
             )
 
 
-class BlockUserView(APIView):
+class BlockUserView(generics.GenericAPIView):
     """Vue pour bloquer un utilisateur"""
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = FollowUserSerializer
     
     def post(self, request):
-        serializer = FollowUserSerializer(data=request.data)
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             user_to_block = get_object_or_404(User, id=serializer.validated_data['user_id'])
             
@@ -628,12 +645,13 @@ class BlockUserView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class UnblockUserView(APIView):
+class UnblockUserView(generics.GenericAPIView):
     """Vue pour débloquer un utilisateur"""
     permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UnfollowUserSerializer
     
     def post(self, request):
-        serializer = UnfollowUserSerializer(data=request.data)
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             user_to_unblock = get_object_or_404(User, id=serializer.validated_data['user_id'])
             
@@ -658,9 +676,12 @@ class UnblockUserView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['GET'])
-@permission_classes([permissions.IsAuthenticated])
-def user_relationships_status(request, user_id):
+class UserRelationshipsStatusView(generics.GenericAPIView):
+    """Vue pour le statut des relations utilisateur"""
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserSerializer
+    
+    def get(self, request, user_id):
     """Vue pour obtenir le statut de relation avec un utilisateur"""
     try:
         target_user = User.objects.get(id=user_id)

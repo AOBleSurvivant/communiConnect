@@ -8,29 +8,16 @@ import {
   HelpCircle, 
   AlertCircle, 
   Users,
-  Send,
   X,
   Image,
-  Trash2,
-  Video as VideoIcon,
-  Video,
-  Camera,
-  Smile,
-  MapPin,
   Globe,
   Users as UsersIcon,
-  Lock,
-  Upload,
-  Play,
-  Pause,
-  Volume2,
-  VolumeX
+  Lock
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const MAX_IMAGE_SIZE = 10 * 1024 * 1024; // 10MB
 const MAX_VIDEO_SIZE = 50 * 1024 * 1024; // 50MB
-const MAX_VIDEO_DURATION = 60; // 60 secondes
 const MAX_FILES_PER_POST = 5; // Maximum 5 fichiers par post
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
 const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/quicktime', 'video/avi'];

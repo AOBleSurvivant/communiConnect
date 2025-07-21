@@ -15,9 +15,9 @@ class MediaSerializer(serializers.ModelSerializer):
     
     Inclut les URLs CDN et les métadonnées optimisées
     """
-    file_url = serializers.ReadOnlyField(help_text="URL du fichier (CDN en priorité)")
-    thumbnail_url = serializers.ReadOnlyField(help_text="URL de la miniature (pour vidéos)")
-    is_approved_for_publication = serializers.ReadOnlyField(help_text="Indique si le média peut être publié")
+    file_url = serializers.SerializerMethodField(help_text="URL du fichier (CDN en priorité)")
+    thumbnail_url = serializers.SerializerMethodField(help_text="URL de la miniature (pour vidéos)")
+    is_approved_for_publication = serializers.SerializerMethodField(help_text="Indique si le média peut être publié")
     cdn_url = serializers.ReadOnlyField(help_text="URL CDN Cloudinary si configuré")
     cdn_public_id = serializers.ReadOnlyField(help_text="ID public du CDN")
     width = serializers.ReadOnlyField(help_text="Largeur de l'image/vidéo")
@@ -38,6 +38,25 @@ class MediaSerializer(serializers.ModelSerializer):
             'thumbnail_url', 'is_approved_for_publication', 'cdn_url', 
             'cdn_public_id', 'created_at'
         ]
+    
+    @extend_schema_field(OpenApiTypes.STR)
+    def get_file_url(self, obj):
+        """Retourne l'URL du fichier"""
+        if obj.file:
+            return obj.file.url
+        return None
+    
+    @extend_schema_field(OpenApiTypes.STR)
+    def get_thumbnail_url(self, obj):
+        """Retourne l'URL de la miniature"""
+        if obj.media_type == 'video' and hasattr(obj, 'thumbnail_url'):
+            return obj.thumbnail_url
+        return None
+    
+    @extend_schema_field(OpenApiTypes.BOOL)
+    def get_is_approved_for_publication(self, obj):
+        """Indique si le média peut être publié"""
+        return obj.approval_status == 'approved' and obj.is_appropriate
 
 
 class MediaCreateSerializer(serializers.ModelSerializer):
@@ -75,9 +94,9 @@ class MediaCreateSerializer(serializers.ModelSerializer):
 class PostCommentSerializer(serializers.ModelSerializer):
     author = UserSerializer(read_only=True)
     replies = serializers.SerializerMethodField()
-    replies_count = serializers.ReadOnlyField()
-    is_reply = serializers.ReadOnlyField()
-    level = serializers.ReadOnlyField()
+    replies_count = serializers.SerializerMethodField()
+    is_reply = serializers.SerializerMethodField()
+    level = serializers.SerializerMethodField()
     
     class Meta:
         model = PostComment
@@ -91,10 +110,31 @@ class PostCommentSerializer(serializers.ModelSerializer):
             'created_at', 'updated_at'
         ]
     
+    @extend_schema_field(OpenApiTypes.OBJECT)
     def get_replies(self, obj):
         """Retourne les réponses directes (pas récursif pour éviter les boucles infinies)"""
         replies = obj.replies.all()
         return PostCommentSerializer(replies, many=True, context=self.context).data
+    
+    @extend_schema_field(OpenApiTypes.INT)
+    def get_replies_count(self, obj):
+        """Retourne le nombre de réponses"""
+        return obj.replies.count()
+    
+    @extend_schema_field(OpenApiTypes.BOOL)
+    def get_is_reply(self, obj):
+        """Indique si c'est une réponse à un commentaire"""
+        return obj.parent_comment is not None
+    
+    @extend_schema_field(OpenApiTypes.INT)
+    def get_level(self, obj):
+        """Retourne le niveau de profondeur du commentaire"""
+        level = 0
+        current = obj
+        while current.parent_comment:
+            level += 1
+            current = current.parent_comment
+        return level
 
 
 class PostLikeSerializer(serializers.ModelSerializer):
@@ -114,8 +154,8 @@ class PostSerializer(serializers.ModelSerializer):
     comments = PostCommentSerializer(many=True, read_only=True)
     likes = PostLikeSerializer(many=True, read_only=True)
     is_liked_by_user = serializers.SerializerMethodField()
-    has_media = serializers.ReadOnlyField()
-    media_count = serializers.ReadOnlyField()
+    has_media = serializers.SerializerMethodField()
+    media_count = serializers.SerializerMethodField()
     
     class Meta:
         model = Post
@@ -131,11 +171,22 @@ class PostSerializer(serializers.ModelSerializer):
             'comments', 'likes', 'is_liked_by_user', 'has_media', 'media_count'
         ]
     
+    @extend_schema_field(OpenApiTypes.BOOL)
     def get_is_liked_by_user(self, obj):
         request = self.context.get('request')
         if request and request.user.is_authenticated:
             return obj.likes.filter(user=request.user).exists()
         return False
+    
+    @extend_schema_field(OpenApiTypes.BOOL)
+    def get_has_media(self, obj):
+        """Indique si le post contient des médias"""
+        return obj.media_files.exists()
+    
+    @extend_schema_field(OpenApiTypes.INT)
+    def get_media_count(self, obj):
+        """Retourne le nombre de médias dans le post"""
+        return obj.media_files.count()
 
 
 class PostCreateSerializer(serializers.ModelSerializer):
@@ -268,6 +319,7 @@ class PostShareSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'post', 'share_type', 'comment', 'created_at', 'time_ago']
         read_only_fields = ['user', 'created_at']
     
+    @extend_schema_field(OpenApiTypes.STR)
     def get_time_ago(self, obj):
         """Retourne le temps écoulé depuis le partage"""
         from django.utils import timezone
@@ -327,6 +379,7 @@ class ExternalShareSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'platform', 'platform_display', 'shared_at', 'time_ago']
         read_only_fields = ['user', 'shared_at']
     
+    @extend_schema_field(OpenApiTypes.STR)
     def get_time_ago(self, obj):
         """Retourne le temps écoulé depuis le partage"""
         from django.utils import timezone
@@ -384,6 +437,7 @@ class PostAnalyticsSerializer(serializers.ModelSerializer):
             'created_at', 'updated_at'
         ]
     
+    @extend_schema_field(OpenApiTypes.STR)
     def get_viral_score_formatted(self, obj):
         """Retourne le score viral formaté"""
         if obj.viral_score >= 80:
@@ -395,10 +449,12 @@ class PostAnalyticsSerializer(serializers.ModelSerializer):
         else:
             return f"{obj.viral_score:.1f}% 📊 NORMAL"
     
+    @extend_schema_field(OpenApiTypes.STR)
     def get_engagement_rate_formatted(self, obj):
         """Retourne le taux d'engagement formaté"""
         return f"{obj.engagement_rate:.1f}%"
     
+    @extend_schema_field(OpenApiTypes.OBJECT)
     def get_external_shares_breakdown(self, obj):
         """Retourne la répartition des partages externes"""
         return {

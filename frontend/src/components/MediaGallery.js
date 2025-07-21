@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { 
   Play, 
   Pause, 
@@ -7,11 +7,8 @@ import {
   X, 
   ChevronLeft, 
   ChevronRight,
-  Download,
-  Fullscreen,
   Maximize2
 } from 'lucide-react';
-import { formatTime } from '../utils/timeUtils';
 import LiveTimer from './LiveTimer';
 
 const MediaGallery = ({ media, className = '' }) => {

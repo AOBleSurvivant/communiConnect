@@ -11,17 +11,17 @@ urlpatterns = [
     path('<int:pk>/', views.NotificationDetailView.as_view(), name='notification-detail'),
     
     # Compter les notifications non lues
-    path('count/', views.notification_count, name='notification-count'),
+    path('count/', views.NotificationCountView.as_view(), name='notification-count'),
     
     # Marquer comme lues
-    path('mark-as-read/', views.mark_as_read, name='mark-as-read'),
+    path('mark-as-read/', views.MarkAsReadView.as_view(), name='mark-as-read'),
     
     # Préférences de notifications
-    path('preferences/', views.notification_preferences, name='notification-preferences'),
+    path('preferences/', views.NotificationPreferencesView.as_view(), name='notification-preferences'),
     
     # Supprimer une notification
-    path('<int:notification_id>/delete/', views.delete_notification, name='delete-notification'),
+    path('<int:pk>/delete/', views.DeleteNotificationView.as_view(), name='delete-notification'),
     
     # Supprimer toutes les notifications
-    path('clear-all/', views.clear_all_notifications, name='clear-all-notifications'),
+    path('clear-all/', views.ClearAllNotificationsView.as_view(), name='clear-all-notifications'),
 ] 

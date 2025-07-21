@@ -7,13 +7,11 @@ import LiveStream from '../components/LiveStream';
 import { 
   Plus, 
   Video, 
-  Image, 
   MessageCircle, 
   Calendar,
   HelpCircle,
   AlertCircle,
   Users,
-  Filter,
   Search,
   RefreshCw
 } from 'lucide-react';
@@ -37,10 +35,6 @@ const Dashboard = () => {
     { value: 'live', label: 'Lives', icon: Video }
   ];
 
-  useEffect(() => {
-    fetchPosts();
-  }, [selectedFilter]);
-
   const fetchPosts = async () => {
     setIsLoading(true);
     try {
@@ -61,6 +55,12 @@ const Dashboard = () => {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchPosts();
+  }, [selectedFilter, searchTerm]);
+
+
 
   const handlePostCreated = (newPost) => {
     setPosts(prev => [newPost, ...prev]);

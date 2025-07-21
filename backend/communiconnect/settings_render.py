@@ -29,14 +29,12 @@ DATABASES = {
     }
 }
 
-# Configuration pour Render
+# Configuration pour Render (priorité)
 if os.environ.get('RENDER'):
-    # Utiliser la variable DATABASE_URL de Render
     import dj_database_url
     DATABASES['default'] = dj_database_url.config(
         default=os.environ.get('DATABASE_URL'),
         conn_max_age=600,
-        conn_health_checks=True,
     )
 
 # Application definition
@@ -100,12 +98,9 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 # Configuration des fichiers statiques
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
 
-# Configuration WhiteNoise pour les fichiers statiques (version simplifiée)
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+# Configuration WhiteNoise pour les fichiers statiques (version basique)
+STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'
 
 # Configuration des médias (sans Pillow)
 MEDIA_URL = '/media/'
@@ -141,12 +136,13 @@ LOGGING = {
 # Configuration CORS pour le frontend
 CORS_ALLOWED_ORIGINS = [
     "https://communiconnect.onrender.com",
-    "https://communiconnect-frontend.onrender.com",
+    "https://communiconnect-backend.onrender.com",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = True  # Temporaire pour le déploiement
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -177,10 +173,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',  # Temporaire pour le déploiement
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,

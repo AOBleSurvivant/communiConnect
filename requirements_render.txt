@@ -1,5 +1,5 @@
 # Requirements pour Render - CommuniConnect
-# Version ultra-minimaliste pour éviter les problèmes de compilation
+# Version optimisée pour Python 3.11 et Render
 
 # Django et extensions essentielles
 Django==4.2.7
@@ -7,8 +7,8 @@ djangorestframework==3.14.0
 djangorestframework-simplejwt==5.3.0
 django-cors-headers==4.3.1
 
-# Base de données (version la plus stable)
-psycopg2-binary==2.9.5
+# Base de données (version stable)
+psycopg2-binary==2.9.7
 dj-database-url==2.1.0
 
 # Serveur de production
@@ -17,7 +17,7 @@ whitenoise==6.6.0
 
 # Utilitaires essentiels
 python-decouple==3.8
-Pillow==10.0.1
+Pillow==9.5.0
 
 # API et communication
 requests==2.31.0

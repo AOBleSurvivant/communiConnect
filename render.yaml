@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: communiconnect-backend
+    name: communiConnect-gn224
     env: python
     plan: free
     buildCommand: pip install -r requirements_render.txt
@@ -13,7 +13,7 @@ services:
       - key: DEBUG
         value: false
       - key: ALLOWED_HOSTS
-        value: .render.com,communiconnect-backend.onrender.com,*
+        value: .render.com,communiConnect-gn224.onrender.com,*
       - key: SECRET_KEY
         generateValue: true
       - key: DATABASE_URL

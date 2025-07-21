@@ -341,30 +341,30 @@ class UserDashboardDataView(generics.GenericAPIView):
     serializer_class = UserSerializer
     
     def get(self, request):
-    """Récupère les données pour le tableau de bord utilisateur"""
-    try:
-        user = request.user
-        
-        # Statistiques de base (à enrichir selon les besoins)
-        stats = {
-            'neighbors': User.objects.filter(
-                quartier=user.quartier,
-                is_active=True
-            ).exclude(id=user.id).count(),
-            'posts': 0,  # À implémenter avec le système de posts
-            'events': 0,  # À implémenter avec le système d'événements
-            'messages': 0  # À implémenter avec le système de messages
-        }
-        
-        return Response({
-            'user': UserSerializer(user).data,
-            'stats': stats
+        """Récupère les données pour le tableau de bord utilisateur"""
+        try:
+            user = request.user
+            
+            # Statistiques de base (à enrichir selon les besoins)
+            stats = {
+                'neighbors': User.objects.filter(
+                    quartier=user.quartier,
+                    is_active=True
+                ).exclude(id=user.id).count(),
+                'posts': 0,  # À implémenter avec le système de posts
+                'events': 0,  # À implémenter avec le système d'événements
+                'messages': 0  # À implémenter avec le système de messages
+            }
+            
+            return Response({
+                'user': UserSerializer(user).data,
+                'stats': stats
             })
-        
-    except Exception as e:
-        return Response({
-            'error': f'Erreur lors de la récupération des données: {str(e)}'
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            
+        except Exception as e:
+            return Response({
+                'error': f'Erreur lors de la récupération des données: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class LogoutView(generics.GenericAPIView):
@@ -373,21 +373,21 @@ class LogoutView(generics.GenericAPIView):
     serializer_class = UserSerializer
     
     def post(self, request):
-    """Déconnexion de l'utilisateur"""
-    try:
-        # Blacklist du token (si configuré)
-        # refresh_token = request.data.get('refresh')
-        # if refresh_token:
-        #     token = RefreshToken(refresh_token)
-        #     token.blacklist()
-        
-        return Response({
-            'message': 'Déconnexion réussie'
-        })
-    except Exception as e:
-        return Response({
-            'error': f'Erreur lors de la déconnexion: {str(e)}'
-        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR) 
+        """Déconnexion de l'utilisateur"""
+        try:
+            # Blacklist du token (si configuré)
+            # refresh_token = request.data.get('refresh')
+            # if refresh_token:
+            #     token = RefreshToken(refresh_token)
+            #     token.blacklist()
+            
+            return Response({
+                'message': 'Déconnexion réussie'
+            })
+        except Exception as e:
+            return Response({
+                'error': f'Erreur lors de la déconnexion: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR) 
 
 
 class UserDetailView(generics.RetrieveAPIView):

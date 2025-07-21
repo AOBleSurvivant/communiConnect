@@ -341,30 +341,30 @@ class UserDashboardDataView(generics.GenericAPIView):
     serializer_class = UserSerializer
     
     def get(self, request):
-        """Récupère les données pour le tableau de bord utilisateur"""
-        try:
-            user = request.user
-            
-            # Statistiques de base (à enrichir selon les besoins)
-            stats = {
-                'neighbors': User.objects.filter(
-                    quartier=user.quartier,
-                    is_active=True
-                ).exclude(id=user.id).count(),
-                'posts': 0,  # À implémenter avec le système de posts
-                'events': 0,  # À implémenter avec le système d'événements
-                'messages': 0  # À implémenter avec le système de messages
-            }
-            
-            return Response({
-                'user': UserSerializer(user).data,
-                'stats': stats
+    """Récupère les données pour le tableau de bord utilisateur"""
+    try:
+        user = request.user
+        
+        # Statistiques de base (à enrichir selon les besoins)
+        stats = {
+            'neighbors': User.objects.filter(
+                quartier=user.quartier,
+                is_active=True
+            ).exclude(id=user.id).count(),
+            'posts': 0,  # À implémenter avec le système de posts
+            'events': 0,  # À implémenter avec le système d'événements
+            'messages': 0  # À implémenter avec le système de messages
+        }
+        
+        return Response({
+            'user': UserSerializer(user).data,
+            'stats': stats
             })
-            
-        except Exception as e:
-            return Response({
-                'error': f'Erreur lors de la récupération des données: {str(e)}'
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    except Exception as e:
+        return Response({
+            'error': f'Erreur lors de la récupération des données: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class LogoutView(generics.GenericAPIView):
@@ -373,21 +373,21 @@ class LogoutView(generics.GenericAPIView):
     serializer_class = UserSerializer
     
     def post(self, request):
-        """Déconnexion de l'utilisateur"""
-        try:
-            # Blacklist du token (si configuré)
-            # refresh_token = request.data.get('refresh')
-            # if refresh_token:
-            #     token = RefreshToken(refresh_token)
-            #     token.blacklist()
-            
-            return Response({
-                'message': 'Déconnexion réussie'
-            })
-        except Exception as e:
-            return Response({
-                'error': f'Erreur lors de la déconnexion: {str(e)}'
-            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR) 
+    """Déconnexion de l'utilisateur"""
+    try:
+        # Blacklist du token (si configuré)
+        # refresh_token = request.data.get('refresh')
+        # if refresh_token:
+        #     token = RefreshToken(refresh_token)
+        #     token.blacklist()
+        
+        return Response({
+            'message': 'Déconnexion réussie'
+        })
+    except Exception as e:
+        return Response({
+            'error': f'Erreur lors de la déconnexion: {str(e)}'
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR) 
 
 
 class UserDetailView(generics.RetrieveAPIView):
@@ -682,39 +682,39 @@ class UserRelationshipsStatusView(generics.GenericAPIView):
     serializer_class = UserSerializer
     
     def get(self, request, user_id):
-        """Vue pour obtenir le statut de relation avec un utilisateur"""
-        try:
-            target_user = User.objects.get(id=user_id)
-            
-            # Vérifier si l'utilisateur connecté suit l'utilisateur cible
-            is_following = request.user.is_following(target_user)
-            
-            # Vérifier si l'utilisateur cible suit l'utilisateur connecté
-            is_followed_by = target_user.is_following(request.user)
-            
-            # Vérifier si l'un des deux a bloqué l'autre
-            blocked_by_me = UserRelationship.objects.filter(
-                follower=request.user,
-                followed=target_user,
-                status='blocked'
-            ).exists()
-            
-            blocked_by_other = UserRelationship.objects.filter(
-                follower=target_user,
-                followed=request.user,
-                status='blocked'
-            ).exists()
-            
-            return Response({
-                'is_following': is_following,
-                'is_followed_by': is_followed_by,
-                'blocked_by_me': blocked_by_me,
-                'blocked_by_other': blocked_by_other,
-                'can_interact': not (blocked_by_me or blocked_by_other)
-            })
-            
-        except User.DoesNotExist:
-            return Response(
-                {"error": "Utilisateur introuvable."},
-                status=status.HTTP_404_NOT_FOUND
-            ) 
+    """Vue pour obtenir le statut de relation avec un utilisateur"""
+    try:
+        target_user = User.objects.get(id=user_id)
+        
+        # Vérifier si l'utilisateur connecté suit l'utilisateur cible
+        is_following = request.user.is_following(target_user)
+        
+        # Vérifier si l'utilisateur cible suit l'utilisateur connecté
+        is_followed_by = target_user.is_following(request.user)
+        
+        # Vérifier si l'un des deux a bloqué l'autre
+        blocked_by_me = UserRelationship.objects.filter(
+            follower=request.user,
+            followed=target_user,
+            status='blocked'
+        ).exists()
+        
+        blocked_by_other = UserRelationship.objects.filter(
+            follower=target_user,
+            followed=request.user,
+            status='blocked'
+        ).exists()
+        
+        return Response({
+            'is_following': is_following,
+            'is_followed_by': is_followed_by,
+            'blocked_by_me': blocked_by_me,
+            'blocked_by_other': blocked_by_other,
+            'can_interact': not (blocked_by_me or blocked_by_other)
+        })
+        
+    except User.DoesNotExist:
+        return Response(
+            {"error": "Utilisateur introuvable."},
+            status=status.HTTP_404_NOT_FOUND
+        ) 

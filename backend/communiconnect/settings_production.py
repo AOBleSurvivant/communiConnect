@@ -1,262 +1,111 @@
+"""
+Settings pour PythonAnywhere - CommuniConnect
+"""
+
 import os
 from pathlib import Path
-from decouple import config
-from .settings import *
 
-# Configuration de production pour CommuniConnect
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Désactiver le mode debug en production
+# Configuration PythonAnywhere
 DEBUG = False
+ALLOWED_HOSTS = ['votre-username.pythonanywhere.com', 'localhost', '127.0.0.1']
 
-# Allowed hosts pour la production
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='').split(',')
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-your-secret-key-here')
 
-# Configuration de sécurité renforcée
-SECURE_SSL_REDIRECT = True
-SECURE_HSTS_SECONDS = 31536000  # 1 an
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
-SECURE_BROWSER_XSS_FILTER = True
-X_FRAME_OPTIONS = 'DENY'
-
-# Configuration de la base de données PostgreSQL pour la production
+# Base de données PostgreSQL PythonAnywhere
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME', default='communiconnect'),
-        'USER': config('DB_USER', default='postgres'),
-        'PASSWORD': config('DB_PASSWORD', default=''),
-        'HOST': config('DB_HOST', default='localhost'),
-        'PORT': config('DB_PORT', default='5432'),
-        'OPTIONS': {
-            'sslmode': 'require',
-        },
+        'NAME': os.environ.get('DATABASE_NAME', 'votre_username$communiconnect'),
+        'USER': os.environ.get('DATABASE_USER', 'votre_username'),
+        'PASSWORD': os.environ.get('DATABASE_PASSWORD', ''),
+        'HOST': os.environ.get('DATABASE_HOST', 'votre-username.postgres.pythonanywhere-services.com'),
+        'PORT': os.environ.get('DATABASE_PORT', '13306'),
     }
 }
 
-# Configuration Redis pour la production
-REDIS_URL = config('REDIS_URL', default='redis://localhost:6379')
-REDIS_HOST = config('REDIS_HOST', default='localhost')
-REDIS_PORT = config('REDIS_PORT', default=6379, cast=int)
-REDIS_PASSWORD = config('REDIS_PASSWORD', default='')
+# Application definition
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'corsheaders',
+    'drf_spectacular',
+    'users',
+    'geography',
+    'api',
+    'posts',
+    'notifications',
+]
 
-# Cache Redis Configuration optimisée pour la production
-CACHES = {
-    'default': {
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': f"{REDIS_URL}/1",
+MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+ROOT_URLCONF = 'communiconnect.urls'
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'APP_DIRS': True,
         'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-            'PASSWORD': REDIS_PASSWORD,
-            'CONNECTION_POOL_KWARGS': {
-                'max_connections': 50,
-                'retry_on_timeout': True,
-            },
-            'SOCKET_CONNECT_TIMEOUT': 5,
-            'SOCKET_TIMEOUT': 5,
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
         },
-        'KEY_PREFIX': 'communiconnect',
-        'TIMEOUT': 300,  # 5 minutes par défaut
     },
-    'sessions': {
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': f"{REDIS_URL}/2",
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-            'PASSWORD': REDIS_PASSWORD,
-            'CONNECTION_POOL_KWARGS': {
-                'max_connections': 20,
-                'retry_on_timeout': True,
-            },
-        },
-        'KEY_PREFIX': 'sessions',
-    },
-    'posts': {
-        'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': f"{REDIS_URL}/3",
-        'OPTIONS': {
-            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
-            'PASSWORD': REDIS_PASSWORD,
-            'CONNECTION_POOL_KWARGS': {
-                'max_connections': 30,
-                'retry_on_timeout': True,
-            },
-        },
-        'KEY_PREFIX': 'posts',
-        'TIMEOUT': 600,  # 10 minutes pour les posts
-    },
-}
+]
 
-# Cache pour les requêtes fréquentes - production
-CACHEOPS_REDIS = {
-    'host': REDIS_HOST,
-    'port': REDIS_PORT,
-    'password': REDIS_PASSWORD,
-    'db': 4,
-    'socket_timeout': 3,
-    'socket_connect_timeout': 3,
-    'retry_on_timeout': True,
-}
+WSGI_APPLICATION = 'communiconnect.wsgi.application'
 
-# Configuration Cloudinary pour la production
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': config('CLOUDINARY_CLOUD_NAME', default=''),
-    'API_KEY': config('CLOUDINARY_API_KEY', default=''),
-    'API_SECRET': config('CLOUDINARY_API_SECRET', default=''),
-    'SECURE': True,
-    'MEDIA_TAG': 'communiconnect-prod',
-    'INVALID_VIDEO_ERROR_MESSAGE': 'Vidéo non supportée',
-    'STATIC_TAG': 'static-prod',
-    'MAGIC_FILE_PATH': 'magic',
-    'STATIC_IMAGES_EXTENSIONS': ['jpg', 'jpe', 'jpeg', 'jpc', 'jp2', 'j2k', 'wdp', 'jxr', 'hdp', 'png', 'gif', 'webp', 'bmp', 'tif', 'tiff', 'ico'],
-    'STATIC_VIDEOS_EXTENSIONS': ['mp4', 'webm', 'flv', 'mov', 'ogv', '3gp', '3g2', 'wmv', 'mpeg', 'flv', 'avi'],
-    'OPTIMIZATION': {
-        'quality': 'auto',
-        'fetch_format': 'auto',
-        'crop': 'limit',
-        'width': 1920,
-        'height': 1080,
-    },
-}
+# Configuration des fichiers statiques
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, 'frontend/build'),  # React build
+]
 
-# Forcer l'utilisation de Cloudinary en production
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-STATICFILES_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
+# Configuration des médias
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Configuration des logs pour la production
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '{levelname} {asctime} {module} {process:d} {thread:d} {message}',
-            'style': '{',
-        },
-        'simple': {
-            'format': '{levelname} {message}',
-            'style': '{',
-        },
-    },
-    'handlers': {
-        'file': {
-            'level': 'INFO',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': '/var/log/communiconnect/django.log',
-            'maxBytes': 1024*1024*10,  # 10MB
-            'backupCount': 5,
-            'formatter': 'verbose',
-        },
-        'console': {
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',
-            'formatter': 'simple',
-        },
-        'error_file': {
-            'level': 'ERROR',
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': '/var/log/communiconnect/error.log',
-            'maxBytes': 1024*1024*10,  # 10MB
-            'backupCount': 5,
-            'formatter': 'verbose',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['file', 'console'],
-            'level': 'INFO',
-            'propagate': False,
-        },
-        'posts': {
-            'handlers': ['file', 'console', 'error_file'],
-            'level': 'INFO',
-            'propagate': True,
-        },
-        'media': {
-            'handlers': ['file', 'console', 'error_file'],
-            'level': 'INFO',
-            'propagate': True,
-        },
-        'cache': {
-            'handlers': ['file', 'console'],
-            'level': 'INFO',
-            'propagate': True,
-        },
-    },
-    'root': {
-        'handlers': ['console', 'file'],
-        'level': 'INFO',
-    },
-}
+# Configuration CORS
+CORS_ALLOWED_ORIGINS = [
+    "https://votre-username.pythonanywhere.com",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
 
-# Configuration CORS pour la production
-CORS_ALLOWED_ORIGINS = config('CORS_ALLOWED_ORIGINS', default='').split(',')
 CORS_ALLOW_CREDENTIALS = True
 
-# Configuration des sessions sécurisées
-SESSION_COOKIE_SECURE = True
-SESSION_COOKIE_HTTPONLY = True
-SESSION_COOKIE_SAMESITE = 'Lax'
-SESSION_COOKIE_AGE = 3600  # 1 heure
-
-# Configuration JWT pour la production
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
-    'ROTATE_REFRESH_TOKENS': True,
-    'BLACKLIST_AFTER_ROTATION': True,
-    'UPDATE_LAST_LOGIN': True,
-    'ALGORITHM': 'HS256',
-    'SIGNING_KEY': SECRET_KEY,
-    'VERIFYING_KEY': None,
-    'AUDIENCE': None,
-    'ISSUER': None,
-    'JWK_URL': None,
-    'LEEWAY': 0,
-    'AUTH_HEADER_TYPES': ('Bearer',),
-    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
-    'USER_ID_FIELD': 'id',
-    'USER_ID_CLAIM': 'user_id',
-    'USER_AUTHENTICATION_RULE': 'rest_framework_simplejwt.authentication.default_user_authentication_rule',
-    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
-    'TOKEN_TYPE_CLAIM': 'token_type',
-    'TOKEN_USER_CLASS': 'rest_framework_simplejwt.models.TokenUser',
-    'JTI_CLAIM': 'jti',
-    'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
-    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
-    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
-}
-
-# Configuration pour les fichiers statiques
-STATIC_ROOT = '/var/www/communiconnect/static/'
-MEDIA_ROOT = '/var/www/communiconnect/media/'
-
-# Configuration pour la compression
-MIDDLEWARE += [
-    'django.middleware.gzip.GZipMiddleware',
-]
-
-# Configuration pour la mise en cache des templates
-TEMPLATES[0]['OPTIONS']['loaders'] = [
-    ('django.template.loaders.cached.Loader', [
-        'django.template.loaders.filesystem.Loader',
-        'django.template.loaders.app_directories.Loader',
-    ]),
-]
-
-# Configuration pour les performances
-CONN_MAX_AGE = 60  # Connexions persistantes à la base de données
-
-# Configuration pour la sécurité des mots de passe
+# Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {
         'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-        'OPTIONS': {
-            'min_length': 8,
-        }
     },
     {
         'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
@@ -266,53 +115,27 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Configuration pour les emails en production
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = config('EMAIL_HOST', default='smtp.gmail.com')
-EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
-DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='noreply@communiconnect.com')
+# Internationalization
+LANGUAGE_CODE = 'fr-fr'
+TIME_ZONE = 'Africa/Conakry'
+USE_I18N = True
+USE_TZ = True
 
-# Configuration pour la surveillance et monitoring
-ADMINS = [
-    ('Admin', config('ADMIN_EMAIL', default='admin@communiconnect.com')),
-]
+# Default primary key field type
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Configuration pour les performances
+# REST Framework configuration
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ),
-    'DEFAULT_PERMISSION_CLASSES': (
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
-    ),
-    'DEFAULT_FILTER_BACKENDS': (
-        'django_filters.rest_framework.DjangoFilterBackend',
-    ),
+    ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-    'DEFAULT_THROTTLE_CLASSES': [
-        'rest_framework.throttling.AnonRateThrottle',
-        'rest_framework.throttling.UserRateThrottle'
-    ],
-    'DEFAULT_THROTTLE_RATES': {
-        'anon': '100/hour',
-        'user': '1000/hour',
-    },
 }
 
-# Configuration pour la documentation API en production
-SPECTACULAR_SETTINGS.update({
-    'SERVE_AUTHENTICATION': 'rest_framework_simplejwt.authentication.JWTAuthentication',
-    'SERVE_PERMISSION_CLASSES': ['rest_framework.permissions.IsAdminUser'],
-    'SWAGGER_UI_SETTINGS': {
-        'persistAuthorization': True,
-        'displayRequestDuration': True,
-        'filter': True,
-        'deepLinking': True,
-        'displayOperationId': True,
-    },
-}) 
+# Custom user model
+AUTH_USER_MODEL = 'users.User' 

@@ -3,6 +3,7 @@ from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from django.http import JsonResponse
+from django.views.generic import TemplateView
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView, SpectacularRedocView
 
 def home(request):
@@ -36,6 +37,10 @@ urlpatterns = [
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+    
+    # Frontend React - Catch all route
+    path('app/', TemplateView.as_view(template_name='index.html'), name='react-app'),
+    path('app/<path:path>', TemplateView.as_view(template_name='index.html'), name='react-app-catch-all'),
 ]
 
 if settings.DEBUG:

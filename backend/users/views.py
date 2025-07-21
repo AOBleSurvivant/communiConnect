@@ -682,39 +682,39 @@ class UserRelationshipsStatusView(generics.GenericAPIView):
     serializer_class = UserSerializer
     
     def get(self, request, user_id):
-    """Vue pour obtenir le statut de relation avec un utilisateur"""
-    try:
-        target_user = User.objects.get(id=user_id)
-        
-        # Vérifier si l'utilisateur connecté suit l'utilisateur cible
-        is_following = request.user.is_following(target_user)
-        
-        # Vérifier si l'utilisateur cible suit l'utilisateur connecté
-        is_followed_by = target_user.is_following(request.user)
-        
-        # Vérifier si l'un des deux a bloqué l'autre
-        blocked_by_me = UserRelationship.objects.filter(
-            follower=request.user,
-            followed=target_user,
-            status='blocked'
-        ).exists()
-        
-        blocked_by_other = UserRelationship.objects.filter(
-            follower=target_user,
-            followed=request.user,
-            status='blocked'
-        ).exists()
-        
-        return Response({
-            'is_following': is_following,
-            'is_followed_by': is_followed_by,
-            'blocked_by_me': blocked_by_me,
-            'blocked_by_other': blocked_by_other,
-            'can_interact': not (blocked_by_me or blocked_by_other)
-        })
-        
-    except User.DoesNotExist:
-        return Response(
-            {"error": "Utilisateur introuvable."},
-            status=status.HTTP_404_NOT_FOUND
-        ) 
+        """Vue pour obtenir le statut de relation avec un utilisateur"""
+        try:
+            target_user = User.objects.get(id=user_id)
+            
+            # Vérifier si l'utilisateur connecté suit l'utilisateur cible
+            is_following = request.user.is_following(target_user)
+            
+            # Vérifier si l'utilisateur cible suit l'utilisateur connecté
+            is_followed_by = target_user.is_following(request.user)
+            
+            # Vérifier si l'un des deux a bloqué l'autre
+            blocked_by_me = UserRelationship.objects.filter(
+                follower=request.user,
+                followed=target_user,
+                status='blocked'
+            ).exists()
+            
+            blocked_by_other = UserRelationship.objects.filter(
+                follower=target_user,
+                followed=request.user,
+                status='blocked'
+            ).exists()
+            
+            return Response({
+                'is_following': is_following,
+                'is_followed_by': is_followed_by,
+                'blocked_by_me': blocked_by_me,
+                'blocked_by_other': blocked_by_other,
+                'can_interact': not (blocked_by_me or blocked_by_other)
+            })
+            
+        except User.DoesNotExist:
+            return Response(
+                {"error": "Utilisateur introuvable."},
+                status=status.HTTP_404_NOT_FOUND
+            ) 

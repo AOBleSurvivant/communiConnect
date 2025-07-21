@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: communiconnect-api-2024-july
+    name: communiconnect-api
     env: python
     plan: free
     buildCommand: pip install -r requirements_render.txt
@@ -13,7 +13,7 @@ services:
       - key: DEBUG
         value: false
       - key: ALLOWED_HOSTS
-        value: .render.com,communiconnect-api-2024-july.onrender.com,*
+        value: .render.com,communiconnect-api.onrender.com,*
       - key: SECRET_KEY
         generateValue: true
       - key: DATABASE_URL

@@ -12,7 +12,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Configuration Render
 DEBUG = False
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '.render.com,communiConnect-backend-deploi.onrender.com,localhost,127.0.0.1').split(',')
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '.render.com,communiConnect-gn.onrender.com,localhost,127.0.0.1').split(',')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-communiconnect-render-production-2024-secure-key-xyz123abc456def789ghi')
@@ -138,6 +138,7 @@ CORS_ALLOWED_ORIGINS = [
     "https://communiconnect.onrender.com",
     "https://communiconnect-backend.onrender.com",
     "https://communiconnect-backend-deploi.onrender.com",
+    "https://communiconnect-gn.onrender.com",
     "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]

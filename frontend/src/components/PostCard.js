@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { postsAPI, sharePost, repostPost, unsharePost, sharePostExternal, generateShareLinks, getPostAnalytics, updatePost, deletePost } from '../services/postsAPI';
+import { postsAPI, sharePost, repostPost, unsharePost, sharePostExternal, generateShareLinks, getPostAnalytics, updatePost } from '../services/postsAPI';
 import MediaGallery from './MediaGallery';
 import EditPostModal from './EditPostModal';
 import { 
@@ -82,6 +82,23 @@ const PostCard = ({ post, onUpdate }) => {
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef(null);
 
+  // Gestion des clics en dehors du menu
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setShowMenu(false);
+      }
+    };
+
+    if (showMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showMenu]);
+
   // Safety check for post object - after all hooks
   if (!post) {
     return (
@@ -145,7 +162,7 @@ const PostCard = ({ post, onUpdate }) => {
     
     setIsDeleting(true);
     try {
-      await deletePost(post.id);
+      await postsAPI.deletePost(post.id);
       toast.success('Post supprimé avec succès !');
       setShowDeleteModal(false);
       
@@ -176,23 +193,6 @@ const PostCard = ({ post, onUpdate }) => {
   const closeMenu = () => {
     setShowMenu(false);
   };
-
-  // Gestion des clics en dehors du menu
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (menuRef.current && !menuRef.current.contains(event.target)) {
-        setShowMenu(false);
-      }
-    };
-
-    if (showMenu) {
-      document.addEventListener('mousedown', handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [showMenu]);
 
   const postTypeIcons = {
     info: AlertCircle,

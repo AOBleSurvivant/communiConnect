@@ -8,6 +8,8 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
+import AutoLogin from './pages/AutoLogin';
+import TestNewUser from './pages/TestNewUser';
 import GeographicVerification from './pages/GeographicVerification';
 import Notifications from './pages/Notifications';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -23,6 +25,8 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+                                <Route path="/auto-login" element={<AutoLogin />} />
+                  <Route path="/test-new-user" element={<TestNewUser />} />
               <Route 
                 path="/dashboard" 
                 element={

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { postsAPI } from '../services/postsAPI';
 import CreatePost from '../components/CreatePost';
@@ -35,7 +35,7 @@ const Dashboard = () => {
     { value: 'live', label: 'Lives', icon: Video }
   ];
 
-  const fetchPosts = async () => {
+  const fetchPosts = useCallback(async () => {
     setIsLoading(true);
     try {
       const params = {};
@@ -47,18 +47,34 @@ const Dashboard = () => {
       }
       
       const response = await postsAPI.getPosts(params);
-      setPosts(response);
+      
+      // Gérer la structure paginée de l'API et s'assurer que posts est toujours un tableau
+      let postsData = [];
+      if (response && typeof response === 'object') {
+        if (Array.isArray(response)) {
+          postsData = response;
+        } else if (response.results && Array.isArray(response.results)) {
+          postsData = response.results;
+        } else if (response.data && Array.isArray(response.data)) {
+          postsData = response.data;
+        }
+      }
+      
+      setPosts(postsData);
     } catch (error) {
       console.error('Erreur lors du chargement des posts:', error);
       toast.error('Erreur lors du chargement des publications');
+      setPosts([]); // S'assurer que posts est un tableau vide en cas d'erreur
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [selectedFilter, searchTerm]);
 
   useEffect(() => {
-    fetchPosts();
-  }, [selectedFilter, searchTerm]);
+    if (user) { // Assuming user is available from useAuth
+      fetchPosts();
+    }
+  }, [user, fetchPosts]); // fetchPosts est maintenant mémorisé avec useCallback
 
 
 
@@ -80,7 +96,7 @@ const Dashboard = () => {
     fetchPosts();
   };
 
-  const filteredPosts = posts.filter(post => {
+  const filteredPosts = Array.isArray(posts) ? posts.filter(post => {
     if (selectedFilter !== 'all' && post.post_type !== selectedFilter) {
       return false;
     }
@@ -96,7 +112,7 @@ const Dashboard = () => {
     }
     
     return true;
-  });
+  }) : [];
 
   return (
     <div className="min-h-screen bg-gray-50">

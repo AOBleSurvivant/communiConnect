@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { userAPI } from '../services/api';
 import { 
   User, 
   MapPin, 
@@ -15,7 +17,8 @@ import {
 import toast from 'react-hot-toast';
 
 const Profile = () => {
-  const { user, updateProfile } = useAuth();
+  const { user, updateProfile, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isUploadingPicture, setIsUploadingPicture] = useState(false);
@@ -29,6 +32,27 @@ const Profile = () => {
     bio: user?.bio || '',
     date_of_birth: user?.date_of_birth ? new Date(user.date_of_birth).toISOString().split('T')[0] : ''
   });
+  
+  // Vérifier si l'utilisateur est connecté
+  useEffect(() => {
+    if (!isAuthenticated) {
+      toast.error('Vous devez être connecté pour accéder à votre profil');
+      navigate('/login');
+      return;
+    }
+  }, [isAuthenticated, navigate]);
+
+  // Si l'utilisateur n'est pas connecté, ne pas afficher le composant
+  if (!isAuthenticated || !user) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Chargement...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -90,7 +114,14 @@ const Profile = () => {
       const formData = new FormData();
       formData.append('profile_picture', file);
 
-      await updateProfile(formData);
+      // Utiliser la fonction spécifique pour l'upload de photo
+      const response = await userAPI.uploadProfilePicture(formData);
+      
+      // Mettre à jour les données utilisateur
+      if (response.user) {
+        setUser(response.user);
+      }
+      
       setShowPictureModal(false);
       toast.success('Photo de profil mise à jour avec succès !');
     } catch (error) {

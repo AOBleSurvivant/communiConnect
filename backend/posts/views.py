@@ -355,10 +355,18 @@ class PostListView(generics.ListCreateAPIView):
         if cached_queryset is not None:
             return cached_queryset
         
-        # Requête optimisée avec prefetch intelligent
-        queryset = Post.objects.filter(
-            quartier__commune=user.quartier.commune
-        ).select_related(
+        # Vérifier si l'utilisateur a un quartier
+        if not user.quartier:
+            # Si pas de quartier, retourner tous les posts
+            queryset = Post.objects.all()
+        else:
+            # Requête optimisée avec prefetch intelligent
+            queryset = Post.objects.filter(
+                quartier__commune=user.quartier.commune
+            )
+        
+        # Appliquer les optimisations communes
+        queryset = queryset.select_related(
             'author', 
             'quartier', 
             'quartier__commune'
@@ -377,9 +385,9 @@ class PostListView(generics.ListCreateAPIView):
             ),
             'media_files'
         ).annotate(
-            likes_count=Count('likes'),
-            comments_count=Count('comments', filter=Q(comments__parent_comment__isnull=True)),
-            shares_count=Count('shares')
+            likes_count_annotated=Count('likes'),
+            comments_count_annotated=Count('comments', filter=Q(comments__parent_comment__isnull=True)),
+            shares_count_annotated=Count('shares')
         ).order_by('-created_at')
         
         # Mettre en cache pour 5 minutes
@@ -391,12 +399,12 @@ class PostListView(generics.ListCreateAPIView):
         queryset = self.get_queryset()
         
         # Filtres
-        post_type = request.query_params.get('type')
+        post_type = request.GET.get('type')
         if post_type:
             queryset = queryset.filter(post_type=post_type)
         
         # Tri
-        sort_by = request.query_params.get('sort', '-created_at')
+        sort_by = request.GET.get('sort', '-created_at')
         if sort_by in ['created_at', '-created_at', 'likes_count', '-likes_count']:
             queryset = queryset.order_by(sort_by)
         
@@ -445,9 +453,9 @@ class PostDetailView(generics.RetrieveUpdateDestroyAPIView):
             'likes__user',
             'media_files'
         ).annotate(
-            likes_count=Count('likes'),
-            comments_count=Count('comments', filter=Q(comments__parent_comment__isnull=True)),
-            shares_count=Count('shares')
+            likes_count_annotated=Count('likes'),
+            comments_count_annotated=Count('comments', filter=Q(comments__parent_comment__isnull=True)),
+            shares_count_annotated=Count('shares')
         )
     
     def retrieve(self, request, *args, **kwargs):

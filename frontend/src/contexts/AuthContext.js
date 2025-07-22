@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { authAPI, tokenService, userService, handleAPIError } from '../services/api';
+import { authAPI, userAPI } from '../services/api';
+import { tokenService, userService, handleAPIError } from '../services/api';
 import toast from 'react-hot-toast';
 
 const AuthContext = createContext();
@@ -19,29 +20,24 @@ export const AuthProvider = ({ children }) => {
 
   // Vérifier l'authentification au chargement
   useEffect(() => {
-    const checkAuthStatus = () => {
-      try {
-        const token = tokenService.getAccessToken();
-        const savedUser = userService.getUser();
-        
-        if (token && savedUser) {
-          setUser(savedUser);
-          setIsAuthenticated(true);
-        } else {
-          // Nettoyer les données si pas de token
-          logout();
-        }
-      } catch (error) {
-        console.error('Erreur lors de la vérification de l\'authentification:', error);
-        logout();
-      } finally {
-        setLoading(false);
-      }
-    };
+    const token = localStorage.getItem('access_token');
+    const userData = localStorage.getItem('user');
     
-    checkAuthStatus();
-  }, []);
-
+    if (token && userData) {
+      try {
+        const user = JSON.parse(userData);
+        setUser(user);
+        setIsAuthenticated(true);
+      } catch (error) {
+        console.error('Erreur parsing user data:', error);
+        // Nettoyer les données corrompues
+        localStorage.removeItem('access_token');
+        localStorage.removeItem('refresh_token');
+        localStorage.removeItem('user');
+      }
+    }
+    setLoading(false);
+  }, []); // Dépendances vides car on ne veut exécuter qu'au montage
 
 
   const register = async (userData) => {
@@ -94,14 +90,17 @@ export const AuthProvider = ({ children }) => {
       
       const response = await authAPI.login(email, password);
       
-      // Sauvegarder les tokens et les données utilisateur
-      tokenService.saveTokens(response.tokens);
-      userService.saveUser(response.user);
+      // La réponse de l'API contient directement user et tokens
+      const { user, tokens, message } = response;
       
-      setUser(response.user);
+      // Sauvegarder les tokens et les données utilisateur
+      tokenService.saveTokens(tokens);
+      userService.saveUser(user);
+      
+      setUser(user);
       setIsAuthenticated(true);
       
-      toast.success(response.message || 'Connexion réussie !');
+      toast.success(message || 'Connexion réussie !');
       
       return response;
     } catch (error) {
@@ -145,18 +144,26 @@ export const AuthProvider = ({ children }) => {
     try {
       setLoading(true);
       
-      const response = await authAPI.updateProfile(profileData);
+      const response = await userAPI.updateProfile(profileData);
       
       // Mettre à jour les données utilisateur
-      userService.saveUser(response.user);
-      setUser(response.user);
+      userService.saveUser(response.user || response);
+      setUser(response.user || response);
       
-      toast.success(response.message || 'Profil mis à jour avec succès !');
+      toast.success('Profil mis à jour avec succès !');
       
       return response;
     } catch (error) {
       const errorInfo = handleAPIError(error);
-      toast.error(errorInfo.message);
+      
+      // Si l'erreur est 401, déconnecter l'utilisateur
+      if (error.response?.status === 401) {
+        logout();
+        toast.error('Session expirée. Veuillez vous reconnecter.');
+      } else {
+        toast.error(errorInfo.message);
+      }
+      
       throw error;
     } finally {
       setLoading(false);

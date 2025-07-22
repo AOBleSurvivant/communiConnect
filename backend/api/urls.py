@@ -20,6 +20,9 @@ urlpatterns = [
     # API des notifications
     path('notifications/', include('notifications.urls')),
     
+    # API géographique
+    path('geography/', include('geography.urls')),
+    
     # Refresh token JWT
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ] 

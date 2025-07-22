@@ -50,7 +50,6 @@ const LiveStream = ({ isOpen, onClose, onLiveStarted }) => {
   
   // États pour le chronomètre du live
   const [liveStartTime, setLiveStartTime] = useState(null);
-  const [liveDuration, setLiveDuration] = useState(0);
   
   const videoRef = useRef(null);
   const mediaRecorderRef = useRef(null);
@@ -236,7 +235,6 @@ const LiveStream = ({ isOpen, onClose, onLiveStarted }) => {
       setIsLive(false);
       setLiveData(null);
       setLiveStartTime(null); // Arrêter le chronomètre
-      setLiveDuration(0);
       
       // Créer une URL pour la vidéo enregistrée
       if (mediaRecorderRef.current && mediaRecorderRef.current.recordedChunks && mediaRecorderRef.current.recordedChunks.length > 0) {

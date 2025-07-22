@@ -581,3 +581,18 @@ INFO 2025-07-19 11:43:54,568 views 18800 17764 Tentative de création de post par
 INFO 2025-07-19 11:43:54,568 serializers 18800 17764 Création post - Médias IDs: []
 INFO 2025-07-19 11:43:54,850 serializers 18800 17764 Aucun média à associer
 INFO 2025-07-19 11:43:54,850 views 18800 17764 Post créé avec succès: 34
+INFO 2025-07-22 07:03:24,060 serializers 10084 25444 Validation PostCreateSerializer - Contenu: 'Post de test créé via API avec authentification', Médias: []
+INFO 2025-07-22 07:03:24,196 views 10084 25444 Tentative de création de post par l'utilisateur test_user_posts
+INFO 2025-07-22 07:03:24,238 serializers 10084 25444 Création post - Médias IDs: []
+INFO 2025-07-22 07:03:24,528 serializers 10084 25444 Aucun média à associer
+INFO 2025-07-22 07:03:24,529 views 10084 25444 Post créé avec succès: 38
+INFO 2025-07-22 07:04:20,317 serializers 19376 16084 Validation PostCreateSerializer - Contenu: 'Post de test créé via API avec authentification', Médias: []
+INFO 2025-07-22 07:04:20,317 views 19376 16084 Tentative de création de post par l'utilisateur test_user_posts
+INFO 2025-07-22 07:04:20,317 serializers 19376 16084 Création post - Médias IDs: []
+INFO 2025-07-22 07:04:20,626 serializers 19376 16084 Aucun média à associer
+INFO 2025-07-22 07:04:20,642 views 19376 16084 Post créé avec succès: 39
+INFO 2025-07-22 07:45:50,291 serializers 26868 26156 Validation PostCreateSerializer - Contenu: 'Post de test créé via API avec authentification', Médias: []
+INFO 2025-07-22 07:45:50,291 views 26868 26156 Tentative de création de post par l'utilisateur test_user_posts
+INFO 2025-07-22 07:45:50,291 serializers 26868 26156 Création post - Médias IDs: []
+INFO 2025-07-22 07:45:50,400 serializers 26868 26156 Aucun média à associer
+INFO 2025-07-22 07:45:50,400 views 26868 26156 Post créé avec succès: 49

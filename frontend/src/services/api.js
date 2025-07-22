@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Configuration de base d'axios
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://communiconnect-backend.onrender.com/api';
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -75,13 +75,25 @@ export const authAPI = {
 export const userAPI = {
   // Récupérer le profil utilisateur
   getProfile: async () => {
-    const response = await api.get('/users/profile/');
+    const response = await api.get('/users/my-profile/');
     return response.data;
   },
 
   // Mettre à jour le profil
   updateProfile: async (userData) => {
-    const response = await api.patch('/users/profile/', userData);
+    const response = await api.patch('/users/my-profile/', userData);
+    return response.data;
+  },
+
+  // Upload de photo de profil
+  uploadProfilePicture: async (formData) => {
+    // Pour les données multipart, ne pas définir Content-Type
+    // Axios le définira automatiquement avec la boundary appropriée
+    const response = await api.patch('/users/my-profile/', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     return response.data;
   },
 

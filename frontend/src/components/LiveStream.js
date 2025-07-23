@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { mediaAPI } from '../services/mediaAPI';
+import { liveChatAPI } from '../services/liveChatAPI';
 import { 
   Mic, 
   MicOff, 
@@ -15,13 +16,15 @@ import {
   Sliders,
   Monitor,
   Wifi,
-  Activity
+  Activity,
+  Check,
+  Info
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { formatTime } from '../utils/timeUtils';
 import LiveTimer from './LiveTimer';
 
-const LiveStream = ({ isOpen, onClose, onLiveStarted }) => {
+const LiveStream = ({ isOpen, onClose, onLiveStarted, onLiveStopped }) => {
   const { user } = useAuth();
   const [isStarting, setIsStarting] = useState(false);
   const [isLive, setIsLive] = useState(false);
@@ -48,8 +51,15 @@ const LiveStream = ({ isOpen, onClose, onLiveStarted }) => {
   const [videoDuration, setVideoDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   
+  // Informations sur l'origine live de la vidéo
+  const [liveInfo, setLiveInfo] = useState(null);
+  const [showLiveDetails, setShowLiveDetails] = useState(false);
+  
   // États pour le chronomètre du live
   const [liveStartTime, setLiveStartTime] = useState(null);
+  
+  const [isStopping, setIsStopping] = useState(false);
+  const [showStopConfirmation, setShowStopConfirmation] = useState(false);
   
   const videoRef = useRef(null);
   const mediaRecorderRef = useRef(null);
@@ -68,12 +78,24 @@ const LiveStream = ({ isOpen, onClose, onLiveStarted }) => {
     
     return () => {
       stopCamera();
-      // Nettoyer l'URL de la vidéo enregistrée
+    };
+  }, [isOpen]); // Retiré stream et recordedVideo de la dépendance
+
+  useEffect(() => {
+    // Nettoyer l'URL de la vidéo enregistrée quand le composant se démonte
+    return () => {
       if (recordedVideo) {
         URL.revokeObjectURL(recordedVideo);
       }
     };
-  }, [isOpen, recordedVideo, stream]);
+  }, [recordedVideo]); // Ajouté recordedVideo comme dépendance
+
+  // Debug: Surveiller les changements d'état
+  useEffect(() => {
+    console.log('🔄 État recordedVideo changé:', recordedVideo);
+    console.log('🔄 État isLive:', isLive);
+    console.log('🔄 État videoDuration:', videoDuration);
+  }, [recordedVideo, isLive, videoDuration]);
 
 
 
@@ -85,67 +107,69 @@ const LiveStream = ({ isOpen, onClose, onLiveStarted }) => {
     }
 
     try {
-      // Première tentative avec des contraintes optimales
-      const constraints = {
-        video: {
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-          frameRate: { ideal: 30 }
-        },
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          autoGainControl: true
-        }
+      // Commencer avec des contraintes très simples
+      const simpleConstraints = {
+        video: true,
+        audio: true
       };
 
-      // Créer une promesse avec timeout plus long
-      const getUserMediaPromise = navigator.mediaDevices.getUserMedia(constraints);
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Timeout: Impossible d\'accéder à la caméra dans le délai imparti')), 30000);
-      });
-
-      const mediaStream = await Promise.race([getUserMediaPromise, timeoutPromise]);
+      console.log('🎥 Tentative d\'accès à la caméra avec contraintes simples...');
+      const mediaStream = await navigator.mediaDevices.getUserMedia(simpleConstraints);
       
       setStream(mediaStream);
       streamRef.current = mediaStream;
       
       if (videoRef.current) {
         videoRef.current.srcObject = mediaStream;
-      }
-    } catch (error) {
-      console.error('Première tentative échouée, essai avec des contraintes simplifiées:', error);
-      
-      // Deuxième tentative avec des contraintes plus simples
-      try {
-        const simpleConstraints = {
-          video: true,
-          audio: true
+        // Attendre que la vidéo soit chargée
+        videoRef.current.onloadedmetadata = () => {
+          console.log('✅ Caméra démarrée avec succès');
+          toast.success('Caméra démarrée !');
         };
-
-        const mediaStream = await navigator.mediaDevices.getUserMedia(simpleConstraints);
+      }
+      
+    } catch (error) {
+      console.error('❌ Erreur accès caméra:', error);
+      
+      // Messages d'erreur spécifiques
+      if (error.name === 'NotAllowedError') {
+        toast.error('Accès à la caméra refusé. Veuillez autoriser l\'accès dans les paramètres du navigateur.');
+      } else if (error.name === 'NotFoundError') {
+        toast.error('Aucune caméra trouvée. Veuillez connecter une caméra.');
+      } else if (error.name === 'NotReadableError') {
+        toast.error('Caméra déjà utilisée par une autre application.');
+      } else if (error.name === 'OverconstrainedError') {
+        toast.error('Contraintes de caméra non supportées.');
+      } else if (error.message.includes('Timeout')) {
+        toast.error('Délai d\'attente dépassé. Vérifiez que votre caméra n\'est pas utilisée par une autre application.');
+      } else {
+        toast.error(`Impossible d'accéder à la caméra: ${error.message}`);
+      }
+      
+      // Essayer avec seulement la vidéo si l'audio échoue
+      try {
+        console.log('🎥 Tentative avec vidéo seulement...');
+        const videoOnlyConstraints = {
+          video: true,
+          audio: false
+        };
+        
+        const mediaStream = await navigator.mediaDevices.getUserMedia(videoOnlyConstraints);
         
         setStream(mediaStream);
         streamRef.current = mediaStream;
         
         if (videoRef.current) {
           videoRef.current.srcObject = mediaStream;
+          videoRef.current.onloadedmetadata = () => {
+            console.log('✅ Caméra démarrée (vidéo seulement)');
+            toast.success('Caméra démarrée (sans audio) !');
+          };
         }
         
-        toast.success('Caméra démarrée avec des paramètres de base');
       } catch (secondError) {
-        console.error('Erreur accès caméra (tentative finale):', secondError);
-        
-        // Messages d'erreur plus spécifiques
-        if (secondError.name === 'NotAllowedError') {
-          toast.error('Accès à la caméra refusé. Veuillez autoriser l\'accès dans les paramètres du navigateur.');
-        } else if (secondError.name === 'NotFoundError') {
-          toast.error('Aucune caméra trouvée. Veuillez connecter une caméra.');
-        } else if (secondError.message.includes('Timeout')) {
-          toast.error('Délai d\'attente dépassé. Vérifiez que votre caméra n\'est pas utilisée par une autre application.');
-        } else {
-          toast.error('Impossible d\'accéder à la caméra/microphone. Vérifiez vos permissions.');
-        }
+        console.error('❌ Échec de la deuxième tentative:', secondError);
+        toast.error('Impossible de démarrer la caméra. Vérifiez vos permissions et votre matériel.');
       }
     }
   };
@@ -193,10 +217,36 @@ const LiveStream = ({ isOpen, onClose, onLiveStarted }) => {
       setIsLive(true);
       setLiveStartTime(Date.now()); // Démarrer le chronomètre
       
+      // Charger les messages existants du live
+      if (response.post_id) {
+        await loadChatMessages(response.post_id);
+      }
+      
       // Démarrer l'enregistrement de la vidéo
       if (stream && !mediaRecorderRef.current) {
+        // Debug: Vérifier les types MIME supportés
+        console.log('🔍 Types MIME supportés:');
+        console.log('- video/mp4:', MediaRecorder.isTypeSupported('video/mp4'));
+        console.log('- video/mp4;codecs=h264:', MediaRecorder.isTypeSupported('video/mp4;codecs=h264'));
+        console.log('- video/webm:', MediaRecorder.isTypeSupported('video/webm'));
+        console.log('- video/webm;codecs=vp8,opus:', MediaRecorder.isTypeSupported('video/webm;codecs=vp8,opus'));
+        
+        // Essayer différents formats MP4, sinon fallback vers WebM
+        let mimeType = 'video/mp4';
+        if (!MediaRecorder.isTypeSupported('video/mp4')) {
+          if (MediaRecorder.isTypeSupported('video/mp4;codecs=h264')) {
+            mimeType = 'video/mp4;codecs=h264';
+          } else if (MediaRecorder.isTypeSupported('video/webm')) {
+            mimeType = 'video/webm';
+          } else {
+            mimeType = 'video/webm;codecs=vp8,opus';
+          }
+        }
+        
+        console.log('🎬 Type MIME choisi:', mimeType);
+        
         const mediaRecorder = new MediaRecorder(stream, {
-          mimeType: 'video/webm;codecs=vp8,opus'
+          mimeType: mimeType
         });
         
         mediaRecorderRef.current = mediaRecorder;
@@ -223,46 +273,190 @@ const LiveStream = ({ isOpen, onClose, onLiveStarted }) => {
   };
 
   const stopLive = async () => {
-    if (!liveData) return;
+    // Afficher la confirmation d'arrêt
+    setShowStopConfirmation(true);
+  };
 
-    try {
-      // Arrêter l'enregistrement si actif
-      if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-        mediaRecorderRef.current.stop();
-      }
-
-      await mediaAPI.stopLive(liveData.live_id);
+  const confirmStopLive = async () => {
+    console.log('🛑 Tentative d\'arrêt du live...');
+    console.log('📊 État actuel:', { isLive, liveData, mediaRecorderRef: mediaRecorderRef.current?.state });
+    
+    setIsStopping(true);
+    setShowStopConfirmation(false);
+    
+    if (!liveData) {
+      console.log('❌ Pas de liveData, arrêt direct');
       setIsLive(false);
       setLiveData(null);
-      setLiveStartTime(null); // Arrêter le chronomètre
-      
-      // Créer une URL pour la vidéo enregistrée
-      if (mediaRecorderRef.current && mediaRecorderRef.current.recordedChunks && mediaRecorderRef.current.recordedChunks.length > 0) {
-        const blob = new Blob(mediaRecorderRef.current.recordedChunks, { type: 'video/webm' });
-        const videoUrl = URL.createObjectURL(blob);
-        setRecordedVideo(videoUrl);
-        
-        // Configurer la vidéo pour la lecture avec un délai pour s'assurer que le DOM est mis à jour
-        setTimeout(() => {
-          if (videoRef.current) {
-            videoRef.current.src = videoUrl;
-            videoRef.current.load();
-            videoRef.current.addEventListener('loadedmetadata', () => {
-              setVideoDuration(videoRef.current.duration);
-              setCurrentTime(0);
-              setIsPlaying(false);
-            });
-          }
-        }, 100);
-        
-        toast.success('Live arrêté - Vidéo disponible pour lecture');
-      } else {
-        toast.warning('Aucune vidéo enregistrée disponible');
-      }
-    } catch (error) {
-      console.error('Erreur arrêt live:', error);
-      toast.error('Erreur lors de l\'arrêt du live');
+      setLiveStartTime(null);
+      setIsStopping(false);
+      toast.success('Live arrêté');
+      return;
     }
+
+    // Étape 1: Afficher le message d'arrêt en cours
+    toast.success('🔄 Arrêt du live en cours...', { autoClose: 2000 });
+    
+    try {
+      // Étape 2: Arrêter l'enregistrement média avec transition
+      console.log('🎥 Arrêt de l\'enregistrement média...');
+      if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+        console.log('⏹️ Arrêt du MediaRecorder...');
+        
+        // Attendre que l'enregistrement se termine proprement
+        return new Promise((resolve) => {
+          mediaRecorderRef.current.addEventListener('stop', async () => {
+            console.log('✅ MediaRecorder arrêté, traitement de la vidéo...');
+            
+            // Étape 3: Appel API pour arrêter le live
+            try {
+              // Créer une URL pour la vidéo enregistrée
+              if (mediaRecorderRef.current && mediaRecorderRef.current.recordedChunks && mediaRecorderRef.current.recordedChunks.length > 0) {
+                console.log('🎬 Création du blob vidéo...');
+                // Utiliser le même type MIME que celui détecté pour le MediaRecorder
+                const mimeType = mediaRecorderRef.current.mimeType || 'video/mp4';
+                const blob = new Blob(mediaRecorderRef.current.recordedChunks, { type: mimeType });
+                
+                // Uploader la vidéo vers le serveur
+                console.log('📤 Upload de la vidéo vers le serveur...');
+                console.log('🔍 liveData actuel:', liveData);
+                console.log('🔍 live_id utilisé:', liveData.live_id);
+                const uploadResponse = await mediaAPI.uploadLiveVideo(
+                  liveData.live_id, 
+                  blob,
+                  (progress) => {
+                    console.log(`📤 Upload progress: ${progress}%`);
+                    toast.success(`📤 Upload vidéo: ${progress}%`, { autoClose: 1000 });
+                  }
+                );
+                
+                console.log('✅ Réponse upload vidéo:', uploadResponse);
+                
+                // Maintenant arrêter le live
+                console.log('🌐 Appel API stopLive...');
+                const response = await mediaAPI.stopLive(liveData.live_id);
+                console.log('✅ Réponse API stopLive:', response);
+                
+                if (uploadResponse.media_id) {
+                  console.log('✅ Vidéo uploadée et sauvegardée dans la base de données');
+                  toast.success('🎬 Vidéo enregistrée et sauvegardée !');
+                } else {
+                  console.log('⚠️ Vidéo uploadée mais non sauvegardée');
+                  toast.error('⚠️ Vidéo enregistrée localement seulement');
+                }
+                
+                // Étape 4: Mise à jour des états avec transition
+                setTimeout(() => {
+                  setIsLive(false);
+                  setLiveData(null);
+                  setLiveStartTime(null);
+                  setIsStopping(false);
+                  
+                  console.log('📹 Traitement de la vidéo enregistrée...');
+                  // Utiliser l'URL du serveur si disponible
+                  const videoUrl = uploadResponse.file_url || URL.createObjectURL(blob);
+                  forceVideoDisplay(videoUrl);
+                  
+                  // Notifier le parent que le live est arrêté
+                  onLiveStopped?.({ video_saved: true, video_url: videoUrl, media_id: uploadResponse.media_id });
+                  
+                  toast.success('🎬 Live terminé - Votre vidéo est prête !', { autoClose: 4000 });
+                }, 500); // Délai pour une transition plus douce
+                
+              } else {
+                console.log('⚠️ Aucune vidéo enregistrée trouvée');
+                toast.error('⚠️ Aucune vidéo enregistrée disponible');
+              }
+              
+              resolve();
+            } catch (apiError) {
+              console.error('❌ Erreur API arrêt live:', apiError);
+              toast.error('❌ Erreur serveur - Live arrêté localement');
+              
+              // Arrêt local en cas d'erreur API
+              setIsLive(false);
+              setLiveData(null);
+              setLiveStartTime(null);
+              setIsStopping(false);
+              
+              // Notifier le parent que le live est arrêté
+              onLiveStopped?.({ video_saved: false, error: 'API error' });
+              
+              resolve();
+            }
+          });
+          
+          mediaRecorderRef.current.stop();
+        });
+      } else {
+        // Si pas d'enregistrement actif, arrêt direct
+        console.log('🌐 Appel API stopLive avec live_id:', liveData.live_id);
+        const response = await mediaAPI.stopLive(liveData.live_id);
+        console.log('✅ Réponse API stopLive:', response);
+        
+        setTimeout(() => {
+          setIsLive(false);
+          setLiveData(null);
+          setLiveStartTime(null);
+          setIsStopping(false);
+          
+          // Notifier le parent que le live est arrêté
+          onLiveStopped?.({ video_saved: false });
+          
+          toast.success('✅ Live arrêté avec succès');
+        }, 300);
+      }
+      
+    } catch (error) {
+      console.error('❌ Erreur arrêt live:', error);
+      
+      // En cas d'erreur, on arrête quand même le live côté frontend
+      console.log('🔄 Arrêt forcé côté frontend...');
+      setTimeout(() => {
+        setIsLive(false);
+        setLiveData(null);
+        setLiveStartTime(null);
+        setIsStopping(false);
+        
+        // Notifier le parent que le live est arrêté
+        onLiveStopped?.({ video_saved: false, error: 'network_error' });
+        
+        if (error.response) {
+          console.log('📊 Détails erreur:', error.response.data);
+          toast.error(`❌ Erreur serveur: ${error.response.data.message || 'Erreur lors de l\'arrêt du live'}`);
+        } else if (error.request) {
+          console.log('🌐 Erreur réseau');
+          toast.error('🌐 Erreur de connexion - Live arrêté localement');
+        } else {
+          toast.error(`❌ Erreur: ${error.message}`);
+        }
+      }, 200);
+    }
+  };
+
+  // Fonction d'arrêt forcé (urgence)
+  const forceStopLive = () => {
+    console.log('🚨 ARRÊT FORCÉ DU LIVE');
+    
+    // Arrêter l'enregistrement
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+      mediaRecorderRef.current.stop();
+    }
+    
+    // Arrêter la caméra
+    stopCamera();
+    
+    // Réinitialiser tous les états
+    setIsLive(false);
+    setLiveData(null);
+    setLiveStartTime(null);
+    setRecordedVideo(null);
+    
+    // Notifier le parent que le live est arrêté
+    onLiveStopped?.({ video_saved: false, error: 'force_stop' });
+    
+    toast.success('Live arrêté de force');
+    console.log('✅ Live arrêté de force');
   };
 
   const handleSubmit = (e) => {
@@ -270,18 +464,38 @@ const LiveStream = ({ isOpen, onClose, onLiveStarted }) => {
     startLive();
   };
 
-  const sendChatMessage = () => {
-    if (!newMessage.trim()) return;
+  // Charger les messages existants du live
+  const loadChatMessages = async (postId) => {
+    try {
+      console.log('📨 Chargement des messages du live...');
+      const messages = await liveChatAPI.getMessages(postId);
+      setChatMessages(messages);
+      console.log(`✅ ${messages.length} messages chargés`);
+    } catch (error) {
+      console.error('❌ Erreur chargement messages:', error);
+      toast.error('Erreur lors du chargement des messages');
+    }
+  };
+
+  const sendChatMessage = async () => {
+    if (!newMessage.trim() || !liveData) return;
     
-    const message = {
-      id: Date.now(),
-      author: user,
-      content: newMessage,
-      timestamp: new Date().toISOString()
-    };
-    
-    setChatMessages(prev => [...prev, message]);
-    setNewMessage('');
+    try {
+      // Envoyer le message au backend
+      const savedMessage = await liveChatAPI.sendMessage(liveData.post_id, {
+        content: newMessage.trim(),
+        type: 'text'
+      });
+      
+      // Ajouter le message à la liste locale
+      setChatMessages(prev => [...prev, savedMessage]);
+      setNewMessage('');
+      
+      console.log('✅ Message envoyé et sauvegardé:', savedMessage);
+    } catch (error) {
+      console.error('❌ Erreur envoi message:', error);
+      toast.error('Erreur lors de l\'envoi du message');
+    }
   };
 
   // Nouvelles fonctions pour les contrôles de niveau live
@@ -354,7 +568,19 @@ const LiveStream = ({ isOpen, onClose, onLiveStarted }) => {
 
   const handleLoadedMetadata = () => {
     if (videoRef.current) {
-      setVideoDuration(videoRef.current.duration);
+      const duration = videoRef.current.duration;
+      console.log('📊 Durée vidéo détectée:', duration);
+      
+      // Vérifier que la durée est valide
+      if (isFinite(duration) && duration > 0) {
+        setVideoDuration(duration);
+        console.log('✅ Durée vidéo définie:', duration);
+      } else {
+        console.log('⚠️ Durée vidéo invalide:', duration);
+        // Forcer une durée par défaut si invalide
+        setVideoDuration(1); // 1 seconde par défaut
+        console.log('🔄 Durée forcée à 1 seconde');
+      }
     }
   };
 
@@ -369,6 +595,62 @@ const LiveStream = ({ isOpen, onClose, onLiveStarted }) => {
     }
   };
 
+  // Fonction pour forcer l'affichage de la vidéo
+  const forceVideoDisplay = (videoUrl) => {
+    console.log('🔄 Force video display avec URL:', videoUrl);
+    
+    // Forcer la mise à jour des états
+    setRecordedVideo(videoUrl);
+    setIsLive(false);
+    setLiveData(null);
+    setLiveStartTime(null);
+    
+    // Configurer la vidéo après un délai
+    setTimeout(() => {
+      if (videoRef.current) {
+        videoRef.current.src = videoUrl;
+        videoRef.current.load();
+        
+        videoRef.current.addEventListener('loadedmetadata', () => {
+          console.log('✅ Vidéo chargée avec succès');
+          const duration = videoRef.current.duration;
+          
+          // Gérer la durée invalide
+          if (isFinite(duration) && duration > 0) {
+            setVideoDuration(duration);
+          } else {
+            setVideoDuration(1); // Durée par défaut
+            console.log('🔄 Durée forcée à 1 seconde');
+          }
+          
+          setCurrentTime(0);
+          setIsPlaying(false);
+          
+          // Forcer le re-rendu
+          setTimeout(() => {
+            console.log('🔄 Re-rendu forcé de l\'interface');
+            setRecordedVideo(videoUrl); // Forcer la mise à jour
+            toast.success('🎬 Vidéo enregistrée prête pour la lecture !');
+          }, 100);
+        });
+        
+        videoRef.current.addEventListener('error', (e) => {
+          console.error('❌ Erreur vidéo:', e);
+          toast.error('Erreur lors du chargement de la vidéo');
+        });
+        
+        // Forcer le chargement si pas d'événement
+        setTimeout(() => {
+          if (videoDuration === 0 || !isFinite(videoDuration)) {
+            console.log('🔄 Forçage du chargement vidéo');
+            setVideoDuration(1);
+            setCurrentTime(0);
+            setIsPlaying(false);
+          }
+        }, 1000);
+      }
+    }, 300);
+  };
 
 
   if (!isOpen) return null;
@@ -501,6 +783,53 @@ const LiveStream = ({ isOpen, onClose, onLiveStarted }) => {
                   </div>
                 </div>
               )}
+
+              {/* Message de confirmation vidéo prête */}
+              {recordedVideo && !isLive && videoDuration > 0 && (
+                <div className="absolute top-4 left-4 bg-green-600 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center space-x-1">
+                  <div className="w-2 h-2 bg-white rounded-full"></div>
+                  <span>VIDÉO PRÊTE</span>
+                </div>
+              )}
+
+              {/* Informations sur l'origine live de la vidéo */}
+              {recordedVideo && !isLive && liveInfo && (
+                <div className="absolute top-4 right-4 bg-black bg-opacity-75 text-white p-3 rounded-lg backdrop-blur-sm max-w-xs">
+                  <div className="flex items-center space-x-2 mb-2">
+                    <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+                    <span className="text-sm font-semibold">ENREGISTRÉ EN DIRECT</span>
+                  </div>
+                  
+                  <div className="space-y-1 text-xs">
+                    <div className="flex justify-between">
+                      <span className="text-gray-300">Titre:</span>
+                      <span className="font-medium">{liveInfo.title}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-300">Auteur:</span>
+                      <span className="font-medium">{liveInfo.author}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-300">Durée:</span>
+                      <span className="font-medium">{formatTime(liveInfo.duration)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-300">Messages:</span>
+                      <span className="font-medium">{liveInfo.chatMessages}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-300">Spectateurs:</span>
+                      <span className="font-medium">{liveInfo.viewersCount}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="mt-2 pt-2 border-t border-gray-600">
+                    <div className="text-xs text-gray-400">
+                      Enregistré le {new Date(liveInfo.endTime).toLocaleDateString('fr-FR')} à {new Date(liveInfo.endTime).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'})}
+                    </div>
+                  </div>
+                </div>
+              )}
               
               {/* Contrôles de live */}
               {isLive && (
@@ -577,13 +906,53 @@ const LiveStream = ({ isOpen, onClose, onLiveStarted }) => {
                 </div>
                 
                 {isLive && (
-                  <button
-                    onClick={stopLive}
-                    className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-all duration-200 flex items-center space-x-2 shadow-lg font-medium"
-                  >
-                    <Square className="w-4 h-4" />
-                    <span>Arrêter le live</span>
-                  </button>
+                  <div className="flex space-x-3">
+                    {!showStopConfirmation ? (
+                      <button
+                        onClick={stopLive}
+                        disabled={isStopping}
+                        className="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-all duration-200 flex items-center space-x-2 shadow-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isStopping ? (
+                          <>
+                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                            <span>Arrêt en cours...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Square className="w-4 h-4" />
+                            <span>Arrêter le live</span>
+                          </>
+                        )}
+                      </button>
+                    ) : (
+                      <div className="flex space-x-2">
+                        <button
+                          onClick={confirmStopLive}
+                          className="bg-red-600 text-white px-4 py-3 rounded-lg hover:bg-red-700 transition-all duration-200 flex items-center space-x-2 shadow-lg font-medium"
+                        >
+                          <Check className="w-4 h-4" />
+                          <span>Confirmer</span>
+                        </button>
+                        <button
+                          onClick={() => setShowStopConfirmation(false)}
+                          className="bg-gray-600 text-white px-4 py-3 rounded-lg hover:bg-gray-700 transition-all duration-200 flex items-center space-x-2 shadow-lg font-medium"
+                        >
+                          <X className="w-4 h-4" />
+                          <span>Annuler</span>
+                        </button>
+                      </div>
+                    )}
+                    
+                    <button
+                      onClick={forceStopLive}
+                      className="bg-red-800 text-white px-4 py-3 rounded-lg hover:bg-red-900 transition-all duration-200 flex items-center space-x-2 shadow-lg font-medium border-2 border-red-400"
+                      title="Arrêt d'urgence - Force l'arrêt complet"
+                    >
+                      <X className="w-4 h-4" />
+                      <span>Arrêt forcé</span>
+                    </button>
+                  </div>
                 )}
               </div>
               )}
@@ -595,7 +964,7 @@ const LiveStream = ({ isOpen, onClose, onLiveStarted }) => {
                     <div className="flex items-center space-x-3">
                       <button
                         onClick={togglePlayPause}
-                        className="p-3 rounded-full bg-black/70 text-white hover:bg-black/90 transition-all duration-200 shadow-lg"
+                        className="bg-white/20 hover:bg-white/30 text-white p-3 rounded-full transition-all duration-200 shadow-lg"
                         title={isPlaying ? 'Pause' : 'Lecture'}
                       >
                         {isPlaying ? (
@@ -609,17 +978,38 @@ const LiveStream = ({ isOpen, onClose, onLiveStarted }) => {
                       </button>
                       
                       <div className="text-white text-sm font-medium">
-                        {videoDuration > 0 ? `${formatTime(currentTime)} / ${formatTime(videoDuration)}` : 'Chargement...'}
+                        {videoDuration > 0 && isFinite(videoDuration) ? `${formatTime(currentTime)} / ${formatTime(videoDuration)}` : 'Chargement...'}
                       </div>
+
+                      {/* Badge "LIVE" pour indiquer l'origine */}
+                      {liveInfo && (
+                        <div className="bg-red-600 text-white px-2 py-1 rounded text-xs font-medium flex items-center space-x-1">
+                          <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+                          <span>LIVE</span>
+                        </div>
+                      )}
                     </div>
                     
-                    <button
-                      onClick={onClose}
-                      className="text-white hover:text-gray-300 transition-colors"
-                      title="Fermer"
-                    >
-                      <X className="w-5 h-5" />
-                    </button>
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={onClose}
+                        className="text-white hover:text-gray-300 transition-colors"
+                        title="Fermer"
+                      >
+                        <X className="w-5 h-5" />
+                      </button>
+
+                      {/* Bouton détails du live */}
+                      {liveInfo && (
+                        <button
+                          onClick={() => setShowLiveDetails(!showLiveDetails)}
+                          className="text-white hover:text-gray-300 transition-colors"
+                          title="Détails du live"
+                        >
+                          <Info className="w-5 h-5" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                   
                   {/* Barre de progression */}
@@ -629,17 +1019,38 @@ const LiveStream = ({ isOpen, onClose, onLiveStarted }) => {
                   >
                     <div 
                       className="h-full bg-red-600 rounded-full transition-all duration-200"
-                      style={{ width: `${videoDuration > 0 ? (currentTime / videoDuration) * 100 : 0}%` }}
-                ></div>
-              </div>
+                      style={{ width: `${videoDuration > 0 && isFinite(videoDuration) ? (currentTime / videoDuration) * 100 : 0}%` }}
+                    ></div>
+                  </div>
                   
                   {/* Message d'information */}
-                  {videoDuration === 0 && (
+                  {(videoDuration === 0 || !isFinite(videoDuration)) && (
                     <div className="text-center text-white text-sm mt-2">
                       <div className="inline-block animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                       Préparation de la vidéo...
                     </div>
                   )}
+                </div>
+              )}
+
+              {/* Message de confirmation vidéo prête */}
+              {recordedVideo && !isLive && videoDuration > 0 && (
+                <div className="absolute top-4 left-4 bg-green-600 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center space-x-1">
+                  <div className="w-2 h-2 bg-white rounded-full"></div>
+                  <span>VIDÉO PRÊTE</span>
+                </div>
+              )}
+
+              {/* Message pour vidéo enregistrée en cours de chargement */}
+              {recordedVideo && !isLive && videoDuration === 0 && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                  <div className="text-center text-white">
+                    <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-white mb-4"></div>
+                    <h3 className="text-lg font-semibold mb-2">Préparation de la vidéo</h3>
+                    <p className="text-gray-300">
+                      Votre vidéo enregistrée est en cours de préparation...
+                    </p>
+                  </div>
                 </div>
               )}
 
@@ -879,6 +1290,54 @@ const LiveStream = ({ isOpen, onClose, onLiveStarted }) => {
           )}
         </div>
       </div>
+      {/* Message de confirmation d'arrêt */}
+      {showStopConfirmation && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 shadow-2xl max-w-md mx-4 text-center">
+            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Square className="w-8 h-8 text-red-600" />
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Arrêter le live ?
+            </h3>
+            <p className="text-gray-600 mb-6">
+              Votre vidéo sera automatiquement enregistrée et disponible pour lecture après l'arrêt.
+            </p>
+            <div className="flex space-x-3">
+              <button
+                onClick={() => setShowStopConfirmation(false)}
+                className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                Continuer le live
+              </button>
+              <button
+                onClick={confirmStopLive}
+                className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center space-x-2"
+              >
+                <Square className="w-4 h-4" />
+                <span>Arrêter le live</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Message d'arrêt en cours */}
+      {isStopping && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 shadow-2xl max-w-md mx-4 text-center">
+            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              Arrêt du live en cours...
+            </h3>
+            <p className="text-gray-600">
+              Veuillez patienter pendant que nous finalisons l'enregistrement de votre vidéo.
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

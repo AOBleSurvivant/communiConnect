@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { userAPI } from '../services/api';
 import { 
   User, 
   MapPin, 
@@ -17,7 +16,7 @@ import {
 import toast from 'react-hot-toast';
 
 const Profile = () => {
-  const { user, updateProfile, isAuthenticated } = useAuth();
+  const { user, updateProfile, uploadProfilePicture, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -114,13 +113,8 @@ const Profile = () => {
       const formData = new FormData();
       formData.append('profile_picture', file);
 
-      // Utiliser la fonction spécifique pour l'upload de photo
-      const response = await userAPI.uploadProfilePicture(formData);
-      
-      // Mettre à jour les données utilisateur
-      if (response.user) {
-        setUser(response.user);
-      }
+      // Utiliser la fonction du contexte d'authentification pour l'upload
+      await uploadProfilePicture(formData);
       
       setShowPictureModal(false);
       toast.success('Photo de profil mise à jour avec succès !');

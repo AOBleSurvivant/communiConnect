@@ -142,90 +142,87 @@ class GuineaOnlyMiddleware(MiddlewareMixin):
         return None 
 
 
-class PerformanceMiddleware(MiddlewareMixin):
-    """Middleware pour optimiser les performances et le monitoring"""
+class SecurityMiddleware(MiddlewareMixin):
+    """Middleware de sécurité renforcée"""
     
     def process_request(self, request):
-        """Mesure le temps de traitement de la requête"""
-        request.start_time = time.time()
+        # Rate limiting par IP
+        client_ip = self.get_client_ip(request)
+        rate_limit_key = f"rate_limit_{client_ip}"
         
-        # Cache des en-têtes de performance
-        request.performance_headers = {
-            'X-Request-ID': f"req_{int(time.time() * 1000)}",
-            'X-Start-Time': str(request.start_time)
-        }
+        # Vérifier le rate limiting
+        if not self.check_rate_limit(rate_limit_key):
+            return JsonResponse(
+                {'error': 'Trop de requêtes. Veuillez patienter.'},
+                status=429
+            )
         
-        # Vérification du cache pour les requêtes GET
-        if request.method == 'GET' and not request.path.startswith('/admin/'):
-            cache_key = self._get_cache_key(request)
-            cached_response = cache.get(cache_key)
-            
-            if cached_response:
-                logger.info(f"Cache hit pour {request.path}")
-                return JsonResponse(cached_response, status=200)
+        # Headers de sécurité
+        request.META['HTTP_X_FRAME_OPTIONS'] = 'DENY'
+        request.META['HTTP_X_CONTENT_TYPE_OPTIONS'] = 'nosniff'
+        request.META['HTTP_X_XSS_PROTECTION'] = '1; mode=block'
         
         return None
     
     def process_response(self, request, response):
-        """Ajoute les en-têtes de performance et met en cache si nécessaire"""
-        if hasattr(request, 'start_time'):
-            # Calcul du temps de traitement
-            processing_time = time.time() - request.start_time
-            
-            # Ajout des en-têtes de performance
-            response['X-Processing-Time'] = f"{processing_time:.3f}s"
-            response['X-Request-ID'] = getattr(request, 'performance_headers', {}).get('X-Request-ID', '')
-            
-            # Cache des réponses JSON pour les requêtes GET
-            if (request.method == 'GET' and 
-                response.status_code == 200 and 
-                response.get('Content-Type', '').startswith('application/json') and
-                not request.path.startswith('/admin/')):
-                
-                cache_key = self._get_cache_key(request)
-                cache_timeout = self._get_cache_timeout(request.path)
-                
-                try:
-                    # Mettre en cache la réponse JSON
-                    if hasattr(response, 'content'):
-                        import json
-                        response_data = json.loads(response.content.decode())
-                        cache.set(cache_key, response_data, cache_timeout)
-                        logger.info(f"Réponse mise en cache: {request.path}")
-                except Exception as e:
-                    logger.warning(f"Erreur lors de la mise en cache: {str(e)}")
-            
-            # Log des performances lentes
-            if processing_time > 1.0:  # Plus d'1 seconde
-                logger.warning(f"Requête lente: {request.path} - {processing_time:.3f}s")
+        # Headers de sécurité dans la réponse
+        response['X-Frame-Options'] = 'DENY'
+        response['X-Content-Type-Options'] = 'nosniff'
+        response['X-XSS-Protection'] = '1; mode=block'
+        response['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+        response['Content-Security-Policy'] = "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';"
         
         return response
     
-    def _get_cache_key(self, request):
-        """Génère une clé de cache unique pour la requête"""
-        # Inclure l'utilisateur dans la clé si authentifié
-        user_id = request.user.id if request.user.is_authenticated else 'anonymous'
-        
-        # Inclure les paramètres de requête importants
-        params = []
-        for key in ['page', 'type', 'sort', 'search']:
-            if key in request.GET:
-                params.append(f"{key}={request.GET[key]}")
-        
-        param_string = "&".join(params) if params else "no_params"
-        
-        return f"response_cache:{user_id}:{request.path}:{param_string}"
-    
-    def _get_cache_timeout(self, path):
-        """Détermine le timeout de cache selon le type de contenu"""
-        if '/posts/' in path:
-            return settings.CACHE_TIMEOUTS.get('posts_list', 300)
-        elif '/users/profile/' in path:
-            return settings.CACHE_TIMEOUTS.get('user_profile', 600)
-        elif '/media/' in path:
-            return settings.CACHE_TIMEOUTS.get('media_list', 1800)
+    def get_client_ip(self, request):
+        """Récupère l'IP réelle du client"""
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0]
         else:
-            return 300  # 5 minutes par défaut
+            ip = request.META.get('REMOTE_ADDR')
+        return ip
+    
+    def check_rate_limit(self, key, max_requests=100, window=60):
+        """Vérifie le rate limiting"""
+        current_time = int(time.time())
+        window_start = current_time - window
+        
+        # Récupérer les requêtes récentes
+        requests = cache.get(key, [])
+        
+        # Filtrer les requêtes dans la fenêtre
+        recent_requests = [req for req in requests if req > window_start]
+        
+        # Vérifier la limite
+        if len(recent_requests) >= max_requests:
+            return False
+        
+        # Ajouter la requête actuelle
+        recent_requests.append(current_time)
+        cache.set(key, recent_requests, window)
+        
+        return True
+
+class PerformanceMiddleware(MiddlewareMixin):
+    """Middleware pour le monitoring des performances"""
+    
+    def process_request(self, request):
+        request.start_time = time.time()
+        return None
+    
+    def process_response(self, request, response):
+        if hasattr(request, 'start_time'):
+            duration = time.time() - request.start_time
+            
+            # Logger les requêtes lentes
+            if duration > 1.0:  # Plus d'1 seconde
+                logger.warning(f"Requête lente: {request.path} - {duration:.2f}s")
+            
+            # Ajouter le header de durée
+            response['X-Response-Time'] = f"{duration:.3f}s"
+        
+        return response
 
 
 class DatabaseOptimizationMiddleware(MiddlewareMixin):

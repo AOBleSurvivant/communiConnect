@@ -65,6 +65,19 @@ const MediaGallery = ({ media, className = '' }) => {
 
   const renderMediaContent = () => {
     if (isLive) {
+      // Construire l'URL de la vidéo avec fallback
+      const videoUrl = currentMedia.file_url || currentMedia.file || '';
+      
+      // Détecter le type MIME basé sur l'extension
+      const getVideoType = (url) => {
+        if (url.includes('.webm')) return 'video/webm';
+        if (url.includes('.mp4')) return 'video/mp4';
+        if (url.includes('.mov')) return 'video/quicktime';
+        return 'video/mp4'; // fallback
+      };
+      
+      const videoType = getVideoType(videoUrl);
+      
       return (
         <div className="relative bg-black rounded-lg overflow-hidden">
           <video
@@ -74,8 +87,11 @@ const MediaGallery = ({ media, className = '' }) => {
             muted
             onPlay={handleVideoPlay}
             onPause={handleVideoPause}
+            onError={(e) => {
+              console.error('Erreur chargement vidéo live:', videoUrl, e);
+            }}
           >
-            <source src={currentMedia.file_url} type="video/mp4" />
+            <source src={videoUrl} type={videoType} />
           </video>
           
           {/* Badge Live avec chronomètre */}
@@ -99,16 +115,52 @@ const MediaGallery = ({ media, className = '' }) => {
     }
 
     if (isVideo) {
+      // Construire l'URL de la vidéo avec fallback
+      const videoUrl = currentMedia.file_url || currentMedia.file || '';
+      
+      // Détecter le type MIME basé sur l'extension
+      const getVideoType = (url) => {
+        if (url.includes('.webm')) return 'video/webm';
+        if (url.includes('.mp4')) return 'video/mp4';
+        if (url.includes('.mov')) return 'video/quicktime';
+        return 'video/mp4'; // fallback
+      };
+      
+      const videoType = getVideoType(videoUrl);
+      
       return (
         <div className="relative bg-black rounded-lg overflow-hidden">
           <video
             id={`video-${currentMedia.id}`}
             className="w-full h-full object-cover"
             controls
+            preload="metadata"
             onPlay={handleVideoPlay}
             onPause={handleVideoPause}
+            onError={(e) => {
+              console.error('Erreur chargement vidéo:', videoUrl, e);
+              // Essayer de détecter le type de fichier et proposer une solution
+              if (videoUrl.includes('.webm')) {
+                console.warn('Format WebM détecté - compatibilité limitée sur certains navigateurs');
+                console.warn('Format vidéo non supporté par votre navigateur. Essayez Chrome ou Firefox.');
+              }
+            }}
           >
-            <source src={currentMedia.file_url} type="video/mp4" />
+            <source src={videoUrl} type={videoType} />
+            <source src={videoUrl} type="video/mp4" />
+            <source src={videoUrl} type="video/webm" />
+            <div className="flex flex-col items-center justify-center h-full text-white bg-gray-800 p-4">
+              <p className="mb-4">Votre navigateur ne supporte pas la lecture de cette vidéo.</p>
+              {videoUrl.includes('.webm') && (
+                <a 
+                  href={videoUrl} 
+                  download 
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+                >
+                  📥 Télécharger la vidéo
+                </a>
+              )}
+            </div>
           </video>
           
           {/* Contrôles personnalisés */}
@@ -138,13 +190,19 @@ const MediaGallery = ({ media, className = '' }) => {
       );
     }
 
-    // Image
+    // Image - Utiliser l'URL complète si disponible, sinon construire l'URL
+    const imageUrl = currentMedia.file || currentMedia.file_url || '';
+    
     return (
       <div className="relative">
         <img
-          src={currentMedia.file_url}
+          src={imageUrl}
           alt={currentMedia.title || 'Image'}
           className="w-full h-full object-cover rounded-lg"
+          onError={(e) => {
+            console.error('Erreur chargement image:', imageUrl);
+            e.target.style.display = 'none';
+          }}
         />
         
         {/* Bouton plein écran */}
@@ -163,36 +221,50 @@ const MediaGallery = ({ media, className = '' }) => {
 
     return (
       <div className="flex space-x-2 mt-3 overflow-x-auto">
-        {media.map((item, index) => (
-          <button
-            key={item.id}
-            onClick={() => setCurrentIndex(index)}
-            className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${
-              index === currentIndex
-                ? 'border-blue-500'
-                : 'border-gray-300 hover:border-gray-400'
-            }`}
-          >
-            {item.media_type === 'video' ? (
-              <div className="relative w-full h-full">
-                <img
-                  src={item.thumbnail_url || item.file_url}
-                  alt={item.title || 'Vidéo'}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
-                  <Play className="w-4 h-4 text-white" />
+        {media.map((item, index) => {
+          // Utiliser l'URL complète si disponible
+          const imageUrl = item.file || item.file_url || '';
+          const thumbnailUrl = item.thumbnail_url || imageUrl;
+          
+          return (
+            <button
+              key={item.id}
+              onClick={() => setCurrentIndex(index)}
+              className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all ${
+                index === currentIndex
+                  ? 'border-blue-500'
+                  : 'border-gray-300 hover:border-gray-400'
+              }`}
+            >
+              {item.media_type === 'video' ? (
+                <div className="relative w-full h-full">
+                  <img
+                    src={thumbnailUrl}
+                    alt={item.title || 'Vidéo'}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      console.error('Erreur chargement thumbnail vidéo:', thumbnailUrl);
+                      e.target.style.display = 'none';
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-black bg-opacity-30 flex items-center justify-center">
+                    <Play className="w-4 h-4 text-white" />
+                  </div>
                 </div>
-              </div>
-            ) : (
-              <img
-                src={item.file_url}
-                alt={item.title || 'Image'}
-                className="w-full h-full object-cover"
-              />
-            )}
-          </button>
-        ))}
+              ) : (
+                <img
+                  src={imageUrl}
+                  alt={item.title || 'Image'}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    console.error('Erreur chargement thumbnail image:', imageUrl);
+                    e.target.style.display = 'none';
+                  }}
+                />
+              )}
+            </button>
+          );
+        })}
       </div>
     );
   };
@@ -240,9 +312,12 @@ const MediaGallery = ({ media, className = '' }) => {
               />
             ) : (
               <img
-                src={currentMedia.file_url}
+                src={currentMedia.file || currentMedia.file_url}
                 alt={currentMedia.title || 'Image'}
                 className="max-w-full max-h-full object-contain"
+                onError={(e) => {
+                  console.error('Erreur chargement image plein écran:', currentMedia.file || currentMedia.file_url);
+                }}
               />
             )}
           </div>

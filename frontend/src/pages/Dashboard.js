@@ -4,6 +4,7 @@ import { postsAPI } from '../services/postsAPI';
 import CreatePost from '../components/CreatePost';
 import PostCard from '../components/PostCard';
 import LiveStream from '../components/LiveStream';
+import CameraTest from '../components/CameraTest';
 import { 
   Plus, 
   Video, 
@@ -13,7 +14,8 @@ import {
   AlertCircle,
   Users,
   Search,
-  RefreshCw
+  RefreshCw,
+  Camera
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -23,6 +25,7 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [showCreatePost, setShowCreatePost] = useState(false);
   const [showLiveStream, setShowLiveStream] = useState(false);
+  const [showCameraTest, setShowCameraTest] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -36,6 +39,7 @@ const Dashboard = () => {
   ];
 
   const fetchPosts = useCallback(async () => {
+    console.log('🔍 fetchPosts appelé avec:', { selectedFilter, searchTerm });
     setIsLoading(true);
     try {
       const params = {};
@@ -46,23 +50,30 @@ const Dashboard = () => {
         params.search = searchTerm;
       }
       
+      console.log('📝 Appel API avec params:', params);
       const response = await postsAPI.getPosts(params);
+      console.log('📊 Réponse API reçue:', response);
       
       // Gérer la structure paginée de l'API et s'assurer que posts est toujours un tableau
       let postsData = [];
       if (response && typeof response === 'object') {
         if (Array.isArray(response)) {
           postsData = response;
+          console.log('📊 Réponse est un tableau direct');
         } else if (response.results && Array.isArray(response.results)) {
           postsData = response.results;
+          console.log('📊 Réponse contient results');
         } else if (response.data && Array.isArray(response.data)) {
           postsData = response.data;
+          console.log('📊 Réponse contient data');
         }
       }
       
+      console.log('📊 PostsData final:', postsData);
+      console.log('📊 Nombre de posts:', postsData.length);
       setPosts(postsData);
     } catch (error) {
-      console.error('Erreur lors du chargement des posts:', error);
+      console.error('❌ Erreur lors du chargement des posts:', error);
       toast.error('Erreur lors du chargement des publications');
       setPosts([]); // S'assurer que posts est un tableau vide en cas d'erreur
     } finally {
@@ -71,10 +82,14 @@ const Dashboard = () => {
   }, [selectedFilter, searchTerm]);
 
   useEffect(() => {
+    console.log('👤 useEffect Dashboard - user:', user);
     if (user) { // Assuming user is available from useAuth
+      console.log('✅ Utilisateur connecté, appel fetchPosts');
       fetchPosts();
+    } else {
+      console.log('❌ Utilisateur non connecté');
     }
-  }, [user, fetchPosts]); // fetchPosts est maintenant mémorisé avec useCallback
+  }, [user, fetchPosts]); // Ajouté fetchPosts avec useCallback pour éviter la boucle
 
 
 
@@ -84,6 +99,12 @@ const Dashboard = () => {
 
   const handleLiveStarted = (liveData) => {
     // Le live sera automatiquement ajouté aux posts
+    fetchPosts();
+  };
+
+  const handleLiveStopped = (stopData) => {
+    // Rafraîchir les posts pour afficher la vidéo enregistrée
+    console.log('🔄 Live arrêté, rafraîchissement des posts...', stopData);
     fetchPosts();
   };
 
@@ -157,6 +178,14 @@ const Dashboard = () => {
               <Video className="w-4 h-4" />
               <span>Lancer un live</span>
             </button>
+            
+            <button
+              onClick={() => setShowCameraTest(true)}
+              className="flex items-center space-x-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+            >
+              <Camera className="w-4 h-4" />
+              <span>Test Caméra</span>
+            </button>
           </div>
         </div>
 
@@ -208,6 +237,7 @@ const Dashboard = () => {
 
         {/* Liste des posts */}
         <div className="space-y-6">
+          {console.log('🎨 Rendu Dashboard - isLoading:', isLoading, 'filteredPosts:', filteredPosts.length)}
           {isLoading ? (
             <div className="flex items-center justify-center py-12">
               <div className="flex items-center space-x-2">
@@ -260,6 +290,12 @@ const Dashboard = () => {
         isOpen={showLiveStream}
         onClose={() => setShowLiveStream(false)}
         onLiveStarted={handleLiveStarted}
+        onLiveStopped={handleLiveStopped}
+      />
+
+      <CameraTest
+        isOpen={showCameraTest}
+        onClose={() => setShowCameraTest(false)}
       />
     </div>
   );

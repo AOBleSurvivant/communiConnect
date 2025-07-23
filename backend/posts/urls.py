@@ -3,12 +3,20 @@ from .views import (
     PostListView, PostDetailView, PostLikeView, PostCommentView,
     PostCommentDetailView, PostCommentReplyView, UserPostsView, PostIncrementViewsView,
     MediaUploadView, MediaListView, MediaDetailView, LiveStreamView, PostShareView, PostSharesListView,
-    ExternalShareView, ExternalSharesListView, PostAnalyticsView, UserAnalyticsView, CommunityAnalyticsView
+    ExternalShareView, ExternalSharesListView, PostAnalyticsView, UserAnalyticsView, CommunityAnalyticsView,
+    LiveChatView, LiveVideoUploadView
 )
 
 app_name = 'posts'
 
 urlpatterns = [
+    # Live streaming et chat (doit être avant les URLs génériques)
+    path('live/start/', LiveStreamView.as_view(), name='live-start'),
+    path('live/<int:live_id>/stop/', LiveStreamView.as_view(), name='live-stop'),
+    path('live/<int:live_id>/upload-video/', LiveVideoUploadView.as_view(), name='live-upload-video'),
+    path('live/<int:post_id>/chat/', LiveChatView.as_view(), name='live-chat'),
+    path('live/<int:post_id>/chat/messages/', LiveChatView.as_view(), name='live-chat-messages'),
+    
     # Posts
     path('', PostListView.as_view(), name='post-list'),
     path('<int:pk>/', PostDetailView.as_view(), name='post-detail'),
@@ -29,10 +37,6 @@ urlpatterns = [
     path('media/upload/', MediaUploadView.as_view(), name='media-upload'),
     path('media/', MediaListView.as_view(), name='media-list'),
     path('media/<int:pk>/', MediaDetailView.as_view(), name='media-detail'),
-    
-    # Live streaming
-    path('live/start/', LiveStreamView.as_view(), name='live-start'),
-    path('live/<int:live_id>/stop/', LiveStreamView.as_view(), name='live-stop'),
 
     # Partages
     path('posts/<int:pk>/share/', PostShareView.as_view(), name='post-share'),

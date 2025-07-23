@@ -91,7 +91,7 @@ export const postsAPI = {
 
   // Incrémenter les vues d'un post
   incrementViews: async (postId) => {
-    const response = await api.post(`/posts/${postId}/increment-views/`);
+    const response = await api.post(`/posts/posts/${postId}/increment-views/`);
     return response.data;
   },
 };
@@ -99,7 +99,7 @@ export const postsAPI = {
 // Fonctions de partage
 export const sharePost = async (postId, shareData = {}) => {
   try {
-    const response = await api.post(`/posts/${postId}/share/`, {
+    const response = await api.post(`/posts/posts/${postId}/share/`, {
       share_type: 'share',
       comment: shareData.comment || '',
       ...shareData
@@ -113,7 +113,7 @@ export const sharePost = async (postId, shareData = {}) => {
 
 export const repostPost = async (postId, repostData = {}) => {
   try {
-    const response = await api.post(`/posts/${postId}/share/`, {
+    const response = await api.post(`/posts/posts/${postId}/share/`, {
       share_type: 'repost',
       comment: repostData.comment || '',
       ...repostData
@@ -127,7 +127,7 @@ export const repostPost = async (postId, repostData = {}) => {
 
 export const unsharePost = async (postId, shareType = 'share') => {
   try {
-    const response = await api.delete(`/posts/${postId}/share/`, {
+    const response = await api.delete(`/posts/posts/${postId}/share/`, {
       data: { share_type: shareType }
     });
     return response.data;
@@ -139,7 +139,7 @@ export const unsharePost = async (postId, shareType = 'share') => {
 
 export const getPostShares = async (postId) => {
   try {
-    const response = await api.get(`/posts/${postId}/shares/`);
+    const response = await api.get(`/posts/posts/${postId}/shares/`);
     return response.data;
   } catch (error) {
     console.error('Erreur lors de la récupération des partages:', error);
@@ -150,7 +150,7 @@ export const getPostShares = async (postId) => {
 // Fonctions de partage externe
 export const sharePostExternal = async (postId, platform) => {
   try {
-    const response = await api.post(`/posts/${postId}/share-external/`, {
+    const response = await api.post(`/posts/posts/${postId}/share-external/`, {
       platform: platform
     });
     return response.data;
@@ -162,7 +162,7 @@ export const sharePostExternal = async (postId, platform) => {
 
 export const getExternalShares = async (postId) => {
   try {
-    const response = await api.get(`/posts/${postId}/external-shares/`);
+    const response = await api.get(`/posts/posts/${postId}/external-shares/`);
     return response.data;
   } catch (error) {
     console.error('Erreur lors de la récupération des partages externes:', error);
@@ -190,7 +190,7 @@ export const generateShareLinks = (postId, postContent) => {
 // Fonctions d'analytics
 export const getPostAnalytics = async (postId) => {
   try {
-    const response = await api.get(`/posts/${postId}/analytics/`);
+    const response = await api.get(`/posts/posts/${postId}/analytics/`);
     return response.data;
   } catch (error) {
     console.error('Erreur lors de la récupération des analytics:', error);

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test MIME Types Support</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .supported { background-color: #d4edda; color: #155724; }
+        .not-supported { background-color: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>Test Support MIME Types MediaRecorder</h1>
+    <div id="results"></div>
+
+    <script>
+        const mimeTypes = [
+            'video/mp4',
+            'video/mp4;codecs=h264',
+            'video/mp4;codecs=h264,aac',
+            'video/webm',
+            'video/webm;codecs=vp8',
+            'video/webm;codecs=vp8,opus',
+            'video/webm;codecs=vp9',
+            'video/webm;codecs=vp9,opus',
+            'video/ogg',
+            'video/ogg;codecs=theora',
+            'video/ogg;codecs=theora,vorbis'
+        ];
+
+        const resultsDiv = document.getElementById('results');
+        
+        mimeTypes.forEach(mimeType => {
+            const isSupported = MediaRecorder.isTypeSupported(mimeType);
+            const div = document.createElement('div');
+            div.className = `result ${isSupported ? 'supported' : 'not-supported'}`;
+            div.innerHTML = `<strong>${mimeType}:</strong> ${isSupported ? '✅ Supporté' : '❌ Non supporté'}`;
+            resultsDiv.appendChild(div);
+        });
+
+        // Test avec getUserMedia
+        async function testWithStream() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                console.log('Stream obtenu:', stream);
+                
+                // Tester les types supportés avec le stream
+                mimeTypes.forEach(mimeType => {
+                    if (MediaRecorder.isTypeSupported(mimeType)) {
+                        try {
+                            const recorder = new MediaRecorder(stream, { mimeType });
+                            console.log(`✅ MediaRecorder créé avec succès: ${mimeType}`);
+                        } catch (error) {
+                            console.log(`❌ Erreur création MediaRecorder: ${mimeType}`, error);
+                        }
+                    }
+                });
+                
+                // Arrêter le stream
+                stream.getTracks().forEach(track => track.stop());
+            } catch (error) {
+                console.error('Erreur getUserMedia:', error);
+            }
+        }
+
+        // Lancer le test après 2 secondes
+        setTimeout(testWithStream, 2000);
+    </script>
+</body>
+</html> 

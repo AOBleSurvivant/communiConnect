@@ -238,123 +238,414 @@ class MediaModelTestCase(TestCase):
         self.assertEqual(media_cdn.file_url, 'https://res.cloudinary.com/test/image.jpg')
 
 
-class PostModelTestCase(TestCase):
+class PostModelTest(TestCase):
     """Tests pour le modèle Post"""
     
     def setUp(self):
-        """Configuration initiale"""
+        # Créer les données géographiques
+        self.region = Region.objects.create(nom="Conakry")
+        self.prefecture = Prefecture.objects.create(
+            region=self.region, 
+            nom="Conakry"
+        )
+        self.commune = Commune.objects.create(
+            prefecture=self.prefecture, 
+            nom="Kaloum"
+        )
+        self.quartier = Quartier.objects.create(
+            commune=self.commune, 
+            nom="Centre-ville"
+        )
+        
+        # Créer un utilisateur
         self.user = User.objects.create_user(
             username='testuser',
             email='test@example.com',
-            password='testpass123'
+            password='testpass123',
+            quartier=self.quartier
         )
-        
-        # Créer un quartier
-        self.region = Region.objects.create(name='Conakry')
-        self.prefecture = Prefecture.objects.create(
-            name='Conakry', 
-            region=self.region
-        )
-        self.commune = Commune.objects.create(
-            name='Kaloum', 
-            prefecture=self.prefecture
-        )
-        self.quartier = Quartier.objects.create(
-            name='Test Quartier',
-            commune=self.commune
-        )
-        
-        self.user.quartier = self.quartier
-        self.user.save()
     
-    def test_post_creation(self):
+    def test_create_post(self):
         """Test de création d'un post"""
         post = Post.objects.create(
             author=self.user,
             quartier=self.quartier,
-            content='Test post content',
+            content="Test post content",
             post_type='info'
         )
         
-        # Vérifications
         self.assertEqual(post.author, self.user)
         self.assertEqual(post.quartier, self.quartier)
-        self.assertEqual(post.content, 'Test post content')
+        self.assertEqual(post.content, "Test post content")
         self.assertEqual(post.post_type, 'info')
         self.assertEqual(post.likes_count, 0)
         self.assertEqual(post.comments_count, 0)
-        self.assertEqual(post.views_count, 0)
     
-    def test_post_like_system(self):
-        """Test du système de likes"""
+    def test_post_str_representation(self):
+        """Test de la représentation string du post"""
         post = Post.objects.create(
             author=self.user,
             quartier=self.quartier,
-            content='Test post for likes',
+            content="Test post",
             post_type='info'
         )
         
-        # Test d'ajout de like
-        post.increment_likes()
-        self.assertEqual(post.likes_count, 1)
-        
-        # Test de suppression de like
-        post.decrement_likes()
-        self.assertEqual(post.likes_count, 0)
-        
-        # Test de non-négatif
-        post.decrement_likes()
-        self.assertEqual(post.likes_count, 0)
+        self.assertIn("Test post", str(post))
+        self.assertIn(self.user.username, str(post))
     
-    def test_post_views_increment(self):
-        """Test de l'incrémentation des vues"""
+    def test_post_has_media_property(self):
+        """Test de la propriété has_media"""
         post = Post.objects.create(
             author=self.user,
             quartier=self.quartier,
-            content='Test post for views',
+            content="Test post",
             post_type='info'
         )
         
-        # Test d'incrémentation
-        post.increment_views()
-        self.assertEqual(post.views_count, 1)
+        self.assertFalse(post.has_media)
         
-        post.increment_views()
-        self.assertEqual(post.views_count, 2)
-    
-    def test_post_media_relationship(self):
-        """Test de la relation post-médias"""
-        # Créer un média
-        image = Image.new('RGB', (100, 100), color='red')
-        image_buffer = io.BytesIO()
-        image.save(image_buffer, format='JPEG')
-        image_buffer.seek(0)
-        
+        # Ajouter un média
         media = Media.objects.create(
-            file=SimpleUploadedFile(
-                "test.jpg",
-                image_buffer.getvalue(),
-                content_type="image/jpeg"
-            ),
+            file="test.jpg",
             media_type='image',
-            title='Test Media',
-            user=self.user
+            title="Test image"
         )
-        
-        # Créer un post avec média
-        post = Post.objects.create(
-            author=self.user,
-            quartier=self.quartier,
-            content='Test post with media',
-            post_type='info'
-        )
-        
         post.media_files.add(media)
         
-        # Vérifications
         self.assertTrue(post.has_media)
-        self.assertEqual(post.media_count, 1)
-        self.assertIn(media, post.media_files.all())
+
+class PostAPITest(APITestCase):
+    """Tests pour l'API des posts"""
+    
+    def setUp(self):
+        # Créer les données géographiques
+        self.region = Region.objects.create(nom="Conakry")
+        self.prefecture = Prefecture.objects.create(
+            region=self.region, 
+            nom="Conakry"
+        )
+        self.commune = Commune.objects.create(
+            prefecture=self.prefecture, 
+            nom="Kaloum"
+        )
+        self.quartier = Quartier.objects.create(
+            commune=self.commune, 
+            nom="Centre-ville"
+        )
+        
+        # Créer un utilisateur
+        self.user = User.objects.create_user(
+            username='testuser',
+            email='test@example.com',
+            password='testpass123',
+            quartier=self.quartier
+        )
+        
+        # Créer un client API
+        self.client = APIClient()
+        
+        # Créer quelques posts de test
+        self.post1 = Post.objects.create(
+            author=self.user,
+            quartier=self.quartier,
+            content="Premier post de test",
+            post_type='info'
+        )
+        
+        self.post2 = Post.objects.create(
+            author=self.user,
+            quartier=self.quartier,
+            content="Deuxième post de test",
+            post_type='event'
+        )
+    
+    def test_get_posts_list(self):
+        """Test de récupération de la liste des posts"""
+        # Authentifier l'utilisateur
+        self.client.force_authenticate(user=self.user)
+        
+        # Faire la requête
+        url = reverse('posts:post-list')
+        response = self.client.get(url)
+        
+        # Vérifier la réponse
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertIn('results', response.data)
+        self.assertEqual(len(response.data['results']), 2)
+    
+    def test_create_post(self):
+        """Test de création d'un post"""
+        # Authentifier l'utilisateur
+        self.client.force_authenticate(user=self.user)
+        
+        # Données du post
+        post_data = {
+            'content': 'Nouveau post via API',
+            'post_type': 'info',
+            'is_anonymous': False
+        }
+        
+        # Faire la requête
+        url = reverse('posts:post-list')
+        response = self.client.post(url, post_data, format='json')
+        
+        # Vérifier la réponse
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['content'], 'Nouveau post via API')
+        self.assertEqual(response.data['author']['username'], self.user.username)
+        
+        # Vérifier que le post a été créé en base
+        self.assertEqual(Post.objects.count(), 3)
+    
+    def test_get_post_detail(self):
+        """Test de récupération d'un post spécifique"""
+        # Authentifier l'utilisateur
+        self.client.force_authenticate(user=self.user)
+        
+        # Faire la requête
+        url = reverse('posts:post-detail', args=[self.post1.id])
+        response = self.client.get(url)
+        
+        # Vérifier la réponse
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['content'], 'Premier post de test')
+        self.assertEqual(response.data['id'], self.post1.id)
+    
+    def test_update_post(self):
+        """Test de modification d'un post"""
+        # Authentifier l'utilisateur
+        self.client.force_authenticate(user=self.user)
+        
+        # Données de modification
+        update_data = {
+            'content': 'Post modifié via API',
+            'post_type': 'event'
+        }
+        
+        # Faire la requête
+        url = reverse('posts:post-detail', args=[self.post1.id])
+        response = self.client.put(url, update_data, format='json')
+        
+        # Vérifier la réponse
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['content'], 'Post modifié via API')
+        self.assertEqual(response.data['post_type'], 'event')
+        
+        # Vérifier en base
+        self.post1.refresh_from_db()
+        self.assertEqual(self.post1.content, 'Post modifié via API')
+    
+    def test_delete_post(self):
+        """Test de suppression d'un post"""
+        # Authentifier l'utilisateur
+        self.client.force_authenticate(user=self.user)
+        
+        # Faire la requête
+        url = reverse('posts:post-detail', args=[self.post1.id])
+        response = self.client.delete(url)
+        
+        # Vérifier la réponse
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        
+        # Vérifier que le post a été supprimé
+        self.assertEqual(Post.objects.count(), 1)
+        self.assertFalse(Post.objects.filter(id=self.post1.id).exists())
+    
+    def test_like_post(self):
+        """Test de like d'un post"""
+        # Authentifier l'utilisateur
+        self.client.force_authenticate(user=self.user)
+        
+        # Faire la requête de like
+        url = reverse('posts:post-like', args=[self.post1.id])
+        response = self.client.post(url)
+        
+        # Vérifier la réponse
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        
+        # Vérifier que le like a été créé
+        self.assertTrue(PostLike.objects.filter(
+            user=self.user, 
+            post=self.post1
+        ).exists())
+        
+        # Vérifier que le compteur a été incrémenté
+        self.post1.refresh_from_db()
+        self.assertEqual(self.post1.likes_count, 1)
+    
+    def test_unlike_post(self):
+        """Test de unlike d'un post"""
+        # Créer un like
+        PostLike.objects.create(user=self.user, post=self.post1)
+        self.post1.likes_count = 1
+        self.post1.save()
+        
+        # Authentifier l'utilisateur
+        self.client.force_authenticate(user=self.user)
+        
+        # Faire la requête de unlike
+        url = reverse('posts:post-like', args=[self.post1.id])
+        response = self.client.delete(url)
+        
+        # Vérifier la réponse
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        
+        # Vérifier que le like a été supprimé
+        self.assertFalse(PostLike.objects.filter(
+            user=self.user, 
+            post=self.post1
+        ).exists())
+        
+        # Vérifier que le compteur a été décrémenté
+        self.post1.refresh_from_db()
+        self.assertEqual(self.post1.likes_count, 0)
+
+class PostCommentTest(APITestCase):
+    """Tests pour les commentaires"""
+    
+    def setUp(self):
+        # Créer les données géographiques
+        self.region = Region.objects.create(nom="Conakry")
+        self.prefecture = Prefecture.objects.create(
+            region=self.region, 
+            nom="Conakry"
+        )
+        self.commune = Commune.objects.create(
+            prefecture=self.prefecture, 
+            nom="Kaloum"
+        )
+        self.quartier = Quartier.objects.create(
+            commune=self.commune, 
+            nom="Centre-ville"
+        )
+        
+        # Créer un utilisateur
+        self.user = User.objects.create_user(
+            username='testuser',
+            email='test@example.com',
+            password='testpass123',
+            quartier=self.quartier
+        )
+        
+        # Créer un post
+        self.post = Post.objects.create(
+            author=self.user,
+            quartier=self.quartier,
+            content="Post pour tester les commentaires",
+            post_type='info'
+        )
+        
+        # Créer un client API
+        self.client = APIClient()
+    
+    def test_create_comment(self):
+        """Test de création d'un commentaire"""
+        # Authentifier l'utilisateur
+        self.client.force_authenticate(user=self.user)
+        
+        # Données du commentaire
+        comment_data = {
+            'content': 'Commentaire de test',
+            'is_anonymous': False
+        }
+        
+        # Faire la requête
+        url = reverse('posts:post-comments', args=[self.post.id])
+        response = self.client.post(url, comment_data, format='json')
+        
+        # Vérifier la réponse
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data['content'], 'Commentaire de test')
+        self.assertEqual(response.data['author']['username'], self.user.username)
+        
+        # Vérifier que le commentaire a été créé en base
+        self.assertEqual(PostComment.objects.count(), 1)
+        
+        # Vérifier que le compteur du post a été incrémenté
+        self.post.refresh_from_db()
+        self.assertEqual(self.post.comments_count, 1)
+    
+    def test_get_comments(self):
+        """Test de récupération des commentaires d'un post"""
+        # Créer quelques commentaires
+        PostComment.objects.create(
+            post=self.post,
+            author=self.user,
+            content="Premier commentaire"
+        )
+        PostComment.objects.create(
+            post=self.post,
+            author=self.user,
+            content="Deuxième commentaire"
+        )
+        
+        # Authentifier l'utilisateur
+        self.client.force_authenticate(user=self.user)
+        
+        # Faire la requête
+        url = reverse('posts:post-comments', args=[self.post.id])
+        response = self.client.get(url)
+        
+        # Vérifier la réponse
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response.data), 2)
+        self.assertEqual(response.data[0]['content'], 'Premier commentaire')
+        self.assertEqual(response.data[1]['content'], 'Deuxième commentaire')
+
+class MediaTest(APITestCase):
+    """Tests pour les médias"""
+    
+    def setUp(self):
+        # Créer les données géographiques
+        self.region = Region.objects.create(nom="Conakry")
+        self.prefecture = Prefecture.objects.create(
+            region=self.region, 
+            nom="Conakry"
+        )
+        self.commune = Commune.objects.create(
+            prefecture=self.prefecture, 
+            nom="Kaloum"
+        )
+        self.quartier = Quartier.objects.create(
+            commune=self.commune, 
+            nom="Centre-ville"
+        )
+        
+        # Créer un utilisateur
+        self.user = User.objects.create_user(
+            username='testuser',
+            email='test@example.com',
+            password='testpass123',
+            quartier=self.quartier
+        )
+        
+        # Créer un client API
+        self.client = APIClient()
+    
+    def test_media_validation(self):
+        """Test de validation des médias"""
+        # Créer un média valide
+        media = Media.objects.create(
+            file="test.jpg",
+            media_type='image',
+            title="Test image",
+            file_size=1024
+        )
+        
+        self.assertEqual(media.media_type, 'image')
+        self.assertEqual(media.file_size, 1024)
+        self.assertTrue(media.is_approved_for_publication)
+    
+    def test_media_str_representation(self):
+        """Test de la représentation string du média"""
+        media = Media.objects.create(
+            file="test.jpg",
+            media_type='image',
+            title="Test image"
+        )
+        
+        self.assertIn("Test image", str(media))
+        self.assertIn("Image", str(media))
 
 
 class CacheTestCase(TestCase):

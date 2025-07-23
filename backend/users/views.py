@@ -272,8 +272,26 @@ class GeographicDataView(generics.GenericAPIView):
                 
                 data.append(region_data)
             
+            # Créer aussi une liste plate de quartiers pour la compatibilité
+            quartiers_plats = []
+            for region in regions:
+                for prefecture in region.prefectures.all():
+                    for commune in prefecture.communes.all():
+                        for quartier in commune.quartiers.all():
+                            quartiers_plats.append({
+                                'id': quartier.id,
+                                'nom': quartier.nom,
+                                'code': quartier.code,
+                                'commune': commune.nom,
+                                'prefecture': prefecture.nom,
+                                'region': region.nom,
+                                'population_estimee': quartier.population_estimee,
+                                'superficie_km2': str(quartier.superficie_km2) if quartier.superficie_km2 else None
+                            })
+            
             return Response({
-                'regions': data
+                'regions': data,
+                'quartiers': quartiers_plats
             })
         except Exception as e:
             return Response({

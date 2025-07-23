@@ -55,8 +55,47 @@ export const mediaAPI = {
   },
 
   // Arrêter un live
-  stopLive: async (liveId) => {
-    const response = await api.put(`/posts/live/${liveId}/stop/`);
+  stopLive: async (liveId, videoData = null) => {
+    const requestData = videoData ? { video_data: videoData } : {};
+    const response = await api.put(`/posts/live/${liveId}/stop/`, requestData);
+    return response.data;
+  },
+
+  // Uploader une vidéo de live enregistrée
+  uploadLiveVideo: async (liveId, videoBlob, onProgress) => {
+    const formData = new FormData();
+    formData.append('video', videoBlob, `live_video_${liveId}.webm`);
+    
+    // Récupérer le token d'authentification
+    const token = localStorage.getItem('access_token');
+    
+    const config = {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        'Authorization': `Bearer ${token}`,
+      },
+      onUploadProgress: (progressEvent) => {
+        if (onProgress) {
+          const percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
+          onProgress(percentCompleted);
+        }
+      },
+    };
+    
+    console.log('Uploading live video with formData:', formData);
+    console.log('Auth token:', token ? 'Present' : 'Missing');
+    const response = await api.post(`/posts/live/${liveId}/upload-video/`, formData, config);
+    console.log('Live video upload response:', response.data);
+    return response.data;
+  },
+
+  // Sauvegarder une vidéo enregistrée pendant un live
+  saveLiveVideo: async (liveId, videoData) => {
+    const response = await api.put(`/posts/live/${liveId}/stop/`, {
+      video_data: videoData
+    });
     return response.data;
   },
 

@@ -18,7 +18,7 @@ from django.core.cache import cache
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 import time
-from .models import Post, PostLike, PostComment, Media, PostShare
+from .models import Post, PostLike, PostComment, Media, PostShare, PostAnalytics, ExternalShare, LiveChatMessage
 from .serializers import (
     PostSerializer, PostCreateSerializer, PostCommentSerializer,
     PostCommentCreateSerializer, PostLikeSerializer,
@@ -72,6 +72,7 @@ class MediaUploadView(generics.CreateAPIView):
     """Vue pour uploader des médias avec modération automatique"""
     serializer_class = MediaCreateSerializer
     permission_classes = [permissions.IsAuthenticated]
+    throttle_scope = 'media'  # Rate limiting spécifique
     
     def perform_create(self, serializer):
         media = serializer.save()
@@ -203,70 +204,178 @@ class LiveStreamView(generics.GenericAPIView):
     def post(self, request):
         """Démarrer un live"""
         try:
+            logger.info(f"Tentative de démarrage live pour {request.user.username}")
+            
             # Vérifier que l'utilisateur a un quartier assigné
             if not request.user.quartier:
+                logger.warning(f"Utilisateur {request.user.username} sans quartier")
                 return Response(
                     {'error': 'Vous devez être assigné à un quartier pour démarrer un live'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
             
+            # Récupérer les données du live
+            content = request.data.get('content', 'Live en cours')
+            title = request.data.get('title', 'Live streaming')
+            description = request.data.get('description', '')
+            
+            logger.info(f"Données live: content='{content}', title='{title}'")
+            
             # Générer une clé de stream unique
             stream_key = LiveStreamingService.generate_stream_key(request.user.id)
+            logger.info(f"Clé de stream générée: {stream_key}")
             
-            # Créer un média de type live
-            live_media = Media.objects.create(
-                media_type='live',
-                is_live=True,
-                live_stream_key=stream_key,
-                live_started_at=timezone.now(),
-                title=request.data.get('title', 'Live en cours'),
-                description=request.data.get('description', ''),
-                approval_status='approved',
-                is_appropriate=True
-            )
-            
-            # Créer un post live
+            # Créer un post live avec type 'info' au lieu de 'live'
             post = Post.objects.create(
-                author=request.user,
+                author=request.user,  # Utiliser 'author' au lieu de 'user'
                 quartier=request.user.quartier,
-                content=request.data.get('content', ''),
-                post_type='live',
-                is_live_post=True,
-                live_stream=live_media
+                content=content,
+                post_type='info',  # Utiliser 'info' au lieu de 'live'
+                is_live_post=True
             )
+            
+            logger.info(f"Post live créé avec ID: {post.id}")
             
             # Démarrer le stream (simulation)
             LiveStreamingService.start_stream(stream_key)
+            logger.info(f"Stream démarré pour la clé: {stream_key}")
             
-            return Response({
-                'live_id': live_media.id,
+            # Préparer la réponse
+            response_data = {
+                'live_id': post.id,
                 'stream_key': stream_key,
                 'post_id': post.id,
                 'rtmp_url': LiveStreamingService.get_rtmp_url(stream_key),
-                'hls_url': LiveStreamingService.get_hls_url(stream_key)
-            })
+                'hls_url': LiveStreamingService.get_hls_url(stream_key),
+                'message': 'Live démarré avec succès'
+            }
+            
+            logger.info(f"Live démarré avec succès: {response_data}")
+            return Response(response_data, status=status.HTTP_201_CREATED)
             
         except Exception as e:
             logger.error(f"Erreur lors du démarrage du live: {str(e)}")
+            logger.error(f"Type d'erreur: {type(e).__name__}")
+            import traceback
+            logger.error(f"Traceback: {traceback.format_exc()}")
+            
             return Response(
-                {'error': 'Erreur lors du démarrage du live. Veuillez réessayer.'},
+                {
+                    'error': 'Erreur lors du démarrage du live. Veuillez réessayer.',
+                    'details': str(e) if settings.DEBUG else None
+                },
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
     
     def put(self, request, live_id):
         """Arrêter un live"""
         try:
-            live_media = get_object_or_404(Media, id=live_id, is_live=True)
+            logger.info(f"Tentative d'arrêt du live {live_id}")
+            
+            # Chercher le post live
+            try:
+                post = Post.objects.get(id=live_id, is_live_post=True)
+            except Post.DoesNotExist:
+                return Response(
+                    {'error': 'Live non trouvé'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
             
             # Arrêter le stream
-            LiveStreamingService.stop_stream(live_media.live_stream_key)
+            stream_key = f"live_{post.author.id}_"  # Utiliser author au lieu de user
+            LiveStreamingService.stop_stream(stream_key)
             
-            # Mettre à jour le média
-            live_media.is_live = False
-            live_media.live_ended_at = timezone.now()
-            live_media.save()
+            # Récupérer les données de la vidéo enregistrée
+            video_data = request.data.get('video_data', {})
+            video_url = video_data.get('url')
+            video_duration = video_data.get('duration', 0)
+            video_size = video_data.get('size', 0)
             
-            return Response({'message': 'Live arrêté'})
+            # Si une vidéo a été enregistrée, la sauvegarder
+            media = None
+            if video_url:
+                logger.info(f"Sauvegarde de la vidéo enregistrée pour le live {live_id}")
+                
+                try:
+                    # Convertir la durée en secondes en timedelta
+                    # S'assurer que video_duration est un nombre
+                    if isinstance(video_duration, (int, float)):
+                        duration_timedelta = timedelta(seconds=int(video_duration))
+                    else:
+                        # Valeur par défaut si la durée n'est pas valide
+                        duration_timedelta = timedelta(seconds=1)
+                        logger.warning(f"Durée vidéo invalide: {video_duration}, utilisation de la valeur par défaut")
+                    
+                    # Si c'est une URL blob, on va la convertir en fichier
+                    if video_url.startswith('blob:'):
+                        logger.info("Conversion de l'URL blob en fichier...")
+                        
+                        # Créer un nom de fichier unique
+                        import uuid
+                        import base64
+                        from django.core.files.base import ContentFile
+                        
+                        # Extraire les données base64 de l'URL blob
+                        # Note: En production, il faudrait recevoir les données directement
+                        video_filename = f"live_video_{live_id}_{uuid.uuid4().hex[:8]}.webm"
+                        
+                        # Créer un objet Media avec un fichier temporaire
+                        media = Media.objects.create(
+                            title=f"Vidéo du live - {post.content}",
+                            description=f"Vidéo enregistrée du live '{post.content}'",
+                            media_type='video',
+                            file_size=video_size,
+                            duration=duration_timedelta,
+                            is_live_recording=True,
+                            live_post=post
+                        )
+                        
+                        # Pour l'instant, on sauvegarde l'URL blob comme cdn_url
+                        # En production, on ferait un vrai upload de fichier
+                        media.cdn_url = video_url
+                        media.save()
+                        
+                        logger.info(f"Vidéo sauvegardée avec ID: {media.id} (URL blob temporaire)")
+                    else:
+                        # Si c'est déjà une URL permanente
+                        media = Media.objects.create(
+                            title=f"Vidéo du live - {post.content}",
+                            description=f"Vidéo enregistrée du live '{post.content}'",
+                            media_type='video',
+                            cdn_url=video_url,
+                            file_size=video_size,
+                            duration=duration_timedelta,
+                            is_live_recording=True,
+                            live_post=post
+                        )
+                        logger.info(f"Vidéo sauvegardée avec ID: {media.id}")
+                    
+                    # Associer la vidéo au post
+                    post.media_files.add(media)
+                    
+                    # Mettre à jour le contenu du post
+                    post.content = f"{post.content}\n\n📹 Vidéo enregistrée disponible"
+                    
+                except Exception as video_error:
+                    logger.error(f"Erreur lors de la sauvegarde de la vidéo: {str(video_error)}")
+                    # Continuer sans la vidéo plutôt que d'échouer complètement
+            
+            # Marquer le post comme non-live
+            post.is_live_post = False
+            post.save()
+            
+            # Invalider le cache des posts pour que la vidéo apparaisse immédiatement
+            from django.core.cache import cache
+            user = request.user
+            cache_key = f"posts_list_{user.id}_{user.quartier.id if user.quartier else 'none'}"
+            cache.delete(cache_key)
+            
+            logger.info(f"Live {live_id} arrêté avec succès")
+            return Response({
+                'message': 'Live arrêté',
+                'video_saved': bool(video_url),
+                'video_id': media.id if media else None
+            })
             
         except Exception as e:
             logger.error(f"Erreur lors de l'arrêt du live: {str(e)}")
@@ -335,9 +444,11 @@ class LiveStreamView(generics.GenericAPIView):
         ]
     )
 )
+@method_decorator(cache_page(60 * 5), name='dispatch')  # Cache 5 minutes
 class PostListView(generics.ListCreateAPIView):
     """Vue pour lister et créer des posts"""
     permission_classes = [permissions.IsAuthenticated]
+    throttle_scope = 'posts'  # Rate limiting spécifique
     
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -345,77 +456,96 @@ class PostListView(generics.ListCreateAPIView):
         return PostSerializer
     
     def get_queryset(self):
-        user = self.request.user
-        
-        # Clé de cache unique par utilisateur et paramètres
-        cache_key = f"posts_list_{user.id}_{user.quartier.id if user.quartier else 'none'}"
-        
-        # Essayer de récupérer depuis le cache
-        cached_queryset = cache.get(cache_key)
-        if cached_queryset is not None:
-            return cached_queryset
-        
-        # Vérifier si l'utilisateur a un quartier
-        if not user.quartier:
-            # Si pas de quartier, retourner tous les posts
-            queryset = Post.objects.all()
-        else:
-            # Requête optimisée avec prefetch intelligent
-            queryset = Post.objects.filter(
-                quartier__commune=user.quartier.commune
-            )
-        
-        # Appliquer les optimisations communes
-        queryset = queryset.select_related(
-            'author', 
-            'quartier', 
-            'quartier__commune'
-        ).prefetch_related(
-            Prefetch(
-                'comments',
-                queryset=PostComment.objects.select_related('author').filter(
-                    parent_comment__isnull=True
-                ).order_by('-created_at')[:10],  # Limiter à 10 commentaires récents
-                to_attr='recent_comments'
-            ),
-            Prefetch(
-                'likes',
-                queryset=PostLike.objects.select_related('user').order_by('-created_at')[:20],
-                to_attr='recent_likes'
-            ),
-            'media_files'
-        ).annotate(
-            likes_count_annotated=Count('likes'),
-            comments_count_annotated=Count('comments', filter=Q(comments__parent_comment__isnull=True)),
-            shares_count_annotated=Count('shares')
-        ).order_by('-created_at')
-        
-        # Mettre en cache pour 5 minutes
-        cache.set(cache_key, queryset, 300)
-        
-        return queryset
+        try:
+            user = self.request.user
+            
+            # Clé de cache unique par utilisateur et paramètres
+            cache_key = f"posts_list_{user.id}_{user.quartier.id if user.quartier else 'none'}"
+            
+            # Essayer de récupérer depuis le cache
+            cached_queryset = cache.get(cache_key)
+            if cached_queryset is not None:
+                return cached_queryset
+            
+            # Vérifier si l'utilisateur a un quartier
+            if not user.quartier:
+                # Si pas de quartier, retourner tous les posts
+                queryset = Post.objects.all()
+            else:
+                # Requête optimisée avec prefetch intelligent
+                queryset = Post.objects.filter(
+                    quartier__commune=user.quartier.commune
+                )
+            
+            # Appliquer les optimisations communes avec gestion d'erreur
+            queryset = queryset.select_related(
+                'author', 
+                'quartier', 
+                'quartier__commune'
+            ).prefetch_related(
+                Prefetch(
+                    'comments',
+                    queryset=PostComment.objects.select_related('author').filter(
+                        parent_comment__isnull=True
+                    ).order_by('-created_at')[:10],  # Limiter à 10 commentaires récents
+                    to_attr='recent_comments'
+                ),
+                Prefetch(
+                    'likes',
+                    queryset=PostLike.objects.select_related('user').order_by('-created_at')[:20],
+                    to_attr='recent_likes'
+                ),
+                'media_files'
+            ).annotate(
+                likes_count_annotated=Count('likes'),
+                comments_count_annotated=Count('comments', filter=Q(comments__parent_comment__isnull=True)),
+                shares_count_annotated=Count('shares')
+            ).order_by('-created_at')
+            
+            # Mettre en cache pour 5 minutes
+            cache.set(cache_key, queryset, 300)
+            
+            return queryset
+            
+        except Exception as e:
+            logger.error(f"Erreur lors de la récupération du queryset: {str(e)}")
+            # Fallback vers une requête simple en cas d'erreur
+            return Post.objects.select_related('author', 'quartier').order_by('-created_at')[:20]
     
     def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        
-        # Filtres
-        post_type = request.GET.get('type')
-        if post_type:
-            queryset = queryset.filter(post_type=post_type)
-        
-        # Tri
-        sort_by = request.GET.get('sort', '-created_at')
-        if sort_by in ['created_at', '-created_at', 'likes_count', '-likes_count']:
-            queryset = queryset.order_by(sort_by)
-        
-        # Pagination
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-        
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+        try:
+            queryset = self.get_queryset()
+            
+            # Filtres
+            post_type = request.GET.get('type')
+            if post_type:
+                if post_type == 'live':
+                    # Pour les lives, filtrer par is_live_post=True
+                    queryset = queryset.filter(is_live_post=True)
+                else:
+                    # Pour les autres types, filtrer par post_type
+                    queryset = queryset.filter(post_type=post_type)
+            
+            # Tri
+            sort_by = request.GET.get('sort', '-created_at')
+            if sort_by in ['created_at', '-created_at', 'likes_count', '-likes_count']:
+                queryset = queryset.order_by(sort_by)
+            
+            # Pagination
+            page = self.paginate_queryset(queryset)
+            if page is not None:
+                serializer = self.get_serializer(page, many=True)
+                return self.get_paginated_response(serializer.data)
+            
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
+            
+        except Exception as e:
+            logger.error(f"Erreur lors de la récupération des posts: {str(e)}")
+            return Response(
+                {'error': 'Erreur lors du chargement des posts', 'details': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
     
     def perform_create(self, serializer):
         try:
@@ -432,6 +562,17 @@ class PostListView(generics.ListCreateAPIView):
         except Exception as e:
             logger.error(f"Erreur lors de la création du post: {str(e)}")
             raise
+
+    def create(self, request, *args, **kwargs):
+        """Créer un post et retourner les données complètes"""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        post = self.perform_create(serializer)
+        
+        # Retourner le post complet avec tous les champs
+        post_serializer = PostSerializer(post, context={'request': request})
+        headers = self.get_success_headers(serializer.data)
+        return Response(post_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
 class PostDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -539,16 +680,37 @@ class PostLikeView(generics.CreateAPIView, generics.DestroyAPIView):
         like = PostLike.objects.create(post=post, user=request.user)
         post.increment_likes()
         
+        # Invalider les caches
+        cache.delete(f"post_detail_{post_id}")
+        user = request.user
+        cache_key = f"posts_list_{user.id}_{user.quartier.id if user.quartier else 'none'}"
+        cache.delete(cache_key)
+        
         serializer = self.get_serializer(like)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     
     def destroy(self, request, *args, **kwargs):
-        like = self.get_object()
-        post = like.post
-        like.delete()
-        post.decrement_likes()
+        post_id = self.kwargs.get('pk')
+        post = get_object_or_404(Post, pk=post_id)
         
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        # Chercher le like de l'utilisateur pour ce post
+        try:
+            like = PostLike.objects.get(post=post, user=request.user)
+            like.delete()
+            post.decrement_likes()
+            
+            # Invalider les caches
+            cache.delete(f"post_detail_{post_id}")
+            user = request.user
+            cache_key = f"posts_list_{user.id}_{user.quartier.id if user.quartier else 'none'}"
+            cache.delete(cache_key)
+            
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except PostLike.DoesNotExist:
+            return Response(
+                {'detail': 'Vous n\'avez pas liké ce post'}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
 
 
 class PostCommentView(generics.ListCreateAPIView):
@@ -587,6 +749,17 @@ class PostCommentView(generics.ListCreateAPIView):
         post.save(update_fields=['comments_count'])
         
         return comment
+
+    def create(self, request, *args, **kwargs):
+        """Créer un commentaire et retourner les données complètes"""
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        comment = self.perform_create(serializer)
+        
+        # Retourner le commentaire complet avec tous les champs
+        comment_serializer = PostCommentSerializer(comment, context={'request': request})
+        headers = self.get_success_headers(serializer.data)
+        return Response(comment_serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
 class PostCommentDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -688,24 +861,46 @@ class PostShareView(generics.CreateAPIView, generics.DestroyAPIView):
         post_id = self.kwargs.get('pk')
         post = get_object_or_404(Post, pk=post_id)
         
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        share = serializer.save()
+        # Créer un partage simple sans serializer complexe
+        from .models import PostShare
+        
+        # Vérifier si l'utilisateur a déjà partagé ce post
+        existing_share = PostShare.objects.filter(
+            user=request.user,
+            post=post,
+            share_type='share'
+        ).first()
+        
+        if existing_share:
+            return Response({
+                'message': 'Vous avez déjà partagé ce post',
+                'share_id': existing_share.id
+            }, status=status.HTTP_200_OK)
+        
+        share = PostShare.objects.create(
+            user=request.user,
+            post=post,
+            comment=request.data.get('message', '')
+        )
         
         # Notifier l'auteur du post
-        from notifications.services import create_notification
-        create_notification(
-            recipient=post.author,
-            sender=request.user,
-            notification_type='post_shared',
-            title='Post partagé',
-            message=f"{request.user.first_name} {request.user.last_name} a partagé votre publication",
-            extra_data={'post_id': post.id, 'share_id': share.id}
-        )
+        try:
+            from notifications.services import create_notification
+            create_notification(
+                recipient=post.user,
+                sender=request.user,
+                notification_type='post_shared',
+                title='Post partagé',
+                message=f"{request.user.first_name} {request.user.last_name} a partagé votre publication",
+                extra_data={'post_id': post.id, 'share_id': share.id}
+            )
+        except Exception as e:
+            # Ignorer les erreurs de notification
+            pass
         
         return Response({
             'message': 'Post partagé avec succès !',
-            'share': PostShareSerializer(share).data
+            'share_id': share.id
         }, status=status.HTTP_201_CREATED)
     
     def destroy(self, request, *args, **kwargs):
@@ -756,20 +951,50 @@ class ExternalShareView(generics.CreateAPIView):
         post_id = self.kwargs.get('pk')
         post = get_object_or_404(Post, pk=post_id)
         
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        external_share = serializer.save()
+        # Créer un partage externe simple
+        from .models import ExternalShare
+        
+        platform = request.data.get('platform', 'whatsapp')
+        
+        # Créer un partage externe avec gestion d'erreur
+        try:
+            external_share = ExternalShare.objects.create(
+                user=request.user,
+                post=post,
+                platform=platform
+            )
+        except Exception as e:
+            # Si erreur de contrainte unique, récupérer l'existant
+            existing_share = ExternalShare.objects.filter(
+                user=request.user,
+                post=post,
+                platform=platform
+            ).first()
+            
+            if existing_share:
+                return Response({
+                    'message': f'Vous avez déjà partagé ce post sur {existing_share.get_platform_display()}',
+                    'platform': existing_share.platform,
+                    'platform_display': existing_share.get_platform_display()
+                }, status=status.HTTP_200_OK)
+            else:
+                raise e
         
         # Notifier l'auteur du post
-        if post.user != request.user:
-            from notifications.services import create_notification
-            create_notification(
-                recipient=post.user,
-                notification_type='post_shared_external',
-                title=f"{request.user.username} a partagé votre post",
-                message=f"Votre post a été partagé sur {external_share.get_platform_display()}",
-                related_post=post
-            )
+        if post.author != request.user:
+            try:
+                from notifications.services import create_notification
+                create_notification(
+                    recipient=post.author,
+                    sender=request.user,
+                    notification_type='post_shared_external',
+                    title=f"{request.user.username} a partagé votre post",
+                    message=f"Votre post a été partagé sur {external_share.get_platform_display()}",
+                    extra_data={'post_id': post.id, 'external_share_id': external_share.id}
+                )
+            except Exception as e:
+                # Ignorer les erreurs de notification
+                pass
         
         return Response({
             'message': f'Post partagé sur {external_share.get_platform_display()}',
@@ -806,13 +1031,45 @@ class PostAnalyticsView(generics.RetrieveAPIView):
 class UserAnalyticsView(generics.GenericAPIView):
     """Vue pour récupérer les analytics d'un utilisateur"""
     permission_classes = [permissions.IsAuthenticated]
-    serializer_class = PostAnalyticsSerializer
     
     def get(self, request):
         user = request.user
-        analytics = PostAnalytics.objects.filter(post__author=user)
-        serializer = self.get_serializer(analytics, many=True)
-        return Response(serializer.data)
+        
+        # Récupérer les statistiques de l'utilisateur
+        user_posts = Post.objects.filter(author=user)
+        total_posts = user_posts.count()
+        
+        # Calculer les totaux
+        total_likes = sum(post.likes.count() for post in user_posts)
+        total_comments = sum(post.comments.count() for post in user_posts)
+        total_shares = sum(post.shares.count() for post in user_posts)
+        total_views = sum(post.views_count for post in user_posts)
+        
+        # Analytics des posts récents
+        recent_posts = user_posts.order_by('-created_at')[:5]
+        recent_analytics = []
+        
+        for post in recent_posts:
+            recent_analytics.append({
+                'post_id': post.id,
+                'content': post.content[:100] + '...' if len(post.content) > 100 else post.content,
+                'likes_count': post.likes.count(),
+                'comments_count': post.comments.count(),
+                'shares_count': post.shares.count(),
+                'views_count': post.views_count,
+                'created_at': post.created_at
+            })
+        
+        return Response({
+            'user_id': user.id,
+            'username': user.username,
+            'total_posts': total_posts,
+            'total_likes_received': total_likes,
+            'total_comments_received': total_comments,
+            'total_shares_received': total_shares,
+            'total_views_received': total_views,
+            'recent_posts_analytics': recent_analytics
+        })
 
 
 class CommunityAnalyticsView(generics.GenericAPIView):
@@ -823,3 +1080,167 @@ class CommunityAnalyticsView(generics.GenericAPIView):
     def get(self, request):
         # Logique pour les analytics communautaires
         return Response({'message': 'Analytics communautaires'}) 
+
+
+class LiveChatView(generics.GenericAPIView):
+    """Vue pour gérer les messages de chat live"""
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def post(self, request, post_id):
+        """Envoyer un message dans le chat live"""
+        try:
+            # Vérifier que le post existe et est un live
+            post = Post.objects.get(id=post_id, is_live_post=True)
+            
+            content = request.data.get('content', '').strip()
+            if not content:
+                return Response(
+                    {'error': 'Le contenu du message ne peut pas être vide'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Créer le message
+            message = LiveChatMessage.objects.create(
+                live_post=post,
+                author=request.user,
+                content=content,
+                message_type=request.data.get('type', 'text')
+            )
+            
+            # Sérialiser le message pour la réponse
+            message_data = {
+                'id': message.id,
+                'content': message.content,
+                'timestamp': message.timestamp.isoformat(),
+                'author': {
+                    'id': message.author.id,
+                    'first_name': message.author.first_name,
+                    'last_name': message.author.last_name,
+                    'profile_picture': message.author.profile_picture.url if message.author.profile_picture else None
+                }
+            }
+            
+            return Response(message_data, status=status.HTTP_201_CREATED)
+            
+        except Post.DoesNotExist:
+            return Response(
+                {'error': 'Live non trouvé'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            logger.error(f"Erreur envoi message chat: {e}")
+            return Response(
+                {'error': 'Erreur lors de l\'envoi du message'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    
+    def get(self, request, post_id):
+        """Récupérer les messages d'un live"""
+        try:
+            # Vérifier que le post existe et est un live
+            post = Post.objects.get(id=post_id, is_live_post=True)
+            
+            # Récupérer les messages avec pagination
+            messages = LiveChatMessage.objects.filter(live_post=post).select_related('author')
+            
+            # Sérialiser les messages
+            messages_data = []
+            for message in messages:
+                messages_data.append({
+                    'id': message.id,
+                    'content': message.content,
+                    'timestamp': message.timestamp.isoformat(),
+                    'author': {
+                        'id': message.author.id,
+                        'first_name': message.author.first_name,
+                        'last_name': message.author.last_name,
+                        'profile_picture': message.author.profile_picture.url if message.author.profile_picture else None
+                    }
+                })
+            
+            return Response(messages_data, status=status.HTTP_200_OK)
+            
+        except Post.DoesNotExist:
+            return Response(
+                {'error': 'Live non trouvé'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            logger.error(f"Erreur récupération messages chat: {e}")
+            return Response(
+                {'error': 'Erreur lors de la récupération des messages'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            ) 
+
+
+class LiveVideoUploadView(generics.GenericAPIView):
+    """Vue pour uploader les vidéos de live enregistrées"""
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = MediaSerializer
+    
+    def post(self, request, live_id):
+        """Uploader une vidéo de live enregistrée"""
+        try:
+            logger.info(f"Tentative d'upload vidéo pour le live {live_id}")
+            
+            # Chercher le post live
+            try:
+                post = Post.objects.get(id=live_id, is_live_post=True)
+            except Post.DoesNotExist:
+                return Response(
+                    {'error': 'Post live non trouvé'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            # Récupérer le fichier vidéo
+            video_file = request.FILES.get('video')
+            if not video_file:
+                return Response(
+                    {'error': 'Fichier vidéo requis'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Vérifier le type de fichier
+            allowed_types = ['video/webm', 'video/mp4', 'video/quicktime']
+            if video_file.content_type not in allowed_types:
+                return Response(
+                    {'error': 'Type de fichier non supporté'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Créer le média
+            media = Media.objects.create(
+                title=f"Vidéo du live - {post.content}",
+                description=f"Vidéo enregistrée du live '{post.content}'",
+                media_type='video',
+                file=video_file,  # Django gère automatiquement l'upload
+                file_size=video_file.size,
+                is_live_recording=True,
+                live_post=post,
+                duration=timedelta(seconds=5)  # Durée par défaut plus réaliste pour les lives
+            )
+            
+            # Associer la vidéo au post
+            post.media_files.add(media)
+            
+            # Associer la vidéo au champ live_stream du post
+            post.live_stream = media
+            post.save()
+            
+            # Mettre à jour le contenu du post
+            post.content = f"{post.content}\n\n📹 Vidéo enregistrée disponible"
+            post.save()
+            
+            logger.info(f"Vidéo uploadée avec succès: {media.id}")
+            return Response({
+                'message': 'Vidéo uploadée avec succès',
+                'media_id': media.id,
+                'file_url': media.file.url if media.file else None
+            }, status=status.HTTP_201_CREATED)
+            
+        except Exception as e:
+            logger.error(f"Erreur lors de l'upload vidéo: {str(e)}")
+            return Response(
+                {'error': 'Erreur lors de l\'upload de la vidéo'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            ) 

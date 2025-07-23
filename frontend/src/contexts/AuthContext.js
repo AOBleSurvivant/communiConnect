@@ -170,6 +170,38 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const uploadProfilePicture = async (formData) => {
+    try {
+      setLoading(true);
+      
+      const response = await userAPI.uploadProfilePicture(formData);
+      
+      // Mettre à jour les données utilisateur avec la réponse de l'upload
+      if (response.user) {
+        userService.saveUser(response.user);
+        setUser(response.user);
+      }
+      
+      toast.success('Photo de profil mise à jour avec succès !');
+      
+      return response;
+    } catch (error) {
+      const errorInfo = handleAPIError(error);
+      
+      // Si l'erreur est 401, déconnecter l'utilisateur
+      if (error.response?.status === 401) {
+        logout();
+        toast.error('Session expirée. Veuillez vous reconnecter.');
+      } else {
+        toast.error(errorInfo.message);
+      }
+      
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const refreshUserData = async () => {
     try {
       const response = await authAPI.getProfile();
@@ -194,6 +226,7 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     updateProfile,
+    uploadProfilePicture,
     refreshUserData,
   };
 

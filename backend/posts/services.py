@@ -193,41 +193,35 @@ class VideoProcessingService:
         }
 
 class LiveStreamingService:
-    """Service pour le live streaming"""
+    """Service pour gérer le live streaming"""
     
     @staticmethod
     def generate_stream_key(user_id):
-        """Génère une clé de stream unique"""
-        import time
-        import hashlib
-        
-        timestamp = int(time.time())
-        unique_string = f"{user_id}_{timestamp}"
-        stream_key = hashlib.md5(unique_string.encode()).hexdigest()[:12]
-        
-        return f"live_{stream_key}"
-    
-    @staticmethod
-    def get_rtmp_url(stream_key):
-        """Génère l'URL RTMP pour le stream"""
-        return f"{settings.RTMP_SERVER_URL}/{stream_key}"
-    
-    @staticmethod
-    def get_hls_url(stream_key):
-        """Génère l'URL HLS pour la lecture"""
-        return f"{settings.HLS_SERVER_URL}/{stream_key}.m3u8"
+        """Générer une clé de stream unique"""
+        import uuid
+        return f"live_{user_id}_{uuid.uuid4().hex[:8]}"
     
     @staticmethod
     def start_stream(stream_key):
-        """Démarre un stream (simulation)"""
-        logger.info(f"Démarrage du stream: {stream_key}")
+        """Démarrer un stream (simulation)"""
+        # En production, cela démarrerait un vrai stream RTMP
         return True
     
     @staticmethod
     def stop_stream(stream_key):
-        """Arrête un stream (simulation)"""
-        logger.info(f"Arrêt du stream: {stream_key}")
+        """Arrêter un stream (simulation)"""
+        # En production, cela arrêterait un vrai stream RTMP
         return True
+    
+    @staticmethod
+    def get_rtmp_url(stream_key):
+        """Obtenir l'URL RTMP"""
+        return f"rtmp://localhost/live/{stream_key}"
+    
+    @staticmethod
+    def get_hls_url(stream_key):
+        """Obtenir l'URL HLS"""
+        return f"http://localhost:8080/hls/{stream_key}.m3u8"
 
 class MediaCompressionService:
     """Service pour la compression des médias"""
@@ -472,15 +466,30 @@ class MediaOptimizationService:
             return False 
 
 class AnalyticsService:
-    """Service pour les analytics et statistiques avancées"""
+    """Service pour gérer les analytics"""
     
     @staticmethod
     def create_or_update_post_analytics(post):
-        """Crée ou met à jour les analytics d'un post"""
+        """Créer ou mettre à jour les analytics d'un post"""
         from .models import PostAnalytics
         
-        analytics, created = PostAnalytics.objects.get_or_create(post=post)
-        analytics.update_analytics()
+        analytics, created = PostAnalytics.objects.get_or_create(
+            post=post,
+            defaults={
+                'total_views': 0,
+                'total_likes': 0,
+                'total_comments': 0,
+                'total_shares': 0
+            }
+        )
+        
+        # Mettre à jour les compteurs
+        analytics.total_views = post.views_count
+        analytics.total_likes = post.likes.count()
+        analytics.total_comments = post.comments.count()
+        analytics.total_shares = post.shares.count()
+        analytics.save()
+        
         return analytics
     
     @staticmethod
@@ -1153,3 +1162,85 @@ class CacheOptimizationService:
         except Exception as e:
             logger.error(f"Erreur lors de la récupération des stats: {str(e)}")
             return {'cache_enabled': False} 
+
+import os
+import logging
+from PIL import Image
+from io import BytesIO
+from django.core.files import File
+from django.conf import settings
+
+logger = logging.getLogger(__name__)
+
+class ImageCompressionService:
+    """Service pour la compression automatique des images"""
+    
+    @staticmethod
+    def compress_image(image_file, max_width=1920, max_height=1080, quality=85):
+        """
+        Compresse une image en conservant ses proportions
+        
+        Args:
+            image_file: Fichier image à compresser
+            max_width: Largeur maximale (défaut: 1920)
+            max_height: Hauteur maximale (défaut: 1080)
+            quality: Qualité JPEG (défaut: 85)
+        
+        Returns:
+            BytesIO: Image compressée en mémoire
+        """
+        try:
+            # Ouvrir l'image avec PIL
+            img = Image.open(image_file)
+            
+            # Convertir en RGB si nécessaire
+            if img.mode in ('RGBA', 'LA', 'P'):
+                img = img.convert('RGB')
+            
+            # Redimensionner si nécessaire
+            if img.width > max_width or img.height > max_height:
+                img.thumbnail((max_width, max_height), Image.Resampling.LANCZOS)
+            
+            # Compresser l'image
+            output = BytesIO()
+            img.save(output, format='JPEG', quality=quality, optimize=True)
+            output.seek(0)
+            
+            logger.info(f"Image compressée: {image_file.name} -> {len(output.getvalue())} bytes")
+            return output
+            
+        except Exception as e:
+            logger.error(f"Erreur lors de la compression de l'image {image_file.name}: {str(e)}")
+            return None
+    
+    @staticmethod
+    def create_thumbnail(image_file, size=(300, 300)):
+        """
+        Crée une miniature d'une image
+        
+        Args:
+            image_file: Fichier image source
+            size: Taille de la miniature (largeur, hauteur)
+        
+        Returns:
+            BytesIO: Miniature en mémoire
+        """
+        try:
+            img = Image.open(image_file)
+            
+            # Convertir en RGB si nécessaire
+            if img.mode in ('RGBA', 'LA', 'P'):
+                img = img.convert('RGB')
+            
+            # Créer la miniature
+            img.thumbnail(size, Image.Resampling.LANCZOS)
+            
+            output = BytesIO()
+            img.save(output, format='JPEG', quality=85, optimize=True)
+            output.seek(0)
+            
+            return output
+            
+        except Exception as e:
+            logger.error(f"Erreur lors de la création de la miniature: {str(e)}")
+            return None 

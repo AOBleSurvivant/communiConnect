@@ -23,6 +23,32 @@ def validate_file_size(value):
         elif 'image' in value.content_type:
             if filesize > 10 * 1024 * 1024:  # 10MB
                 raise ValidationError("L'image ne peut pas dépasser 10MB")
+    
+    # Validation supplémentaire pour la sécurité
+    if filesize > 100 * 1024 * 1024:  # 100MB max absolu
+        raise ValidationError("Le fichier est trop volumineux (max 100MB)")
+
+def validate_file_type(value):
+    """Valide le type de fichier pour la sécurité"""
+    import magic
+    
+    # Lire les premiers octets pour détecter le type réel
+    file_content = value.read(1024)
+    value.seek(0)  # Remettre le curseur au début
+    
+    # Détecter le type MIME réel
+    mime_type = magic.from_buffer(file_content, mime=True)
+    
+    # Types autorisés
+    allowed_types = [
+        'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp',
+        'video/mp4', 'video/webm', 'video/quicktime', 'video/avi'
+    ]
+    
+    if mime_type not in allowed_types:
+        raise ValidationError(f"Type de fichier non autorisé: {mime_type}")
+    
+    return value
 
 class Media(models.Model):
     """Modèle pour les fichiers médias (images et vidéos)"""
@@ -73,6 +99,8 @@ class Media(models.Model):
     
     # Live streaming
     is_live = models.BooleanField(default=False, verbose_name="En direct")
+    is_live_recording = models.BooleanField(default=False, verbose_name="Enregistrement de live")
+    live_post = models.ForeignKey('Post', on_delete=models.CASCADE, null=True, blank=True, related_name='recorded_videos', verbose_name="Post live associé")
     live_stream_key = models.CharField(max_length=100, blank=True, verbose_name="Clé de stream")
     live_viewers_count = models.PositiveIntegerField(default=0, verbose_name="Nombre de spectateurs")
     live_started_at = models.DateTimeField(null=True, blank=True, verbose_name="Début du live")
@@ -149,7 +177,7 @@ class Post(models.Model):
         on_delete=models.SET_NULL, 
         null=True, 
         blank=True, 
-        related_name='live_post',
+        related_name='live_stream_post',
         verbose_name="Stream live"
     )
     
@@ -412,3 +440,38 @@ class PostAnalytics(models.Model):
         self.calculate_engagement_rate()
         
         self.save() 
+
+class LiveChatMessage(models.Model):
+    """Modèle pour les messages de chat pendant les lives"""
+    
+    live_post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name='chat_messages')
+    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='live_messages')
+    content = models.TextField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+    
+    # Métadonnées
+    message_type = models.CharField(max_length=20, default='text', choices=[
+        ('text', 'Texte'),
+        ('emoji', 'Emoji'),
+        ('reaction', 'Réaction'),
+    ])
+    
+    # Réponse à un autre message (optionnel)
+    reply_to = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='replies')
+    
+    class Meta:
+        ordering = ['timestamp']
+        verbose_name = "Message de chat live"
+        verbose_name_plural = "Messages de chat live"
+        indexes = [
+            models.Index(fields=['live_post', 'timestamp']),
+            models.Index(fields=['author', 'timestamp']),
+        ]
+    
+    def __str__(self):
+        return f"Message de {self.author.username} - {self.timestamp.strftime('%H:%M')}"
+    
+    @property
+    def formatted_time(self):
+        """Retourne l'heure formatée"""
+        return self.timestamp.strftime('%H:%M') 

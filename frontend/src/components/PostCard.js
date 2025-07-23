@@ -73,7 +73,7 @@ const PostCard = ({ post, onUpdate }) => {
 
   // Fonction pour l'édition (placeholder)
   const handleEditPost = () => {
-    toast.info('Fonctionnalité d\'édition en cours de développement');
+    toast.error('Fonctionnalité d\'édition en cours de développement');
   };
 
   // Gestion des clics en dehors du menu
@@ -205,7 +205,17 @@ const PostCard = ({ post, onUpdate }) => {
       }
     } catch (error) {
       console.error('Erreur lors du like:', error);
-      toast.error('Erreur lors du like');
+      
+      // Gérer l'erreur 400 "Vous avez déjà liké ce post"
+      if (error.response?.status === 400 && error.response?.data?.detail === 'Vous avez déjà liké ce post') {
+        toast.error('Vous avez déjà liké ce post');
+        // Forcer la mise à jour pour synchroniser l'état
+        if (onUpdate) {
+          onUpdate();
+        }
+      } else {
+        toast.error('Erreur lors du like');
+      }
     } finally {
       setIsLiking(false);
     }

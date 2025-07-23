@@ -596,3 +596,637 @@ INFO 2025-07-22 07:45:50,291 views 26868 26156 Tentative de création de post par
 INFO 2025-07-22 07:45:50,291 serializers 26868 26156 Création post - Médias IDs: []
 INFO 2025-07-22 07:45:50,400 serializers 26868 26156 Aucun média à associer
 INFO 2025-07-22 07:45:50,400 views 26868 26156 Post créé avec succès: 49
+INFO 2025-07-23 08:13:49,391 serializers 15456 15996 Validation PostCreateSerializer - Contenu: 'Post de test créé le 2025-07-23 08:13:49', Médias: []
+INFO 2025-07-23 08:13:49,415 views 15456 15996 Tentative de création de post par l'utilisateur testuser_1753258346
+INFO 2025-07-23 08:13:49,417 serializers 15456 15996 Création post - Médias IDs: []
+INFO 2025-07-23 08:13:49,583 serializers 15456 15996 Aucun média à associer
+INFO 2025-07-23 08:13:49,586 views 15456 15996 Post créé avec succès: 370
+INFO 2025-07-23 08:18:03,873 views 15456 8836 Contenu analysé pour le média 54
+INFO 2025-07-23 08:18:04,466 views 15456 8836 Contenu analysé pour le média 55
+INFO 2025-07-23 08:18:04,525 serializers 15456 8836 Validation PostCreateSerializer - Contenu: 'Post avec média créé le 2025-07-23 08:18:04', Médias: [55]
+INFO 2025-07-23 08:18:04,546 views 15456 8836 Tentative de création de post par l'utilisateur testuser_1753258346
+INFO 2025-07-23 08:18:04,618 serializers 15456 8836 Création post - Médias IDs: [55]
+INFO 2025-07-23 08:18:05,199 serializers 15456 8836 Médias trouvés: 1
+INFO 2025-07-23 08:18:05,209 serializers 15456 8836 Médias IDs recherchés: [55]
+INFO 2025-07-23 08:18:05,223 serializers 15456 8836 Médias trouvés: [55]
+INFO 2025-07-23 08:18:05,506 serializers 15456 8836 Médias associés au post 371: 1
+INFO 2025-07-23 08:18:05,506 views 15456 8836 Post créé avec succès: 371
+ERROR 2025-07-23 08:18:06,837 views 15456 8836 Erreur lors du démarrage du live: 'NoneType' object has no attribute 'first_name'
+INFO 2025-07-23 08:21:07,615 views 15456 14716 Contenu analysé pour le média 57
+INFO 2025-07-23 08:21:08,102 views 15456 14716 Contenu analysé pour le média 58
+INFO 2025-07-23 08:21:08,132 serializers 15456 14716 Validation PostCreateSerializer - Contenu: 'Post avec média créé le 2025-07-23 08:21:08', Médias: [58]
+INFO 2025-07-23 08:21:08,132 views 15456 14716 Tentative de création de post par l'utilisateur testuser_1753258346
+INFO 2025-07-23 08:21:08,133 serializers 15456 14716 Création post - Médias IDs: [58]
+INFO 2025-07-23 08:21:08,396 serializers 15456 14716 Médias trouvés: 1
+INFO 2025-07-23 08:21:08,396 serializers 15456 14716 Médias IDs recherchés: [58]
+INFO 2025-07-23 08:21:08,398 serializers 15456 14716 Médias trouvés: [58]
+INFO 2025-07-23 08:21:08,748 serializers 15456 14716 Médias associés au post 372: 1
+INFO 2025-07-23 08:21:08,749 views 15456 14716 Post créé avec succès: 372
+ERROR 2025-07-23 08:21:09,452 views 15456 14716 Erreur lors du démarrage du live: 'NoneType' object has no attribute 'first_name'
+INFO 2025-07-23 08:23:10,660 views 15456 6252 Contenu analysé pour le média 60
+INFO 2025-07-23 08:23:11,191 views 15456 6252 Contenu analysé pour le média 61
+INFO 2025-07-23 08:23:11,211 serializers 15456 6252 Validation PostCreateSerializer - Contenu: 'Post avec média créé le 2025-07-23 08:23:11', Médias: [61]
+INFO 2025-07-23 08:23:11,220 views 15456 6252 Tentative de création de post par l'utilisateur testuser_1753258346
+INFO 2025-07-23 08:23:11,227 serializers 15456 6252 Création post - Médias IDs: [61]
+INFO 2025-07-23 08:23:11,498 serializers 15456 6252 Médias trouvés: 1
+INFO 2025-07-23 08:23:11,498 serializers 15456 6252 Médias IDs recherchés: [61]
+INFO 2025-07-23 08:23:11,498 serializers 15456 6252 Médias trouvés: [61]
+INFO 2025-07-23 08:23:11,757 serializers 15456 6252 Médias associés au post 373: 1
+INFO 2025-07-23 08:23:11,757 views 15456 6252 Post créé avec succès: 373
+ERROR 2025-07-23 08:23:21,406 views 15456 6252 Erreur lors du démarrage du live: 'NoneType' object has no attribute 'first_name'
+INFO 2025-07-23 08:26:46,445 views 11508 17192 Contenu analysé pour le média 63
+INFO 2025-07-23 08:26:46,780 views 11508 17192 Contenu analysé pour le média 64
+INFO 2025-07-23 08:26:46,807 serializers 11508 17192 Validation PostCreateSerializer - Contenu: 'Post avec média créé le 2025-07-23 08:26:46', Médias: [64]
+INFO 2025-07-23 08:26:46,811 views 11508 17192 Tentative de création de post par l'utilisateur testuser_1753258346
+INFO 2025-07-23 08:26:46,813 serializers 11508 17192 Création post - Médias IDs: [64]
+INFO 2025-07-23 08:26:46,948 serializers 11508 17192 Médias trouvés: 1
+INFO 2025-07-23 08:26:46,948 serializers 11508 17192 Médias IDs recherchés: [64]
+INFO 2025-07-23 08:26:46,948 serializers 11508 17192 Médias trouvés: [64]
+INFO 2025-07-23 08:26:47,077 serializers 11508 17192 Médias associés au post 374: 1
+INFO 2025-07-23 08:26:47,077 views 11508 17192 Post créé avec succès: 374
+ERROR 2025-07-23 08:26:49,483 views 11508 17192 Erreur lors du démarrage du live: 'NoneType' object has no attribute 'first_name'
+ERROR 2025-07-23 08:28:25,506 views 11508 13208 Erreur lors du démarrage du live: 'NoneType' object has no attribute 'first_name'
+INFO 2025-07-23 08:29:49,177 views 14964 15780 Contenu analysé pour le média 67
+INFO 2025-07-23 08:29:49,605 views 14964 15780 Contenu analysé pour le média 68
+INFO 2025-07-23 08:29:49,621 serializers 14964 15780 Validation PostCreateSerializer - Contenu: 'Post avec média créé le 2025-07-23 08:29:49', Médias: [68]
+INFO 2025-07-23 08:29:49,635 views 14964 15780 Tentative de création de post par l'utilisateur testuser_1753258346
+INFO 2025-07-23 08:29:49,637 serializers 14964 15780 Création post - Médias IDs: [68]
+INFO 2025-07-23 08:29:49,753 serializers 14964 15780 Médias trouvés: 1
+INFO 2025-07-23 08:29:49,753 serializers 14964 15780 Médias IDs recherchés: [68]
+INFO 2025-07-23 08:29:49,753 serializers 14964 15780 Médias trouvés: [68]
+INFO 2025-07-23 08:29:49,847 serializers 14964 15780 Médias associés au post 375: 1
+INFO 2025-07-23 08:29:49,847 views 14964 15780 Post créé avec succès: 375
+ERROR 2025-07-23 08:29:51,965 views 14964 15780 Erreur lors du démarrage du live: 'NoneType' object has no attribute 'first_name'
+INFO 2025-07-23 08:33:05,816 views 3296 15932 Contenu analysé pour le média 70
+INFO 2025-07-23 08:33:06,323 views 3296 15932 Contenu analysé pour le média 71
+INFO 2025-07-23 08:33:06,346 serializers 3296 15932 Validation PostCreateSerializer - Contenu: 'Post avec média créé le 2025-07-23 08:33:06', Médias: [71]
+INFO 2025-07-23 08:33:06,346 views 3296 15932 Tentative de création de post par l'utilisateur testuser_1753258346
+INFO 2025-07-23 08:33:06,348 serializers 3296 15932 Création post - Médias IDs: [71]
+INFO 2025-07-23 08:33:06,566 serializers 3296 15932 Médias trouvés: 1
+INFO 2025-07-23 08:33:06,567 serializers 3296 15932 Médias IDs recherchés: [71]
+INFO 2025-07-23 08:33:06,577 serializers 3296 15932 Médias trouvés: [71]
+INFO 2025-07-23 08:33:06,837 serializers 3296 15932 Médias associés au post 376: 1
+INFO 2025-07-23 08:33:06,837 views 3296 15932 Post créé avec succès: 376
+ERROR 2025-07-23 08:33:10,137 views 3296 15932 Erreur lors du démarrage du live: 'NoneType' object has no attribute 'first_name'
+ERROR 2025-07-23 08:34:55,659 views 3296 16688 Erreur lors du démarrage du live: 'NoneType' object has no attribute 'first_name'
+INFO 2025-07-23 08:36:55,491 views 16324 14796 Contenu analysé pour le média 74
+INFO 2025-07-23 08:36:55,752 views 16324 14796 Contenu analysé pour le média 75
+INFO 2025-07-23 08:36:55,770 serializers 16324 14796 Validation PostCreateSerializer - Contenu: 'Post avec média créé le 2025-07-23 08:36:55', Médias: [75]
+INFO 2025-07-23 08:36:55,772 views 16324 14796 Tentative de création de post par l'utilisateur testuser_1753258346
+INFO 2025-07-23 08:36:55,773 serializers 16324 14796 Création post - Médias IDs: [75]
+INFO 2025-07-23 08:36:55,901 serializers 16324 14796 Médias trouvés: 1
+INFO 2025-07-23 08:36:55,901 serializers 16324 14796 Médias IDs recherchés: [75]
+INFO 2025-07-23 08:36:55,911 serializers 16324 14796 Médias trouvés: [75]
+INFO 2025-07-23 08:36:56,025 serializers 16324 14796 Médias associés au post 377: 1
+INFO 2025-07-23 08:36:56,025 views 16324 14796 Post créé avec succès: 377
+ERROR 2025-07-23 08:36:58,354 views 16324 14796 Erreur lors du démarrage du live: 'NoneType' object has no attribute 'first_name'
+ERROR 2025-07-23 08:37:24,362 views 16324 16496 Erreur lors du démarrage du live: 'NoneType' object has no attribute 'first_name'
+INFO 2025-07-23 08:39:03,313 views 16588 17356 Contenu analysé pour le média 78
+INFO 2025-07-23 08:39:04,012 views 16588 17356 Contenu analysé pour le média 79
+INFO 2025-07-23 08:39:04,041 serializers 16588 17356 Validation PostCreateSerializer - Contenu: 'Post avec média créé le 2025-07-23 08:39:04', Médias: [79]
+INFO 2025-07-23 08:39:04,042 views 16588 17356 Tentative de création de post par l'utilisateur testuser_1753258346
+INFO 2025-07-23 08:39:04,042 serializers 16588 17356 Création post - Médias IDs: [79]
+INFO 2025-07-23 08:39:04,253 serializers 16588 17356 Médias trouvés: 1
+INFO 2025-07-23 08:39:04,268 serializers 16588 17356 Médias IDs recherchés: [79]
+INFO 2025-07-23 08:39:04,315 serializers 16588 17356 Médias trouvés: [79]
+INFO 2025-07-23 08:39:04,840 serializers 16588 17356 Médias associés au post 378: 1
+INFO 2025-07-23 08:39:04,840 views 16588 17356 Post créé avec succès: 378
+ERROR 2025-07-23 08:39:09,896 views 16588 17356 Erreur lors du démarrage du live: 'NoneType' object has no attribute 'first_name'
+ERROR 2025-07-23 08:42:39,362 views 16588 10500 Erreur lors du démarrage du live: 'NoneType' object has no attribute 'first_name'
+INFO 2025-07-23 08:45:16,487 views 13692 15948 Contenu analysé pour le média 82
+INFO 2025-07-23 08:45:17,084 views 13692 15948 Contenu analysé pour le média 83
+INFO 2025-07-23 08:45:17,116 serializers 13692 15948 Validation PostCreateSerializer - Contenu: 'Post avec média créé le 2025-07-23 08:45:17', Médias: [83]
+INFO 2025-07-23 08:45:17,117 views 13692 15948 Tentative de création de post par l'utilisateur testuser_1753258346
+INFO 2025-07-23 08:45:17,118 serializers 13692 15948 Création post - Médias IDs: [83]
+INFO 2025-07-23 08:45:17,507 serializers 13692 15948 Médias trouvés: 1
+INFO 2025-07-23 08:45:17,507 serializers 13692 15948 Médias IDs recherchés: [83]
+INFO 2025-07-23 08:45:17,507 serializers 13692 15948 Médias trouvés: [83]
+INFO 2025-07-23 08:45:17,801 serializers 13692 15948 Médias associés au post 379: 1
+INFO 2025-07-23 08:45:17,801 views 13692 15948 Post créé avec succès: 379
+ERROR 2025-07-23 08:45:22,132 views 13692 15948 Erreur lors du démarrage du live: 'NoneType' object has no attribute 'first_name'
+INFO 2025-07-23 08:52:16,975 views 16872 16816 Contenu analysé pour le média 85
+INFO 2025-07-23 08:52:17,571 views 16872 16816 Contenu analysé pour le média 86
+INFO 2025-07-23 08:52:17,592 serializers 16872 16816 Validation PostCreateSerializer - Contenu: 'Post avec média créé le 2025-07-23 08:52:17', Médias: [86]
+INFO 2025-07-23 08:52:17,593 views 16872 16816 Tentative de création de post par l'utilisateur testuser_1753258346
+INFO 2025-07-23 08:52:17,594 serializers 16872 16816 Création post - Médias IDs: [86]
+INFO 2025-07-23 08:52:18,050 serializers 16872 16816 Médias trouvés: 1
+INFO 2025-07-23 08:52:18,066 serializers 16872 16816 Médias IDs recherchés: [86]
+INFO 2025-07-23 08:52:18,091 serializers 16872 16816 Médias trouvés: [86]
+INFO 2025-07-23 08:52:18,349 serializers 16872 16816 Médias associés au post 380: 1
+INFO 2025-07-23 08:52:18,349 views 16872 16816 Post créé avec succès: 380
+ERROR 2025-07-23 08:52:23,878 views 16872 16816 Erreur lors du démarrage du live: Post() got unexpected keyword arguments: 'user'
+INFO 2025-07-23 08:58:28,567 views 13548 14948 Contenu analysé pour le média 88
+INFO 2025-07-23 08:58:29,384 views 13548 14948 Contenu analysé pour le média 89
+INFO 2025-07-23 08:58:29,402 serializers 13548 14948 Validation PostCreateSerializer - Contenu: 'Post avec média créé le 2025-07-23 08:58:29', Médias: [89]
+INFO 2025-07-23 08:58:29,413 views 13548 14948 Tentative de création de post par l'utilisateur testuser_1753258346
+INFO 2025-07-23 08:58:29,414 serializers 13548 14948 Création post - Médias IDs: [89]
+INFO 2025-07-23 08:58:29,668 serializers 13548 14948 Médias trouvés: 1
+INFO 2025-07-23 08:58:29,668 serializers 13548 14948 Médias IDs recherchés: [89]
+INFO 2025-07-23 08:58:29,668 serializers 13548 14948 Médias trouvés: [89]
+INFO 2025-07-23 08:58:29,950 serializers 13548 14948 Médias associés au post 381: 1
+INFO 2025-07-23 08:58:29,950 views 13548 14948 Post créé avec succès: 381
+ERROR 2025-07-23 08:58:33,577 views 13548 14948 Erreur lors du démarrage du live: Post() got unexpected keyword arguments: 'user'
+INFO 2025-07-23 09:11:59,918 views 15784 13860 Contenu analysé pour le média 92
+INFO 2025-07-23 09:12:00,449 views 15784 13860 Contenu analysé pour le média 93
+INFO 2025-07-23 09:12:00,465 serializers 15784 13860 Validation PostCreateSerializer - Contenu: 'Post avec média créé le 2025-07-23 09:12:00', Médias: [93]
+INFO 2025-07-23 09:12:00,465 views 15784 13860 Tentative de création de post par l'utilisateur testuser_1753258346
+INFO 2025-07-23 09:12:00,465 serializers 15784 13860 Création post - Médias IDs: [93]
+INFO 2025-07-23 09:12:00,918 serializers 15784 13860 Médias trouvés: 1
+INFO 2025-07-23 09:12:00,918 serializers 15784 13860 Médias IDs recherchés: [93]
+INFO 2025-07-23 09:12:00,918 serializers 15784 13860 Médias trouvés: [93]
+INFO 2025-07-23 09:12:01,254 serializers 15784 13860 Médias associés au post 382: 1
+INFO 2025-07-23 09:12:01,254 views 15784 13860 Post créé avec succès: 382
+ERROR 2025-07-23 09:12:05,213 views 15784 13860 Erreur lors du démarrage du live: Post() got unexpected keyword arguments: 'user'
+INFO 2025-07-23 10:33:37,435 serializers 13252 11892 Validation PostCreateSerializer - Contenu: 'Hello', Médias: []
+INFO 2025-07-23 10:33:37,635 views 13252 11892 Tentative de création de post par l'utilisateur testuser
+INFO 2025-07-23 10:33:37,635 serializers 13252 11892 Création post - Médias IDs: []
+INFO 2025-07-23 10:33:39,619 serializers 13252 11892 Aucun média à associer
+INFO 2025-07-23 10:33:39,634 views 13252 11892 Post créé avec succès: 383
+INFO 2025-07-23 10:50:27,922 views 13252 9268 Tentative de création de post par l'utilisateur mariam_diallo
+INFO 2025-07-23 10:50:27,922 serializers 13252 9268 Création post - Médias IDs: []
+INFO 2025-07-23 10:50:28,045 serializers 13252 9268 Aucun média à associer
+INFO 2025-07-23 10:50:28,045 views 13252 9268 Post créé avec succès: 389
+INFO 2025-07-23 10:50:49,541 views 13252 14248 Tentative de création de post par l'utilisateur mariam_diallo
+INFO 2025-07-23 10:50:49,541 serializers 13252 14248 Création post - Médias IDs: []
+INFO 2025-07-23 10:50:49,798 serializers 13252 14248 Aucun média à associer
+INFO 2025-07-23 10:50:49,803 views 13252 14248 Post créé avec succès: 390
+INFO 2025-07-23 10:53:34,519 views 13252 6396 Contenu analysé pour le média 94
+ERROR 2025-07-23 10:53:34,603 views 13252 8440 Erreur lors du démarrage du live: Post() got unexpected keyword arguments: 'user'
+INFO 2025-07-23 10:53:34,917 views 13252 15720 Tentative de création de post par l'utilisateur mariam_diallo
+INFO 2025-07-23 10:53:34,918 serializers 13252 15720 Création post - Médias IDs: [94]
+INFO 2025-07-23 10:53:35,184 serializers 13252 15720 Médias trouvés: 1
+INFO 2025-07-23 10:53:35,184 serializers 13252 15720 Médias IDs recherchés: [94]
+INFO 2025-07-23 10:53:35,186 serializers 13252 15720 Médias trouvés: [94]
+INFO 2025-07-23 10:53:35,587 serializers 13252 15720 Médias associés au post 391: 1
+INFO 2025-07-23 10:53:35,597 views 13252 15720 Post créé avec succès: 391
+INFO 2025-07-23 11:00:20,702 views 13252 12276 Contenu analysé pour le média 95
+ERROR 2025-07-23 11:00:20,730 views 13252 7116 Erreur lors du démarrage du live: Post() got unexpected keyword arguments: 'user'
+INFO 2025-07-23 11:00:20,795 views 13252 14408 Tentative de création de post par l'utilisateur mariam_diallo
+INFO 2025-07-23 11:00:20,795 serializers 13252 14408 Création post - Médias IDs: [95]
+INFO 2025-07-23 11:00:20,934 serializers 13252 14408 Médias trouvés: 1
+INFO 2025-07-23 11:00:20,934 serializers 13252 14408 Médias IDs recherchés: [95]
+INFO 2025-07-23 11:00:20,937 serializers 13252 14408 Médias trouvés: [95]
+INFO 2025-07-23 11:00:21,065 serializers 13252 14408 Médias associés au post 392: 1
+INFO 2025-07-23 11:00:21,066 views 13252 14408 Post créé avec succès: 392
+ERROR 2025-07-23 11:00:53,832 views 13252 5764 Erreur lors du démarrage du live: Post() got unexpected keyword arguments: 'user'
+ERROR 2025-07-23 11:00:53,850 views 13252 11212 Erreur lors du démarrage du live: Post() got unexpected keyword arguments: 'user'
+ERROR 2025-07-23 11:00:53,877 views 13252 5828 Erreur lors du démarrage du live: Post() got unexpected keyword arguments: 'user'
+INFO 2025-07-23 11:02:45,711 views 12124 13932 Tentative de démarrage live pour mariam_diallo
+INFO 2025-07-23 11:02:45,727 views 12124 13932 Données live: content='Live en cours', title='Test de live streaming'
+INFO 2025-07-23 11:02:45,727 views 12124 13932 Clé de stream générée: live_30_996c1d87
+ERROR 2025-07-23 11:02:45,727 views 12124 13932 Erreur lors du démarrage du live: Post() got unexpected keyword arguments: 'user'
+ERROR 2025-07-23 11:02:45,730 views 12124 13932 Type d'erreur: TypeError
+ERROR 2025-07-23 11:02:45,785 views 12124 13932 Traceback: Traceback (most recent call last):
+  File "C:\Users\DELL\Desktop\communiConnect\communiConnect\backend\posts\views.py", line 229, in post
+    post = Post.objects.create(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL\AppData\Roaming\Python\Python311\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL\AppData\Roaming\Python\Python311\site-packages\django\db\models\query.py", line 656, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL\AppData\Roaming\Python\Python311\site-packages\django\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Post() got unexpected keyword arguments: 'user'
+
+INFO 2025-07-23 11:02:45,809 views 12124 8768 Tentative de démarrage live pour mariam_diallo
+INFO 2025-07-23 11:02:45,812 views 12124 8768 Données live: content='Test de live streaming avec contenu', title='Live streaming'
+INFO 2025-07-23 11:02:45,812 views 12124 8768 Clé de stream générée: live_30_af50db12
+ERROR 2025-07-23 11:02:45,812 views 12124 8768 Erreur lors du démarrage du live: Post() got unexpected keyword arguments: 'user'
+ERROR 2025-07-23 11:02:45,812 views 12124 8768 Type d'erreur: TypeError
+ERROR 2025-07-23 11:02:45,812 views 12124 8768 Traceback: Traceback (most recent call last):
+  File "C:\Users\DELL\Desktop\communiConnect\communiConnect\backend\posts\views.py", line 229, in post
+    post = Post.objects.create(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL\AppData\Roaming\Python\Python311\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL\AppData\Roaming\Python\Python311\site-packages\django\db\models\query.py", line 656, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL\AppData\Roaming\Python\Python311\site-packages\django\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Post() got unexpected keyword arguments: 'user'
+
+INFO 2025-07-23 11:02:45,859 views 12124 14004 Tentative de démarrage live pour mariam_diallo
+INFO 2025-07-23 11:02:45,860 views 12124 14004 Données live: content='Contenu du live', title='Live Test'
+INFO 2025-07-23 11:02:45,861 views 12124 14004 Clé de stream générée: live_30_5ce373e2
+ERROR 2025-07-23 11:02:45,861 views 12124 14004 Erreur lors du démarrage du live: Post() got unexpected keyword arguments: 'user'
+ERROR 2025-07-23 11:02:45,862 views 12124 14004 Type d'erreur: TypeError
+ERROR 2025-07-23 11:02:45,870 views 12124 14004 Traceback: Traceback (most recent call last):
+  File "C:\Users\DELL\Desktop\communiConnect\communiConnect\backend\posts\views.py", line 229, in post
+    post = Post.objects.create(
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL\AppData\Roaming\Python\Python311\site-packages\django\db\models\manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL\AppData\Roaming\Python\Python311\site-packages\django\db\models\query.py", line 656, in create
+    obj = self.model(**kwargs)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\DELL\AppData\Roaming\Python\Python311\site-packages\django\db\models\base.py", line 567, in __init__
+    raise TypeError(
+TypeError: Post() got unexpected keyword arguments: 'user'
+
+INFO 2025-07-23 11:03:06,861 views 1832 11512 Tentative de démarrage live pour mariam_diallo
+INFO 2025-07-23 11:03:06,871 views 1832 11512 Données live: content='Live en cours', title='Test de live streaming'
+INFO 2025-07-23 11:03:06,923 views 1832 11512 Clé de stream générée: live_30_79f7f3f9
+INFO 2025-07-23 11:03:07,311 views 1832 11512 Post live créé avec ID: 393
+INFO 2025-07-23 11:03:07,389 views 1832 11512 Stream démarré pour la clé: live_30_79f7f3f9
+INFO 2025-07-23 11:03:07,460 views 1832 11512 Live démarré avec succès: {'live_id': 393, 'stream_key': 'live_30_79f7f3f9', 'post_id': 393, 'rtmp_url': 'rtmp://localhost/live/live_30_79f7f3f9', 'hls_url': 'http://localhost:8080/hls/live_30_79f7f3f9.m3u8', 'message': 'Live démarré avec succès'}
+INFO 2025-07-23 11:05:29,333 views 1832 15956 Contenu analysé pour le média 96
+INFO 2025-07-23 11:05:29,421 views 1832 10092 Tentative de création de post par l'utilisateur mariam_diallo
+INFO 2025-07-23 11:05:29,436 serializers 1832 10092 Création post - Médias IDs: [96]
+INFO 2025-07-23 11:05:29,567 serializers 1832 10092 Médias trouvés: 1
+INFO 2025-07-23 11:05:29,568 serializers 1832 10092 Médias IDs recherchés: [96]
+INFO 2025-07-23 11:05:29,570 serializers 1832 10092 Médias trouvés: [96]
+INFO 2025-07-23 11:05:29,701 serializers 1832 10092 Médias associés au post 394: 1
+INFO 2025-07-23 11:05:29,701 views 1832 10092 Post créé avec succès: 394
+INFO 2025-07-23 11:05:29,718 views 1832 6028 Tentative de démarrage live pour mariam_diallo
+INFO 2025-07-23 11:05:29,720 views 1832 6028 Données live: content='Live de test final - CommuniConnect fonctionne !', title='Test final de live streaming'
+INFO 2025-07-23 11:05:29,720 views 1832 6028 Clé de stream générée: live_30_1c4125ae
+INFO 2025-07-23 11:05:29,899 views 1832 6028 Post live créé avec ID: 395
+INFO 2025-07-23 11:05:29,900 views 1832 6028 Stream démarré pour la clé: live_30_1c4125ae
+INFO 2025-07-23 11:05:29,901 views 1832 6028 Live démarré avec succès: {'live_id': 395, 'stream_key': 'live_30_1c4125ae', 'post_id': 395, 'rtmp_url': 'rtmp://localhost/live/live_30_1c4125ae', 'hls_url': 'http://localhost:8080/hls/live_30_1c4125ae.m3u8', 'message': 'Live démarré avec succès'}
+INFO 2025-07-23 11:09:28,268 views 1832 3684 Contenu analysé pour le média 97
+INFO 2025-07-23 11:09:28,343 views 1832 17452 Tentative de création de post par l'utilisateur mariam_diallo
+INFO 2025-07-23 11:09:28,343 serializers 1832 17452 Création post - Médias IDs: [97]
+INFO 2025-07-23 11:09:28,460 serializers 1832 17452 Médias trouvés: 1
+INFO 2025-07-23 11:09:28,476 serializers 1832 17452 Médias IDs recherchés: [97]
+INFO 2025-07-23 11:09:28,481 serializers 1832 17452 Médias trouvés: [97]
+INFO 2025-07-23 11:09:28,600 serializers 1832 17452 Médias associés au post 396: 1
+INFO 2025-07-23 11:09:28,600 views 1832 17452 Post créé avec succès: 396
+INFO 2025-07-23 11:09:28,632 views 1832 4308 Tentative de démarrage live pour mariam_diallo
+INFO 2025-07-23 11:09:28,639 views 1832 4308 Données live: content='Live de test systématique - CommuniConnect !', title='Test systématique de live streaming'
+INFO 2025-07-23 11:09:28,640 views 1832 4308 Clé de stream générée: live_30_fe155925
+INFO 2025-07-23 11:09:28,805 views 1832 4308 Post live créé avec ID: 397
+INFO 2025-07-23 11:09:28,805 views 1832 4308 Stream démarré pour la clé: live_30_fe155925
+INFO 2025-07-23 11:09:28,805 views 1832 4308 Live démarré avec succès: {'live_id': 397, 'stream_key': 'live_30_fe155925', 'post_id': 397, 'rtmp_url': 'rtmp://localhost/live/live_30_fe155925', 'hls_url': 'http://localhost:8080/hls/live_30_fe155925.m3u8', 'message': 'Live démarré avec succès'}
+INFO 2025-07-23 11:14:46,093 views 15520 7664 Contenu analysé pour le média 98
+INFO 2025-07-23 11:14:46,211 views 15520 17272 Tentative de création de post par l'utilisateur mariam_diallo
+INFO 2025-07-23 11:14:46,211 serializers 15520 17272 Création post - Médias IDs: [98]
+INFO 2025-07-23 11:14:46,314 serializers 15520 17272 Médias trouvés: 1
+INFO 2025-07-23 11:14:46,314 serializers 15520 17272 Médias IDs recherchés: [98]
+INFO 2025-07-23 11:14:46,314 serializers 15520 17272 Médias trouvés: [98]
+INFO 2025-07-23 11:14:46,476 serializers 15520 17272 Médias associés au post 398: 1
+INFO 2025-07-23 11:14:46,477 views 15520 17272 Post créé avec succès: 398
+INFO 2025-07-23 11:14:46,507 views 15520 3440 Tentative de démarrage live pour mariam_diallo
+INFO 2025-07-23 11:14:46,510 views 15520 3440 Données live: content='Live de test final corrigé - CommuniConnect !', title='Test final corrigé de live streaming'
+INFO 2025-07-23 11:14:46,510 views 15520 3440 Clé de stream générée: live_30_9c7389ec
+INFO 2025-07-23 11:14:46,653 views 15520 3440 Post live créé avec ID: 399
+INFO 2025-07-23 11:14:46,653 views 15520 3440 Stream démarré pour la clé: live_30_9c7389ec
+INFO 2025-07-23 11:14:46,653 views 15520 3440 Live démarré avec succès: {'live_id': 399, 'stream_key': 'live_30_9c7389ec', 'post_id': 399, 'rtmp_url': 'rtmp://localhost/live/live_30_9c7389ec', 'hls_url': 'http://localhost:8080/hls/live_30_9c7389ec.m3u8', 'message': 'Live démarré avec succès'}
+INFO 2025-07-23 11:20:20,474 views 15520 9796 Contenu analysé pour le média 99
+INFO 2025-07-23 11:20:20,518 serializers 15520 9796 Validation PostCreateSerializer - Contenu: 'Super', Médias: [99]
+INFO 2025-07-23 11:20:20,526 views 15520 9796 Tentative de création de post par l'utilisateur testuser
+INFO 2025-07-23 11:20:20,527 serializers 15520 9796 Création post - Médias IDs: [99]
+INFO 2025-07-23 11:20:20,727 serializers 15520 9796 Médias trouvés: 1
+INFO 2025-07-23 11:20:20,727 serializers 15520 9796 Médias IDs recherchés: [99]
+INFO 2025-07-23 11:20:20,729 serializers 15520 9796 Médias trouvés: [99]
+INFO 2025-07-23 11:20:20,850 serializers 15520 9796 Médias associés au post 400: 1
+INFO 2025-07-23 11:20:20,850 views 15520 9796 Post créé avec succès: 400
+INFO 2025-07-23 11:23:48,801 views 15520 10400 Contenu analysé pour le média 100
+INFO 2025-07-23 11:23:48,904 views 15520 13728 Tentative de création de post par l'utilisateur mariam_diallo
+INFO 2025-07-23 11:23:48,905 serializers 15520 13728 Création post - Médias IDs: [100]
+INFO 2025-07-23 11:23:49,151 serializers 15520 13728 Médias trouvés: 1
+INFO 2025-07-23 11:23:49,151 serializers 15520 13728 Médias IDs recherchés: [100]
+INFO 2025-07-23 11:23:49,153 serializers 15520 13728 Médias trouvés: [100]
+INFO 2025-07-23 11:23:49,254 serializers 15520 13728 Médias associés au post 401: 1
+INFO 2025-07-23 11:23:49,254 views 15520 13728 Post créé avec succès: 401
+INFO 2025-07-23 11:26:30,814 views 15520 16108 Contenu analysé pour le média 101
+INFO 2025-07-23 11:26:30,872 views 15520 10256 Tentative de création de post par l'utilisateur mariam_diallo
+INFO 2025-07-23 11:26:30,872 serializers 15520 10256 Création post - Médias IDs: [101]
+INFO 2025-07-23 11:26:34,803 serializers 15520 10256 Médias trouvés: 1
+INFO 2025-07-23 11:26:34,803 serializers 15520 10256 Médias IDs recherchés: [101]
+INFO 2025-07-23 11:26:34,803 serializers 15520 10256 Médias trouvés: [101]
+INFO 2025-07-23 11:26:35,942 serializers 15520 10256 Médias associés au post 402: 1
+INFO 2025-07-23 11:26:35,942 views 15520 10256 Post créé avec succès: 402
+INFO 2025-07-23 11:28:57,163 views 15520 15992 Contenu analysé pour le média 102
+INFO 2025-07-23 11:28:57,181 serializers 15520 15992 Validation PostCreateSerializer - Contenu: 'Remise de diplôme bien passée avec ma compagnon', Médias: [102]
+INFO 2025-07-23 11:28:57,182 views 15520 15992 Tentative de création de post par l'utilisateur testuser
+INFO 2025-07-23 11:28:57,183 serializers 15520 15992 Création post - Médias IDs: [102]
+INFO 2025-07-23 11:28:57,309 serializers 15520 15992 Médias trouvés: 1
+INFO 2025-07-23 11:28:57,309 serializers 15520 15992 Médias IDs recherchés: [102]
+INFO 2025-07-23 11:28:57,327 serializers 15520 15992 Médias trouvés: [102]
+INFO 2025-07-23 11:28:57,480 serializers 15520 15992 Médias associés au post 403: 1
+INFO 2025-07-23 11:28:57,480 views 15520 15992 Post créé avec succès: 403
+INFO 2025-07-23 11:30:42,462 serializers 15520 15992 Validation PostCreateSerializer - Contenu: 'hello', Médias: []
+INFO 2025-07-23 11:30:42,470 views 15520 15992 Tentative de création de post par l'utilisateur testuser
+INFO 2025-07-23 11:30:42,471 serializers 15520 15992 Création post - Médias IDs: []
+INFO 2025-07-23 11:30:42,581 serializers 15520 15992 Aucun média à associer
+INFO 2025-07-23 11:30:42,581 views 15520 15992 Post créé avec succès: 404
+INFO 2025-07-23 11:31:22,829 views 15520 14036 Tentative de création de post par l'utilisateur mariam_diallo
+INFO 2025-07-23 11:31:22,830 serializers 15520 14036 Création post - Médias IDs: []
+INFO 2025-07-23 11:31:23,028 serializers 15520 14036 Aucun média à associer
+INFO 2025-07-23 11:31:23,028 views 15520 14036 Post créé avec succès: 405
+INFO 2025-07-23 11:31:23,898 views 15520 16848 Contenu analysé pour le média 103
+INFO 2025-07-23 11:31:24,294 views 15520 17932 Tentative de création de post par l'utilisateur mariam_diallo
+INFO 2025-07-23 11:31:24,295 serializers 15520 17932 Création post - Médias IDs: [103]
+INFO 2025-07-23 11:31:24,534 serializers 15520 17932 Médias trouvés: 1
+INFO 2025-07-23 11:31:24,534 serializers 15520 17932 Médias IDs recherchés: [103]
+INFO 2025-07-23 11:31:24,549 serializers 15520 17932 Médias trouvés: [103]
+INFO 2025-07-23 11:31:25,098 serializers 15520 17932 Médias associés au post 406: 1
+INFO 2025-07-23 11:31:25,114 views 15520 17932 Post créé avec succès: 406
+INFO 2025-07-23 11:33:10,823 views 15520 11176 Tentative de création de post par l'utilisateur mariam_diallo
+INFO 2025-07-23 11:33:10,824 serializers 15520 11176 Création post - Médias IDs: []
+INFO 2025-07-23 11:33:11,075 serializers 15520 11176 Aucun média à associer
+INFO 2025-07-23 11:33:11,075 views 15520 11176 Post créé avec succès: 407
+INFO 2025-07-23 11:34:14,079 views 17224 3080 Tentative de création de post par l'utilisateur mariam_diallo
+INFO 2025-07-23 11:34:14,079 serializers 17224 3080 Création post - Médias IDs: []
+INFO 2025-07-23 11:34:14,299 serializers 17224 3080 Aucun média à associer
+INFO 2025-07-23 11:34:14,299 views 17224 3080 Post créé avec succès: 408
+INFO 2025-07-23 11:35:19,665 serializers 17224 17560 Validation PostCreateSerializer - Contenu: 'coucou', Médias: []
+INFO 2025-07-23 11:35:19,665 views 17224 17560 Tentative de création de post par l'utilisateur testuser
+INFO 2025-07-23 11:35:19,665 serializers 17224 17560 Création post - Médias IDs: []
+INFO 2025-07-23 11:35:19,785 serializers 17224 17560 Aucun média à associer
+INFO 2025-07-23 11:35:19,785 views 17224 17560 Post créé avec succès: 409
+INFO 2025-07-23 11:35:44,277 views 17224 17560 Contenu analysé pour le média 104
+INFO 2025-07-23 11:35:44,295 serializers 17224 17560 Validation PostCreateSerializer - Contenu: 'Remise de diplôme avec ma poupée d'amour', Médias: [104]
+INFO 2025-07-23 11:35:44,296 views 17224 17560 Tentative de création de post par l'utilisateur testuser
+INFO 2025-07-23 11:35:44,296 serializers 17224 17560 Création post - Médias IDs: [104]
+INFO 2025-07-23 11:35:44,427 serializers 17224 17560 Médias trouvés: 1
+INFO 2025-07-23 11:35:44,427 serializers 17224 17560 Médias IDs recherchés: [104]
+INFO 2025-07-23 11:35:44,427 serializers 17224 17560 Médias trouvés: [104]
+INFO 2025-07-23 11:35:44,627 serializers 17224 17560 Médias associés au post 410: 1
+INFO 2025-07-23 11:35:44,627 views 17224 17560 Post créé avec succès: 410
+INFO 2025-07-23 13:02:44,831 views 8064 15476 Contenu analysé pour le média 105
+INFO 2025-07-23 13:02:44,888 serializers 8064 15476 Validation PostCreateSerializer - Contenu: 'REMISE de diplôme à l'université de Labé avec ma Chérie Talibé Barry', Médias: [105]
+INFO 2025-07-23 13:02:44,888 views 8064 15476 Tentative de création de post par l'utilisateur aob_oumar_rich
+INFO 2025-07-23 13:02:44,888 serializers 8064 15476 Création post - Médias IDs: [105]
+INFO 2025-07-23 13:02:45,069 serializers 8064 15476 Médias trouvés: 1
+INFO 2025-07-23 13:02:45,069 serializers 8064 15476 Médias IDs recherchés: [105]
+INFO 2025-07-23 13:02:45,069 serializers 8064 15476 Médias trouvés: [105]
+INFO 2025-07-23 13:02:45,252 serializers 8064 15476 Médias associés au post 411: 1
+INFO 2025-07-23 13:02:45,252 views 8064 15476 Post créé avec succès: 411
+INFO 2025-07-23 14:42:44,347 serializers 8064 9820 Validation PostCreateSerializer - Contenu: 'Test post automatique - 14:42:44', Médias: []
+INFO 2025-07-23 14:42:44,349 views 8064 9820 Tentative de création de post par l'utilisateur mariam_diallo
+INFO 2025-07-23 14:42:44,351 serializers 8064 9820 Création post - Médias IDs: []
+INFO 2025-07-23 14:42:44,615 serializers 8064 9820 Aucun média à associer
+INFO 2025-07-23 14:42:44,615 views 8064 9820 Post créé avec succès: 412
+INFO 2025-07-23 14:43:48,682 serializers 8064 10256 Validation PostCreateSerializer - Contenu: 'Test post automatique - 14:43:48', Médias: []
+INFO 2025-07-23 14:43:48,683 views 8064 10256 Tentative de création de post par l'utilisateur mariam_diallo
+INFO 2025-07-23 14:43:48,683 serializers 8064 10256 Création post - Médias IDs: []
+INFO 2025-07-23 14:43:48,812 serializers 8064 10256 Aucun média à associer
+INFO 2025-07-23 14:43:48,812 views 8064 10256 Post créé avec succès: 413
+INFO 2025-07-23 14:50:56,566 serializers 8064 18720 Validation PostCreateSerializer - Contenu: 'Test post automatique - 14:50:56', Médias: []
+INFO 2025-07-23 14:50:56,566 views 8064 18720 Tentative de création de post par l'utilisateur mariam_diallo
+INFO 2025-07-23 14:50:56,566 serializers 8064 18720 Création post - Médias IDs: []
+INFO 2025-07-23 14:50:56,710 serializers 8064 18720 Aucun média à associer
+INFO 2025-07-23 14:50:56,725 views 8064 18720 Post créé avec succès: 414
+INFO 2025-07-23 15:03:15,371 views 8064 17184 Tentative de démarrage live pour mariam_diallo
+INFO 2025-07-23 15:03:15,390 views 8064 17184 Données live: content='Test en cours...', title='Test Live Stream'
+INFO 2025-07-23 15:03:15,390 views 8064 17184 Clé de stream générée: live_30_ab34ed6c
+INFO 2025-07-23 15:03:15,628 views 8064 17184 Post live créé avec ID: 415
+INFO 2025-07-23 15:03:15,659 views 8064 17184 Stream démarré pour la clé: live_30_ab34ed6c
+INFO 2025-07-23 15:03:15,659 views 8064 17184 Live démarré avec succès: {'live_id': 415, 'stream_key': 'live_30_ab34ed6c', 'post_id': 415, 'rtmp_url': 'rtmp://localhost/live/live_30_ab34ed6c', 'hls_url': 'http://localhost:8080/hls/live_30_ab34ed6c.m3u8', 'message': 'Live démarré avec succès'}
+INFO 2025-07-23 15:11:37,102 views 8064 17796 Tentative de démarrage live pour aob_oumar_rich
+INFO 2025-07-23 15:11:37,102 views 8064 17796 Données live: content='Live démarré !', title='Live de Alpha Oumar'
+INFO 2025-07-23 15:11:37,102 views 8064 17796 Clé de stream générée: live_14_8c1ac5c9
+INFO 2025-07-23 15:11:37,386 views 8064 17796 Post live créé avec ID: 416
+INFO 2025-07-23 15:11:37,396 views 8064 17796 Stream démarré pour la clé: live_14_8c1ac5c9
+INFO 2025-07-23 15:11:37,403 views 8064 17796 Live démarré avec succès: {'live_id': 416, 'stream_key': 'live_14_8c1ac5c9', 'post_id': 416, 'rtmp_url': 'rtmp://localhost/live/live_14_8c1ac5c9', 'hls_url': 'http://localhost:8080/hls/live_14_8c1ac5c9.m3u8', 'message': 'Live démarré avec succès'}
+INFO 2025-07-23 15:12:13,282 views 8064 17796 Tentative d'arrêt du live 416
+ERROR 2025-07-23 15:12:13,282 views 8064 17796 Erreur lors de l'arrêt du live: 'Post' object has no attribute 'user'
+INFO 2025-07-23 15:16:33,325 views 8064 20044 Tentative de démarrage live pour aob_oumar_rich
+INFO 2025-07-23 15:16:33,334 views 8064 20044 Données live: content='Live démarré !', title='Live de Alpha Oumar'
+INFO 2025-07-23 15:16:33,334 views 8064 20044 Clé de stream générée: live_14_2b08d41f
+INFO 2025-07-23 15:16:33,488 views 8064 20044 Post live créé avec ID: 417
+INFO 2025-07-23 15:16:33,488 views 8064 20044 Stream démarré pour la clé: live_14_2b08d41f
+INFO 2025-07-23 15:16:33,493 views 8064 20044 Live démarré avec succès: {'live_id': 417, 'stream_key': 'live_14_2b08d41f', 'post_id': 417, 'rtmp_url': 'rtmp://localhost/live/live_14_2b08d41f', 'hls_url': 'http://localhost:8080/hls/live_14_2b08d41f.m3u8', 'message': 'Live démarré avec succès'}
+INFO 2025-07-23 15:16:37,499 views 8064 20044 Tentative d'arrêt du live 417
+ERROR 2025-07-23 15:16:37,499 views 8064 20044 Erreur lors de l'arrêt du live: 'Post' object has no attribute 'user'
+INFO 2025-07-23 15:29:18,919 views 14152 20664 Tentative de démarrage live pour aob_oumar_rich
+INFO 2025-07-23 15:29:18,980 views 14152 20664 Données live: content='Live démarré !', title='Live de Alpha Oumar'
+INFO 2025-07-23 15:29:19,130 views 14152 20664 Clé de stream générée: live_14_f06b1f68
+INFO 2025-07-23 15:29:19,718 views 14152 20664 Post live créé avec ID: 418
+INFO 2025-07-23 15:29:19,852 views 14152 20664 Stream démarré pour la clé: live_14_f06b1f68
+INFO 2025-07-23 15:29:19,888 views 14152 20664 Live démarré avec succès: {'live_id': 418, 'stream_key': 'live_14_f06b1f68', 'post_id': 418, 'rtmp_url': 'rtmp://localhost/live/live_14_f06b1f68', 'hls_url': 'http://localhost:8080/hls/live_14_f06b1f68.m3u8', 'message': 'Live démarré avec succès'}
+INFO 2025-07-23 15:29:46,592 views 14152 20664 Tentative d'arrêt du live 418
+ERROR 2025-07-23 15:29:46,602 views 14152 20664 Erreur lors de l'arrêt du live: 'Post' object has no attribute 'user'
+INFO 2025-07-23 15:32:52,742 views 2948 21480 Tentative d'arrêt du live 415
+INFO 2025-07-23 15:32:52,881 views 2948 21480 Live 415 arrêté avec succès
+INFO 2025-07-23 15:34:02,497 views 2948 19304 Tentative de démarrage live pour aob_oumar_rich
+INFO 2025-07-23 15:34:02,505 views 2948 19304 Données live: content='Live démarré !', title='Live de Alpha Oumar'
+INFO 2025-07-23 15:34:02,505 views 2948 19304 Clé de stream générée: live_14_c4beb46b
+INFO 2025-07-23 15:34:02,670 views 2948 19304 Post live créé avec ID: 419
+INFO 2025-07-23 15:34:02,675 views 2948 19304 Stream démarré pour la clé: live_14_c4beb46b
+INFO 2025-07-23 15:34:02,675 views 2948 19304 Live démarré avec succès: {'live_id': 419, 'stream_key': 'live_14_c4beb46b', 'post_id': 419, 'rtmp_url': 'rtmp://localhost/live/live_14_c4beb46b', 'hls_url': 'http://localhost:8080/hls/live_14_c4beb46b.m3u8', 'message': 'Live démarré avec succès'}
+INFO 2025-07-23 15:34:26,205 views 2948 12776 Tentative d'arrêt du live 419
+INFO 2025-07-23 15:34:26,848 views 2948 12776 Live 419 arrêté avec succès
+INFO 2025-07-23 15:34:57,069 views 2948 5016 Tentative de démarrage live pour aob_oumar_rich
+INFO 2025-07-23 15:34:57,069 views 2948 5016 Données live: content='Live démarré !', title='Live de Alpha Oumar'
+INFO 2025-07-23 15:34:57,084 views 2948 5016 Clé de stream générée: live_14_438cbf01
+INFO 2025-07-23 15:34:57,299 views 2948 5016 Post live créé avec ID: 420
+INFO 2025-07-23 15:34:57,311 views 2948 5016 Stream démarré pour la clé: live_14_438cbf01
+INFO 2025-07-23 15:34:57,322 views 2948 5016 Live démarré avec succès: {'live_id': 420, 'stream_key': 'live_14_438cbf01', 'post_id': 420, 'rtmp_url': 'rtmp://localhost/live/live_14_438cbf01', 'hls_url': 'http://localhost:8080/hls/live_14_438cbf01.m3u8', 'message': 'Live démarré avec succès'}
+INFO 2025-07-23 15:35:10,274 views 2948 5016 Tentative d'arrêt du live 420
+INFO 2025-07-23 15:35:10,419 views 2948 5016 Live 420 arrêté avec succès
+INFO 2025-07-23 15:39:30,279 views 2948 7348 Tentative de démarrage live pour aob_oumar_rich
+INFO 2025-07-23 15:39:30,282 views 2948 7348 Données live: content='Live démarré !', title='Live de Alpha Oumar'
+INFO 2025-07-23 15:39:30,282 views 2948 7348 Clé de stream générée: live_14_c2a67679
+INFO 2025-07-23 15:39:30,469 views 2948 7348 Post live créé avec ID: 421
+INFO 2025-07-23 15:39:30,469 views 2948 7348 Stream démarré pour la clé: live_14_c2a67679
+INFO 2025-07-23 15:39:30,474 views 2948 7348 Live démarré avec succès: {'live_id': 421, 'stream_key': 'live_14_c2a67679', 'post_id': 421, 'rtmp_url': 'rtmp://localhost/live/live_14_c2a67679', 'hls_url': 'http://localhost:8080/hls/live_14_c2a67679.m3u8', 'message': 'Live démarré avec succès'}
+INFO 2025-07-23 15:39:43,385 views 2948 20740 Tentative d'arrêt du live 421
+INFO 2025-07-23 15:39:43,607 views 2948 20740 Live 421 arrêté avec succès
+INFO 2025-07-23 15:40:46,686 views 2948 20740 Tentative de démarrage live pour aob_oumar_rich
+INFO 2025-07-23 15:40:46,688 views 2948 20740 Données live: content='Live démarré !', title='Live de Alpha Oumar'
+INFO 2025-07-23 15:40:46,688 views 2948 20740 Clé de stream générée: live_14_5599c3f8
+INFO 2025-07-23 15:40:46,856 views 2948 20740 Post live créé avec ID: 422
+INFO 2025-07-23 15:40:46,859 views 2948 20740 Stream démarré pour la clé: live_14_5599c3f8
+INFO 2025-07-23 15:40:46,866 views 2948 20740 Live démarré avec succès: {'live_id': 422, 'stream_key': 'live_14_5599c3f8', 'post_id': 422, 'rtmp_url': 'rtmp://localhost/live/live_14_5599c3f8', 'hls_url': 'http://localhost:8080/hls/live_14_5599c3f8.m3u8', 'message': 'Live démarré avec succès'}
+INFO 2025-07-23 15:40:58,785 views 2948 20740 Tentative d'arrêt du live 422
+INFO 2025-07-23 15:40:59,001 views 2948 20740 Live 422 arrêté avec succès
+INFO 2025-07-23 15:44:20,323 views 2948 20304 Tentative de démarrage live pour aob_oumar_rich
+INFO 2025-07-23 15:44:20,326 views 2948 20304 Données live: content='Live démarré !', title='Live de Alpha Oumar'
+INFO 2025-07-23 15:44:20,326 views 2948 20304 Clé de stream générée: live_14_574ac31c
+INFO 2025-07-23 15:44:20,712 views 2948 20304 Post live créé avec ID: 423
+INFO 2025-07-23 15:44:20,762 views 2948 20304 Stream démarré pour la clé: live_14_574ac31c
+INFO 2025-07-23 15:44:20,794 views 2948 20304 Live démarré avec succès: {'live_id': 423, 'stream_key': 'live_14_574ac31c', 'post_id': 423, 'rtmp_url': 'rtmp://localhost/live/live_14_574ac31c', 'hls_url': 'http://localhost:8080/hls/live_14_574ac31c.m3u8', 'message': 'Live démarré avec succès'}
+INFO 2025-07-23 19:06:37,490 views 2948 5780 Tentative de démarrage live pour aob_oumar_rich
+INFO 2025-07-23 19:06:37,490 views 2948 5780 Données live: content='Live démarré !', title='Live de Alpha Oumar'
+INFO 2025-07-23 19:06:37,490 views 2948 5780 Clé de stream générée: live_14_f633ae89
+INFO 2025-07-23 19:06:37,641 views 2948 5780 Post live créé avec ID: 424
+INFO 2025-07-23 19:06:37,641 views 2948 5780 Stream démarré pour la clé: live_14_f633ae89
+INFO 2025-07-23 19:06:37,641 views 2948 5780 Live démarré avec succès: {'live_id': 424, 'stream_key': 'live_14_f633ae89', 'post_id': 424, 'rtmp_url': 'rtmp://localhost/live/live_14_f633ae89', 'hls_url': 'http://localhost:8080/hls/live_14_f633ae89.m3u8', 'message': 'Live démarré avec succès'}
+INFO 2025-07-23 19:16:47,840 views 2948 2044 Tentative de démarrage live pour aob_oumar_rich
+INFO 2025-07-23 19:16:47,844 views 2948 2044 Données live: content='Live démarré !', title='Live de Alpha Oumar'
+INFO 2025-07-23 19:16:47,844 views 2948 2044 Clé de stream générée: live_14_bd091ada
+INFO 2025-07-23 19:16:47,945 views 2948 2044 Post live créé avec ID: 425
+INFO 2025-07-23 19:16:47,945 views 2948 2044 Stream démarré pour la clé: live_14_bd091ada
+INFO 2025-07-23 19:16:47,945 views 2948 2044 Live démarré avec succès: {'live_id': 425, 'stream_key': 'live_14_bd091ada', 'post_id': 425, 'rtmp_url': 'rtmp://localhost/live/live_14_bd091ada', 'hls_url': 'http://localhost:8080/hls/live_14_bd091ada.m3u8', 'message': 'Live démarré avec succès'}
+INFO 2025-07-23 19:20:00,502 views 2948 2044 Tentative de démarrage live pour aob_oumar_rich
+INFO 2025-07-23 19:20:00,510 views 2948 2044 Données live: content='Live démarré !', title='Live de Alpha Oumar'
+INFO 2025-07-23 19:20:00,515 views 2948 2044 Clé de stream générée: live_14_f3d0c2c1
+INFO 2025-07-23 19:20:00,690 views 2948 2044 Post live créé avec ID: 426
+INFO 2025-07-23 19:20:00,700 views 2948 2044 Stream démarré pour la clé: live_14_f3d0c2c1
+INFO 2025-07-23 19:20:00,700 views 2948 2044 Live démarré avec succès: {'live_id': 426, 'stream_key': 'live_14_f3d0c2c1', 'post_id': 426, 'rtmp_url': 'rtmp://localhost/live/live_14_f3d0c2c1', 'hls_url': 'http://localhost:8080/hls/live_14_f3d0c2c1.m3u8', 'message': 'Live démarré avec succès'}
+INFO 2025-07-23 19:20:15,866 views 2948 2044 Tentative d'arrêt du live 426
+INFO 2025-07-23 19:20:16,831 views 2948 2044 Live 426 arrêté avec succès
+INFO 2025-07-23 19:20:40,904 views 2948 16676 Tentative de démarrage live pour aob_oumar_rich
+INFO 2025-07-23 19:20:40,914 views 2948 16676 Données live: content='Live démarré !', title='Live de Alpha Oumar'
+INFO 2025-07-23 19:20:40,914 views 2948 16676 Clé de stream générée: live_14_32b33b54
+INFO 2025-07-23 19:20:41,018 views 2948 16676 Post live créé avec ID: 427
+INFO 2025-07-23 19:20:41,024 views 2948 16676 Stream démarré pour la clé: live_14_32b33b54
+INFO 2025-07-23 19:20:41,029 views 2948 16676 Live démarré avec succès: {'live_id': 427, 'stream_key': 'live_14_32b33b54', 'post_id': 427, 'rtmp_url': 'rtmp://localhost/live/live_14_32b33b54', 'hls_url': 'http://localhost:8080/hls/live_14_32b33b54.m3u8', 'message': 'Live démarré avec succès'}
+INFO 2025-07-23 19:20:51,804 views 2948 16676 Tentative d'arrêt du live 427
+INFO 2025-07-23 19:20:51,964 views 2948 16676 Live 427 arrêté avec succès
+INFO 2025-07-23 19:25:36,970 views 2948 2044 Tentative de démarrage live pour aob_oumar_rich
+INFO 2025-07-23 19:25:37,014 views 2948 2044 Données live: content='Live démarré !', title='Live de Alpha Oumar'
+INFO 2025-07-23 19:25:37,026 views 2948 2044 Clé de stream générée: live_14_d6c00678
+INFO 2025-07-23 19:25:37,234 views 2948 2044 Post live créé avec ID: 428
+INFO 2025-07-23 19:25:37,234 views 2948 2044 Stream démarré pour la clé: live_14_d6c00678
+INFO 2025-07-23 19:25:37,239 views 2948 2044 Live démarré avec succès: {'live_id': 428, 'stream_key': 'live_14_d6c00678', 'post_id': 428, 'rtmp_url': 'rtmp://localhost/live/live_14_d6c00678', 'hls_url': 'http://localhost:8080/hls/live_14_d6c00678.m3u8', 'message': 'Live démarré avec succès'}
+INFO 2025-07-23 19:25:46,624 views 2948 2044 Tentative d'arrêt du live 428
+INFO 2025-07-23 19:25:47,169 views 2948 2044 Live 428 arrêté avec succès
+ERROR 2025-07-23 19:43:44,104 views 13068 1304 Erreur lors de la récupération du queryset: no such column: posts_media.is_live_recording
+ERROR 2025-07-23 19:43:44,119 views 13068 1304 Erreur lors de la récupération des posts: Cannot reorder a query once a slice has been taken.
+ERROR 2025-07-23 19:43:44,232 views 13068 1304 Erreur lors de la récupération du queryset: no such column: posts_media.is_live_recording
+ERROR 2025-07-23 19:43:44,234 views 13068 1304 Erreur lors de la récupération des posts: Cannot reorder a query once a slice has been taken.
+INFO 2025-07-23 19:49:00,802 views 13068 1304 Tentative de démarrage live pour aob_oumar_rich
+INFO 2025-07-23 19:49:00,846 views 13068 1304 Données live: content='Live démarré !', title='Live de Alpha Oumar'
+INFO 2025-07-23 19:49:00,854 views 13068 1304 Clé de stream générée: live_14_48d83880
+INFO 2025-07-23 19:49:01,055 views 13068 1304 Post live créé avec ID: 429
+INFO 2025-07-23 19:49:01,055 views 13068 1304 Stream démarré pour la clé: live_14_48d83880
+INFO 2025-07-23 19:49:01,065 views 13068 1304 Live démarré avec succès: {'live_id': 429, 'stream_key': 'live_14_48d83880', 'post_id': 429, 'rtmp_url': 'rtmp://localhost/live/live_14_48d83880', 'hls_url': 'http://localhost:8080/hls/live_14_48d83880.m3u8', 'message': 'Live démarré avec succès'}
+INFO 2025-07-23 19:49:08,854 views 13068 1304 Tentative d'arrêt du live 429
+INFO 2025-07-23 19:49:08,985 views 13068 1304 Live 429 arrêté avec succès
+INFO 2025-07-23 19:49:09,520 views 13068 1304 Tentative d'arrêt du live 429
+INFO 2025-07-23 19:52:07,456 views 13068 1304 Tentative de démarrage live pour aob_oumar_rich
+INFO 2025-07-23 19:52:07,510 views 13068 1304 Données live: content='Live démarré !', title='Live de Alpha Oumar'
+INFO 2025-07-23 19:52:07,570 views 13068 1304 Clé de stream générée: live_14_be993af6
+INFO 2025-07-23 19:52:07,731 views 13068 1304 Post live créé avec ID: 430
+INFO 2025-07-23 19:52:07,731 views 13068 1304 Stream démarré pour la clé: live_14_be993af6
+INFO 2025-07-23 19:52:07,731 views 13068 1304 Live démarré avec succès: {'live_id': 430, 'stream_key': 'live_14_be993af6', 'post_id': 430, 'rtmp_url': 'rtmp://localhost/live/live_14_be993af6', 'hls_url': 'http://localhost:8080/hls/live_14_be993af6.m3u8', 'message': 'Live démarré avec succès'}
+INFO 2025-07-23 19:52:12,766 views 13068 1304 Tentative d'arrêt du live 430
+INFO 2025-07-23 19:52:12,906 views 13068 1304 Live 430 arrêté avec succès
+INFO 2025-07-23 19:52:13,431 views 13068 1304 Tentative d'arrêt du live 430
+INFO 2025-07-23 19:55:58,663 views 13068 16792 Tentative de démarrage live pour aob_oumar_rich
+INFO 2025-07-23 19:55:58,667 views 13068 16792 Données live: content='Live démarré !', title='Live de Alpha Oumar'
+INFO 2025-07-23 19:55:58,683 views 13068 16792 Clé de stream générée: live_14_51b7d6c4
+INFO 2025-07-23 19:55:58,974 views 13068 16792 Post live créé avec ID: 431
+INFO 2025-07-23 19:55:58,974 views 13068 16792 Stream démarré pour la clé: live_14_51b7d6c4
+INFO 2025-07-23 19:55:58,983 views 13068 16792 Live démarré avec succès: {'live_id': 431, 'stream_key': 'live_14_51b7d6c4', 'post_id': 431, 'rtmp_url': 'rtmp://localhost/live/live_14_51b7d6c4', 'hls_url': 'http://localhost:8080/hls/live_14_51b7d6c4.m3u8', 'message': 'Live démarré avec succès'}
+INFO 2025-07-23 19:56:12,773 views 13068 16792 Tentative d'arrêt du live 431
+INFO 2025-07-23 19:56:12,783 views 13068 16792 Sauvegarde de la vidéo enregistrée pour le live 431
+ERROR 2025-07-23 19:56:12,783 views 13068 16792 Erreur lors de l'arrêt du live: property 'file_url' of 'Media' object has no setter
+INFO 2025-07-23 20:06:16,382 views 21260 20620 Tentative de démarrage live pour aob_oumar_rich
+INFO 2025-07-23 20:06:16,382 views 21260 20620 Données live: content='Live démarré !', title='Live de Alpha Oumar'
+INFO 2025-07-23 20:06:16,382 views 21260 20620 Clé de stream générée: live_14_9df4eeae
+INFO 2025-07-23 20:06:16,550 views 21260 20620 Post live créé avec ID: 432
+INFO 2025-07-23 20:06:16,550 views 21260 20620 Stream démarré pour la clé: live_14_9df4eeae
+INFO 2025-07-23 20:06:16,550 views 21260 20620 Live démarré avec succès: {'live_id': 432, 'stream_key': 'live_14_9df4eeae', 'post_id': 432, 'rtmp_url': 'rtmp://localhost/live/live_14_9df4eeae', 'hls_url': 'http://localhost:8080/hls/live_14_9df4eeae.m3u8', 'message': 'Live démarré avec succès'}
+INFO 2025-07-23 20:06:32,023 views 21260 19556 Tentative de démarrage live pour aob_oumar_rich
+INFO 2025-07-23 20:06:32,040 views 21260 19556 Données live: content='Live démarré !', title='Live de Alpha Oumar'
+INFO 2025-07-23 20:06:32,040 views 21260 19556 Clé de stream générée: live_14_a22bb3f8
+INFO 2025-07-23 20:06:32,352 views 21260 19556 Post live créé avec ID: 433
+INFO 2025-07-23 20:06:32,352 views 21260 19556 Stream démarré pour la clé: live_14_a22bb3f8
+INFO 2025-07-23 20:06:32,352 views 21260 19556 Live démarré avec succès: {'live_id': 433, 'stream_key': 'live_14_a22bb3f8', 'post_id': 433, 'rtmp_url': 'rtmp://localhost/live/live_14_a22bb3f8', 'hls_url': 'http://localhost:8080/hls/live_14_a22bb3f8.m3u8', 'message': 'Live démarré avec succès'}
+INFO 2025-07-23 20:06:40,966 views 21260 19556 Tentative d'arrêt du live 433
+INFO 2025-07-23 20:06:40,971 views 21260 19556 Sauvegarde de la vidéo enregistrée pour le live 433
+ERROR 2025-07-23 20:06:40,973 views 21260 19556 Erreur lors de l'arrêt du live: 'int' object has no attribute 'days'
+INFO 2025-07-23 20:09:27,162 views 12008 12692 Tentative de démarrage live pour aob_oumar_rich
+INFO 2025-07-23 20:09:27,168 views 12008 12692 Données live: content='Live démarré !', title='Live de Alpha Oumar'
+INFO 2025-07-23 20:09:27,192 views 12008 12692 Clé de stream générée: live_14_0a9967c9
+INFO 2025-07-23 20:09:27,409 views 12008 12692 Post live créé avec ID: 434
+INFO 2025-07-23 20:09:27,423 views 12008 12692 Stream démarré pour la clé: live_14_0a9967c9
+INFO 2025-07-23 20:09:27,423 views 12008 12692 Live démarré avec succès: {'live_id': 434, 'stream_key': 'live_14_0a9967c9', 'post_id': 434, 'rtmp_url': 'rtmp://localhost/live/live_14_0a9967c9', 'hls_url': 'http://localhost:8080/hls/live_14_0a9967c9.m3u8', 'message': 'Live démarré avec succès'}
+INFO 2025-07-23 20:09:34,291 views 12008 12692 Tentative d'arrêt du live 434
+INFO 2025-07-23 20:09:34,297 views 12008 12692 Sauvegarde de la vidéo enregistrée pour le live 434
+INFO 2025-07-23 20:09:34,567 views 12008 12692 Vidéo sauvegardée avec ID: 106
+INFO 2025-07-23 20:09:34,725 views 12008 12692 Live 434 arrêté avec succès
+INFO 2025-07-23 20:10:11,795 views 12008 18596 Tentative de démarrage live pour aob_oumar_rich
+INFO 2025-07-23 20:10:11,832 views 12008 18596 Données live: content='Live démarré !', title='Live de Alpha Oumar'
+INFO 2025-07-23 20:10:11,852 views 12008 18596 Clé de stream générée: live_14_28eb3aba
+INFO 2025-07-23 20:10:12,021 views 12008 18596 Post live créé avec ID: 435
+INFO 2025-07-23 20:10:12,028 views 12008 18596 Stream démarré pour la clé: live_14_28eb3aba
+INFO 2025-07-23 20:10:12,028 views 12008 18596 Live démarré avec succès: {'live_id': 435, 'stream_key': 'live_14_28eb3aba', 'post_id': 435, 'rtmp_url': 'rtmp://localhost/live/live_14_28eb3aba', 'hls_url': 'http://localhost:8080/hls/live_14_28eb3aba.m3u8', 'message': 'Live démarré avec succès'}
+INFO 2025-07-23 20:10:19,962 views 12008 18596 Tentative d'arrêt du live 435
+INFO 2025-07-23 20:10:19,970 views 12008 18596 Sauvegarde de la vidéo enregistrée pour le live 435
+INFO 2025-07-23 20:10:20,207 views 12008 18596 Vidéo sauvegardée avec ID: 107
+INFO 2025-07-23 20:10:20,289 views 12008 18596 Live 435 arrêté avec succès
+INFO 2025-07-23 20:30:20,046 views 20508 11536 Tentative de démarrage live pour aob_oumar_rich
+INFO 2025-07-23 20:30:20,056 views 20508 11536 Données live: content='Live démarré !', title='Live de Alpha Oumar'
+INFO 2025-07-23 20:30:20,061 views 20508 11536 Clé de stream générée: live_14_c6d60a86
+INFO 2025-07-23 20:30:21,136 views 20508 11536 Post live créé avec ID: 436
+INFO 2025-07-23 20:30:21,141 views 20508 11536 Stream démarré pour la clé: live_14_c6d60a86
+INFO 2025-07-23 20:30:21,141 views 20508 11536 Live démarré avec succès: {'live_id': 436, 'stream_key': 'live_14_c6d60a86', 'post_id': 436, 'rtmp_url': 'rtmp://localhost/live/live_14_c6d60a86', 'hls_url': 'http://localhost:8080/hls/live_14_c6d60a86.m3u8', 'message': 'Live démarré avec succès'}
+INFO 2025-07-23 20:30:39,948 views 20508 11536 Tentative d'upload vidéo pour le live 436
+INFO 2025-07-23 20:41:01,225 views 17372 6924 Tentative de démarrage live pour aob_oumar_rich
+INFO 2025-07-23 20:41:01,225 views 17372 6924 Données live: content='Live démarré !', title='Live de Alpha Oumar'
+INFO 2025-07-23 20:41:01,225 views 17372 6924 Clé de stream générée: live_14_3f9971cb
+INFO 2025-07-23 20:41:01,370 views 17372 6924 Post live créé avec ID: 437
+INFO 2025-07-23 20:41:01,375 views 17372 6924 Stream démarré pour la clé: live_14_3f9971cb
+INFO 2025-07-23 20:41:01,375 views 17372 6924 Live démarré avec succès: {'live_id': 437, 'stream_key': 'live_14_3f9971cb', 'post_id': 437, 'rtmp_url': 'rtmp://localhost/live/live_14_3f9971cb', 'hls_url': 'http://localhost:8080/hls/live_14_3f9971cb.m3u8', 'message': 'Live démarré avec succès'}
+INFO 2025-07-23 20:41:21,754 views 17372 4820 Tentative d'arrêt du live 437
+INFO 2025-07-23 20:41:21,875 views 17372 4820 Live 437 arrêté avec succès
+INFO 2025-07-23 20:41:43,904 views 17372 14820 Tentative de démarrage live pour aob_oumar_rich
+INFO 2025-07-23 20:41:43,907 views 17372 14820 Données live: content='Live démarré !', title='Live de Alpha Oumar'
+INFO 2025-07-23 20:41:43,907 views 17372 14820 Clé de stream générée: live_14_846c0e7f
+INFO 2025-07-23 20:41:44,054 views 17372 14820 Post live créé avec ID: 438
+INFO 2025-07-23 20:41:44,054 views 17372 14820 Stream démarré pour la clé: live_14_846c0e7f
+INFO 2025-07-23 20:41:44,054 views 17372 14820 Live démarré avec succès: {'live_id': 438, 'stream_key': 'live_14_846c0e7f', 'post_id': 438, 'rtmp_url': 'rtmp://localhost/live/live_14_846c0e7f', 'hls_url': 'http://localhost:8080/hls/live_14_846c0e7f.m3u8', 'message': 'Live démarré avec succès'}
+INFO 2025-07-23 20:42:01,388 views 17372 21208 Tentative d'arrêt du live 438
+INFO 2025-07-23 20:42:01,554 views 17372 21208 Live 438 arrêté avec succès
+INFO 2025-07-23 20:49:18,165 views 17372 18840 Tentative de démarrage live pour aob_oumar_rich
+INFO 2025-07-23 20:49:18,166 views 17372 18840 Données live: content='Live démarré !', title='Live de Alpha Oumar'
+INFO 2025-07-23 20:49:18,171 views 17372 18840 Clé de stream générée: live_14_dfb886ee
+INFO 2025-07-23 20:49:18,366 views 17372 18840 Post live créé avec ID: 439
+INFO 2025-07-23 20:49:18,366 views 17372 18840 Stream démarré pour la clé: live_14_dfb886ee
+INFO 2025-07-23 20:49:18,366 views 17372 18840 Live démarré avec succès: {'live_id': 439, 'stream_key': 'live_14_dfb886ee', 'post_id': 439, 'rtmp_url': 'rtmp://localhost/live/live_14_dfb886ee', 'hls_url': 'http://localhost:8080/hls/live_14_dfb886ee.m3u8', 'message': 'Live démarré avec succès'}
+INFO 2025-07-23 20:49:32,206 views 17372 20084 Tentative d'arrêt du live 439
+INFO 2025-07-23 20:49:32,346 views 17372 20084 Live 439 arrêté avec succès
+INFO 2025-07-23 20:50:19,570 views 17372 7220 Tentative de démarrage live pour aob_oumar_rich
+INFO 2025-07-23 20:50:19,574 views 17372 7220 Données live: content='Live démarré !', title='Live de Alpha Oumar'
+INFO 2025-07-23 20:50:19,585 views 17372 7220 Clé de stream générée: live_14_b15003c3
+INFO 2025-07-23 20:50:21,180 views 17372 7220 Post live créé avec ID: 440
+INFO 2025-07-23 20:50:21,180 views 17372 7220 Stream démarré pour la clé: live_14_b15003c3
+INFO 2025-07-23 20:50:21,185 views 17372 7220 Live démarré avec succès: {'live_id': 440, 'stream_key': 'live_14_b15003c3', 'post_id': 440, 'rtmp_url': 'rtmp://localhost/live/live_14_b15003c3', 'hls_url': 'http://localhost:8080/hls/live_14_b15003c3.m3u8', 'message': 'Live démarré avec succès'}
+INFO 2025-07-23 20:50:28,126 views 17372 7220 Tentative d'arrêt du live 440
+INFO 2025-07-23 20:50:28,695 views 17372 7220 Live 440 arrêté avec succès
+INFO 2025-07-23 20:54:02,637 views 19704 20716 Tentative de démarrage live pour aob_oumar_rich
+INFO 2025-07-23 20:54:02,641 views 19704 20716 Données live: content='Live démarré !', title='Live de Alpha Oumar'
+INFO 2025-07-23 20:54:02,654 views 19704 20716 Clé de stream générée: live_14_ec88cac1
+INFO 2025-07-23 20:54:02,812 views 19704 20716 Post live créé avec ID: 441
+INFO 2025-07-23 20:54:02,819 views 19704 20716 Stream démarré pour la clé: live_14_ec88cac1
+INFO 2025-07-23 20:54:02,819 views 19704 20716 Live démarré avec succès: {'live_id': 441, 'stream_key': 'live_14_ec88cac1', 'post_id': 441, 'rtmp_url': 'rtmp://localhost/live/live_14_ec88cac1', 'hls_url': 'http://localhost:8080/hls/live_14_ec88cac1.m3u8', 'message': 'Live démarré avec succès'}
+INFO 2025-07-23 20:54:17,414 views 19704 20716 Tentative d'arrêt du live 441
+INFO 2025-07-23 20:54:17,589 views 19704 20716 Live 441 arrêté avec succès
+INFO 2025-07-23 20:54:36,238 views 19704 20716 Tentative de démarrage live pour aob_oumar_rich
+INFO 2025-07-23 20:54:36,241 views 19704 20716 Données live: content='Live démarré !', title='Live de Alpha Oumar'
+INFO 2025-07-23 20:54:36,241 views 19704 20716 Clé de stream générée: live_14_62748b7d
+INFO 2025-07-23 20:54:36,384 views 19704 20716 Post live créé avec ID: 442
+INFO 2025-07-23 20:54:36,384 views 19704 20716 Stream démarré pour la clé: live_14_62748b7d
+INFO 2025-07-23 20:54:36,389 views 19704 20716 Live démarré avec succès: {'live_id': 442, 'stream_key': 'live_14_62748b7d', 'post_id': 442, 'rtmp_url': 'rtmp://localhost/live/live_14_62748b7d', 'hls_url': 'http://localhost:8080/hls/live_14_62748b7d.m3u8', 'message': 'Live démarré avec succès'}
+INFO 2025-07-23 20:54:46,921 views 19704 20716 Tentative d'arrêt du live 442
+INFO 2025-07-23 20:54:47,100 views 19704 20716 Live 442 arrêté avec succès
+INFO 2025-07-23 21:12:00,828 views 19704 18644 Tentative de démarrage live pour aob_oumar_rich
+INFO 2025-07-23 21:12:00,925 views 19704 18644 Données live: content='Live démarré !', title='Live de Alpha Oumar'
+INFO 2025-07-23 21:12:01,020 views 19704 18644 Clé de stream générée: live_14_766c3be2
+INFO 2025-07-23 21:12:01,490 views 19704 18644 Post live créé avec ID: 443
+INFO 2025-07-23 21:12:01,496 views 19704 18644 Stream démarré pour la clé: live_14_766c3be2
+INFO 2025-07-23 21:12:01,500 views 19704 18644 Live démarré avec succès: {'live_id': 443, 'stream_key': 'live_14_766c3be2', 'post_id': 443, 'rtmp_url': 'rtmp://localhost/live/live_14_766c3be2', 'hls_url': 'http://localhost:8080/hls/live_14_766c3be2.m3u8', 'message': 'Live démarré avec succès'}
+INFO 2025-07-23 21:12:07,867 views 19704 18644 Tentative d'upload vidéo pour le live 443
+INFO 2025-07-23 21:12:08,581 views 19704 18644 Vidéo uploadée avec succès: 108
+INFO 2025-07-23 21:12:08,610 views 19704 18644 Tentative d'arrêt du live 443
+INFO 2025-07-23 21:12:08,750 views 19704 18644 Live 443 arrêté avec succès
+INFO 2025-07-23 21:15:04,103 views 19704 16344 Tentative de démarrage live pour aob_oumar_rich
+INFO 2025-07-23 21:15:04,115 views 19704 16344 Données live: content='Live démarré !', title='Live de Alpha Oumar'
+INFO 2025-07-23 21:15:04,115 views 19704 16344 Clé de stream générée: live_14_554a0c31
+INFO 2025-07-23 21:15:04,384 views 19704 16344 Post live créé avec ID: 444
+INFO 2025-07-23 21:15:04,384 views 19704 16344 Stream démarré pour la clé: live_14_554a0c31
+INFO 2025-07-23 21:15:04,389 views 19704 16344 Live démarré avec succès: {'live_id': 444, 'stream_key': 'live_14_554a0c31', 'post_id': 444, 'rtmp_url': 'rtmp://localhost/live/live_14_554a0c31', 'hls_url': 'http://localhost:8080/hls/live_14_554a0c31.m3u8', 'message': 'Live démarré avec succès'}
+INFO 2025-07-23 21:15:20,043 views 19704 16344 Tentative d'upload vidéo pour le live 444
+INFO 2025-07-23 21:15:20,582 views 19704 16344 Vidéo uploadée avec succès: 109
+INFO 2025-07-23 21:15:20,793 views 19704 16344 Tentative d'arrêt du live 444
+INFO 2025-07-23 21:15:21,127 views 19704 16344 Live 444 arrêté avec succès
+INFO 2025-07-23 21:34:57,721 views 15676 11604 Tentative de démarrage live pour aob_oumar_rich
+INFO 2025-07-23 21:34:57,733 views 15676 11604 Données live: content='Live démarré !', title='Live de Alpha Oumar'
+INFO 2025-07-23 21:34:57,737 views 15676 11604 Clé de stream générée: live_14_ff9e576d
+INFO 2025-07-23 21:34:57,974 views 15676 11604 Post live créé avec ID: 445
+INFO 2025-07-23 21:34:57,974 views 15676 11604 Stream démarré pour la clé: live_14_ff9e576d
+INFO 2025-07-23 21:34:57,974 views 15676 11604 Live démarré avec succès: {'live_id': 445, 'stream_key': 'live_14_ff9e576d', 'post_id': 445, 'rtmp_url': 'rtmp://localhost/live/live_14_ff9e576d', 'hls_url': 'http://localhost:8080/hls/live_14_ff9e576d.m3u8', 'message': 'Live démarré avec succès'}
+INFO 2025-07-23 21:35:08,756 views 15676 11604 Tentative d'upload vidéo pour le live 445
+INFO 2025-07-23 21:35:09,585 views 15676 11604 Vidéo uploadée avec succès: 110
+INFO 2025-07-23 21:35:09,679 views 15676 11604 Tentative d'arrêt du live 445
+INFO 2025-07-23 21:35:09,872 views 15676 11604 Live 445 arrêté avec succès

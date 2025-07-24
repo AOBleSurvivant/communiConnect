@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import GeographicSelector from '../components/GeographicSelector';
+import QuartierSelector from '../components/QuartierSelector';
 import { Eye, EyeOff, User, Mail, Phone, Lock, MapPin, Shield } from 'lucide-react';
 
 const Register = () => {
-  const { register: registerUser, registerLoading } = useAuth();
+  const { register: registerUser, loading: registerLoading } = useAuth();
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -251,7 +251,7 @@ const Register = () => {
                 Localisation en Guinée
               </h3>
               
-              <GeographicSelector onSelectionChange={setGeographicSelection} />
+              <QuartierSelector onQuartierSelect={setGeographicSelection} />
             </div>
 
             {/* Conditions d'utilisation */}

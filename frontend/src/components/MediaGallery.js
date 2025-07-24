@@ -64,69 +64,68 @@ const MediaGallery = ({ media, className = '' }) => {
   const handleVideoPause = () => setIsPlaying(false);
 
   const renderMediaContent = () => {
-    if (isLive) {
-      // Construire l'URL de la vidéo avec fallback
-      const videoUrl = currentMedia.file_url || currentMedia.file || '';
-      
-      // Détecter le type MIME basé sur l'extension
-      const getVideoType = (url) => {
-        if (url.includes('.webm')) return 'video/webm';
-        if (url.includes('.mp4')) return 'video/mp4';
-        if (url.includes('.mov')) return 'video/quicktime';
-        return 'video/mp4'; // fallback
-      };
-      
-      const videoType = getVideoType(videoUrl);
-      
-      return (
-        <div className="relative bg-black rounded-lg overflow-hidden">
-          <video
-            id={`video-${currentMedia.id}`}
-            className="w-full h-full object-cover"
-            autoPlay
-            muted
-            onPlay={handleVideoPlay}
-            onPause={handleVideoPause}
-            onError={(e) => {
-              console.error('Erreur chargement vidéo live:', videoUrl, e);
-            }}
-          >
-            <source src={videoUrl} type={videoType} />
-          </video>
-          
-          {/* Badge Live avec chronomètre */}
-          <div className="absolute top-4 left-4 bg-red-600 text-white px-3 py-1 rounded-full text-sm font-medium flex items-center space-x-1">
-            <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-            <span>EN DIRECT</span>
-            <LiveTimer 
-              startTime={currentMedia.live_started_at}
-              isActive={isLive}
-              variant="compact"
-              className="ml-2"
-            />
-          </div>
-          
-          {/* Spectateurs */}
-          <div className="absolute top-4 right-4 bg-black bg-opacity-50 text-white px-3 py-1 rounded-full text-sm">
-            {currentMedia.live_viewers_count} spectateurs
-          </div>
-        </div>
-      );
-    }
+    if (!currentMedia) return null;
 
-    if (isVideo) {
-      // Construire l'URL de la vidéo avec fallback
-      const videoUrl = currentMedia.file_url || currentMedia.file || '';
+    // Vérifier si c'est une vidéo
+    if (currentMedia.file_type?.startsWith('video/') || 
+        currentMedia.file?.includes('.mp4') || 
+        currentMedia.file?.includes('.webm') ||
+        currentMedia.file?.includes('.avi') ||
+        currentMedia.file?.includes('.mov')) {
       
-      // Détecter le type MIME basé sur l'extension
+      const videoUrl = currentMedia.file || currentMedia.file_url || '';
+      
       const getVideoType = (url) => {
-        if (url.includes('.webm')) return 'video/webm';
         if (url.includes('.mp4')) return 'video/mp4';
+        if (url.includes('.webm')) return 'video/webm';
+        if (url.includes('.avi')) return 'video/avi';
         if (url.includes('.mov')) return 'video/quicktime';
-        return 'video/mp4'; // fallback
+        return 'video/mp4'; // Par défaut
+      };
+
+      const videoType = getVideoType(videoUrl);
+      
+      // Vérifier la compatibilité WebM
+      const isWebM = videoUrl.includes('.webm');
+      const supportsWebM = () => {
+        const video = document.createElement('video');
+        return video.canPlayType && video.canPlayType('video/webm').replace(/no/, '');
       };
       
-      const videoType = getVideoType(videoUrl);
+      const handleVideoError = (e) => {
+        console.error('Erreur chargement vidéo:', videoUrl, e);
+        
+        if (isWebM && !supportsWebM()) {
+          console.warn('Format WebM détecté - compatibilité limitée sur certains navigateurs');
+          console.warn('Format vidéo non supporté par votre navigateur. Essayez Chrome ou Firefox.');
+          
+          // Afficher un message d'erreur plus informatif
+          const videoElement = e.target;
+          const errorContainer = document.createElement('div');
+          errorContainer.className = 'flex flex-col items-center justify-center h-full text-white bg-gray-800 p-4';
+          errorContainer.innerHTML = `
+            <div class="text-center">
+              <p class="mb-2 font-semibold">Format WebM non supporté</p>
+              <p class="mb-4 text-sm">Votre navigateur ne supporte pas le format WebM.</p>
+              <div class="space-y-2">
+                <p class="text-xs">Solutions recommandées :</p>
+                <ul class="text-xs text-gray-300">
+                  <li>• Utilisez Chrome ou Firefox</li>
+                  <li>• Téléchargez la vidéo pour la lire</li>
+                  <li>• Contactez l'administrateur pour conversion</li>
+                </ul>
+              </div>
+              <a href="${videoUrl}" download class="mt-4 inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors text-sm">
+                📥 Télécharger la vidéo
+              </a>
+            </div>
+          `;
+          
+          // Remplacer le contenu vidéo par le message d'erreur
+          videoElement.parentNode.appendChild(errorContainer);
+          videoElement.style.display = 'none';
+        }
+      };
       
       return (
         <div className="relative bg-black rounded-lg overflow-hidden">
@@ -137,28 +136,34 @@ const MediaGallery = ({ media, className = '' }) => {
             preload="metadata"
             onPlay={handleVideoPlay}
             onPause={handleVideoPause}
-            onError={(e) => {
-              console.error('Erreur chargement vidéo:', videoUrl, e);
-              // Essayer de détecter le type de fichier et proposer une solution
-              if (videoUrl.includes('.webm')) {
-                console.warn('Format WebM détecté - compatibilité limitée sur certains navigateurs');
-                console.warn('Format vidéo non supporté par votre navigateur. Essayez Chrome ou Firefox.');
-              }
-            }}
+            onError={handleVideoError}
           >
             <source src={videoUrl} type={videoType} />
+            {/* Sources alternatives pour WebM */}
+            {isWebM && (
+              <>
+                <source src={videoUrl.replace('.webm', '.mp4')} type="video/mp4" />
+                <source src={videoUrl.replace('.webm', '.avi')} type="video/avi" />
+              </>
+            )}
+            {/* Fallback pour tous les navigateurs */}
             <source src={videoUrl} type="video/mp4" />
             <source src={videoUrl} type="video/webm" />
+            
+            {/* Message de fallback */}
             <div className="flex flex-col items-center justify-center h-full text-white bg-gray-800 p-4">
               <p className="mb-4">Votre navigateur ne supporte pas la lecture de cette vidéo.</p>
-              {videoUrl.includes('.webm') && (
-                <a 
-                  href={videoUrl} 
-                  download 
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
-                >
-                  📥 Télécharger la vidéo
-                </a>
+              {isWebM && (
+                <div className="text-center">
+                  <p className="mb-2 text-sm">Format WebM détecté</p>
+                  <a 
+                    href={videoUrl} 
+                    download 
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+                  >
+                    📥 Télécharger la vidéo
+                  </a>
+                </div>
               )}
             </div>
           </video>

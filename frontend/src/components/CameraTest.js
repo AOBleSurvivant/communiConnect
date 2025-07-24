@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Camera, Mic, MicOff, Video, VideoOff } from 'lucide-react';
+import { Camera, Mic, CheckCircle, XCircle } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 const CameraTest = ({ isOpen, onClose }) => {

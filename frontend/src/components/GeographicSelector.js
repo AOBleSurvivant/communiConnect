@@ -1,237 +1,206 @@
 import React, { useState, useEffect } from 'react';
-import { geographyAPI } from '../services/api';
-import { MapPin, ChevronDown } from 'lucide-react';
+import { MapPin, Search, Loader } from 'lucide-react';
 
-const GeographicSelector = ({ onSelectionChange, initialValues = {} }) => {
-  const [selectedRegion, setSelectedRegion] = useState(initialValues.region_id || '');
-  const [selectedPrefecture, setSelectedPrefecture] = useState(initialValues.prefecture_id || '');
-  const [selectedCommune, setSelectedCommune] = useState(initialValues.commune_id || '');
-  const [selectedQuartier, setSelectedQuartier] = useState(initialValues.quartier_id || '');
-  const [geographicData, setGeographicData] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
+const GeographicSelector = ({ onLocationSelect, userLocation }) => {
+    const [searchQuery, setSearchQuery] = useState('');
+    const [suggestions, setSuggestions] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [selectedLocation, setSelectedLocation] = useState(null);
 
-  // Récupérer les données géographiques
+    // Quartiers populaires (à adapter selon votre région)
+    const popularNeighborhoods = [
+        { name: "Centre-ville", city: "Conakry", region: "Kaloum" },
+        { name: "Hamdallaye", city: "Conakry", region: "Ratoma" },
+        { name: "Almamya", city: "Conakry", region: "Kaloum" },
+        { name: "Dixinn", city: "Conakry", region: "Dixinn" },
+        { name: "Kankan", city: "Kankan", region: "Kankan" },
+        { name: "Kindia", city: "Kindia", region: "Kindia" },
+        { name: "N'Zérékoré", city: "N'Zérékoré", region: "N'Zérékoré" }
+    ];
+
+    // Détecter automatiquement la position
   useEffect(() => {
-    const fetchGeographicData = async () => {
-      try {
+        if (userLocation && !selectedLocation) {
+            detectAddressFromCoordinates(userLocation.latitude, userLocation.longitude);
+        }
+    }, [userLocation]);
+
+    const detectAddressFromCoordinates = async (lat, lng) => {
         setIsLoading(true);
-        setError(null);
-        const data = await geographyAPI.getGeographicData();
-        setGeographicData(data);
-      } catch (err) {
-        setError('Erreur lors du chargement des données géographiques');
-        console.error('Erreur API:', err);
+        try {
+            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`);
+            const data = await response.json();
+            
+            if (data.address) {
+                const location = {
+                    name: data.address.suburb || data.address.neighbourhood || data.address.city || 'Quartier',
+                    city: data.address.city || data.address.town || data.address.village || 'Ville',
+                    region: data.address.state || data.address.county || 'Région',
+                    address: data.display_name,
+                    latitude: lat,
+                    longitude: lng
+                };
+                setSelectedLocation(location);
+                onLocationSelect(location);
+            }
+        } catch (error) {
+            console.error('Erreur détection adresse:', error);
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchGeographicData();
-  }, []);
+    const searchLocations = async (query) => {
+        if (query.length < 3) {
+            setSuggestions([]);
+            return;
+        }
 
-  // Filtrer les données basées sur les sélections
-  const availablePrefectures = selectedRegion 
-    ? geographicData?.regions?.find(r => r.id === parseInt(selectedRegion))?.prefectures || []
-    : [];
+        setIsLoading(true);
+        try {
+            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${query}&countrycodes=gn&limit=5`);
+            const data = await response.json();
+            
+            const formattedSuggestions = data.map(item => ({
+                name: item.display_name.split(',')[0],
+                city: item.address?.city || item.address?.town || '',
+                region: item.address?.state || '',
+                address: item.display_name,
+                latitude: parseFloat(item.lat),
+                longitude: parseFloat(item.lon)
+            }));
+            
+            setSuggestions(formattedSuggestions);
+        } catch (error) {
+            console.error('Erreur recherche:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
-  const availableCommunes = selectedPrefecture
-    ? availablePrefectures.find(p => p.id === parseInt(selectedPrefecture))?.communes || []
-    : [];
+    const handleSearchChange = (e) => {
+        const query = e.target.value;
+        setSearchQuery(query);
+        searchLocations(query);
+    };
 
-  const availableQuartiers = selectedCommune
-    ? availableCommunes.find(c => c.id === parseInt(selectedCommune))?.quartiers || []
-    : [];
+    const selectLocation = (location) => {
+        setSelectedLocation(location);
+        setSearchQuery(location.name);
+        setSuggestions([]);
+        onLocationSelect(location);
+    };
 
-  // Réinitialiser les sélections quand un niveau supérieur change
-  useEffect(() => {
-    if (selectedRegion !== initialValues.region_id) {
-      setSelectedPrefecture('');
-      setSelectedCommune('');
-      setSelectedQuartier('');
-    }
-  }, [selectedRegion, initialValues.region_id]);
-
-  useEffect(() => {
-    if (selectedPrefecture !== initialValues.prefecture_id) {
-      setSelectedCommune('');
-      setSelectedQuartier('');
-    }
-  }, [selectedPrefecture, initialValues.prefecture_id]);
-
-  useEffect(() => {
-    if (selectedCommune !== initialValues.commune_id) {
-      setSelectedQuartier('');
-    }
-  }, [selectedCommune, initialValues.commune_id]);
-
-  // Notifier le parent des changements de sélection
-  useEffect(() => {
-    onSelectionChange({
-      region_id: selectedRegion,
-      prefecture_id: selectedPrefecture,
-      commune_id: selectedCommune,
-      quartier_id: selectedQuartier,
-    });
-  }, [selectedRegion, selectedPrefecture, selectedCommune, selectedQuartier, onSelectionChange]);
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-        <span className="ml-2 text-gray-600">Chargement des données géographiques...</span>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center p-8">
-        <div className="text-center">
-          <div className="text-red-600 mb-2">⚠️</div>
-          <p className="text-red-600">{error}</p>
-          <button 
-            onClick={() => window.location.reload()}
-            className="mt-2 text-sm text-green-600 hover:text-green-700"
-          >
-            Réessayer
-          </button>
-        </div>
-      </div>
-    );
-  }
+    const useCurrentLocation = () => {
+        if (navigator.geolocation) {
+            setIsLoading(true);
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    detectAddressFromCoordinates(position.coords.latitude, position.coords.longitude);
+                },
+                (error) => {
+                    console.error('Erreur géolocalisation:', error);
+                    setIsLoading(false);
+                }
+            );
+        }
+    };
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center mb-4">
-        <MapPin className="w-5 h-5 text-green-600 mr-2" />
-        <h3 className="text-lg font-semibold text-gray-900">
-          Sélectionnez votre localisation
-        </h3>
+            {/* Titre */}
+            <div className="flex items-center space-x-2">
+                <MapPin className="h-5 w-5 text-blue-600" />
+                <h3 className="text-lg font-medium text-gray-900">📍 Localisation de l'alerte</h3>
       </div>
 
-      <div className="space-y-4">
-        {/* Sélection de la région */}
+            {/* Position actuelle automatique */}
+            {selectedLocation && (
+                <div className="p-3 bg-green-50 border border-green-200 rounded-md">
+                    <div className="flex items-center justify-between">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Région <span className="text-red-500">*</span>
-          </label>
-          <div className="relative">
-            <select
-              value={selectedRegion}
-              onChange={(e) => setSelectedRegion(e.target.value)}
-              className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
-              required
-            >
-              <option value="">Sélectionnez une région</option>
-              {geographicData?.regions?.map((region) => (
-                <option key={region.id} value={region.id}>
-                  {region.nom}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                            <p className="text-sm font-medium text-green-800">
+                                Position détectée : {selectedLocation.name}
+                            </p>
+                            <p className="text-xs text-green-600">
+                                {selectedLocation.city}, {selectedLocation.region}
+                            </p>
+                        </div>
+                        <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
+                            ✅ Détecté
+                        </span>
           </div>
         </div>
+            )}
 
-        {/* Sélection de la préfecture */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Préfecture <span className="text-red-500">*</span>
-          </label>
+            {/* Recherche manuelle */}
+            <div className="space-y-3">
           <div className="relative">
-            <select
-              value={selectedPrefecture}
-              onChange={(e) => setSelectedPrefecture(e.target.value)}
-              className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
-              disabled={!selectedRegion}
-              required
-            >
-              <option value="">
-                {!selectedRegion ? 'Sélectionnez d\'abord une région' : 'Sélectionnez une préfecture'}
-              </option>
-              {availablePrefectures.map((prefecture) => (
-                <option key={prefecture.id} value={prefecture.id}>
-                  {prefecture.nom}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-          </div>
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                        placeholder="Rechercher un quartier, une ville..."
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                    />
+                    {isLoading && (
+                        <Loader className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 animate-spin" />
+                    )}
         </div>
 
-        {/* Sélection de la commune */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Commune <span className="text-red-500">*</span>
-          </label>
-          <div className="relative">
-            <select
-              value={selectedCommune}
-              onChange={(e) => setSelectedCommune(e.target.value)}
-              className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
-              disabled={!selectedPrefecture}
-              required
-            >
-              <option value="">
-                {!selectedPrefecture ? 'Sélectionnez d\'abord une préfecture' : 'Sélectionnez une commune'}
-              </option>
-              {availableCommunes.map((commune) => (
-                <option key={commune.id} value={commune.id}>
-                  {commune.nom} ({commune.type})
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                {/* Suggestions de recherche */}
+                {suggestions.length > 0 && (
+                    <div className="border border-gray-200 rounded-md max-h-40 overflow-y-auto">
+                        {suggestions.map((suggestion, index) => (
+                            <button
+                                key={index}
+                                onClick={() => selectLocation(suggestion)}
+                                className="w-full text-left px-3 py-2 hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
+                            >
+                                <div className="font-medium text-sm">{suggestion.name}</div>
+                                <div className="text-xs text-gray-500">{suggestion.city}, {suggestion.region}</div>
+                            </button>
+                        ))}
           </div>
-        </div>
+                )}
 
-        {/* Sélection du quartier */}
+                {/* Quartiers populaires */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Quartier <span className="text-red-500">*</span>
-          </label>
-          <div className="relative">
-            <select
-              value={selectedQuartier}
-              onChange={(e) => setSelectedQuartier(e.target.value)}
-              className="block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
-              disabled={!selectedCommune}
-              required
-            >
-              <option value="">
-                {!selectedCommune ? 'Sélectionnez d\'abord une commune' : 'Sélectionnez un quartier'}
-              </option>
-              {availableQuartiers.map((quartier) => (
-                <option key={quartier.id} value={quartier.id}>
-                  {quartier.nom}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-          </div>
+                    <p className="text-sm font-medium text-gray-700 mb-2">Quartiers populaires :</p>
+                    <div className="grid grid-cols-2 gap-2">
+                        {popularNeighborhoods.map((neighborhood, index) => (
+                            <button
+                                key={index}
+                                onClick={() => selectLocation(neighborhood)}
+                                className="text-left p-2 text-sm border border-gray-200 rounded hover:bg-blue-50 hover:border-blue-300"
+                            >
+                                <div className="font-medium">{neighborhood.name}</div>
+                                <div className="text-xs text-gray-500">{neighborhood.city}</div>
+                            </button>
+                        ))}
         </div>
       </div>
 
-      {/* Affichage de la sélection complète */}
-      {selectedQuartier && (
-        <div className="mt-4 p-4 bg-green-50 rounded-lg">
-          <div className="flex items-center">
-            <MapPin className="w-5 h-5 text-green-600 mr-2" />
-            <div>
-              <p className="text-sm font-medium text-green-800">
-                Localisation sélectionnée :
-              </p>
-              <p className="text-sm text-green-700">
-                {availableQuartiers.find(q => q.id === parseInt(selectedQuartier))?.nom}, {' '}
-                {availableCommunes.find(c => c.id === parseInt(selectedCommune))?.nom}, {' '}
-                {availablePrefectures.find(p => p.id === parseInt(selectedPrefecture))?.nom}, {' '}
-                {geographicData?.regions?.find(r => r.id === parseInt(selectedRegion))?.nom}
-              </p>
+                {/* Bouton position actuelle */}
+                <button
+                    onClick={useCurrentLocation}
+                    disabled={isLoading}
+                    className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
+                >
+                    {isLoading ? (
+                        <Loader className="h-4 w-4 animate-spin" />
+                    ) : (
+                        <MapPin className="h-4 w-4" />
+                    )}
+                    <span>Utiliser ma position actuelle</span>
+                </button>
             </div>
+
+            {/* Informations pour l'utilisateur */}
+            <div className="text-xs text-gray-500 bg-gray-50 p-2 rounded">
+                <p>💡 Conseil : Utilisez "Ma position actuelle" pour une détection automatique, ou recherchez votre quartier.</p>
           </div>
-        </div>
-      )}
     </div>
   );
 };

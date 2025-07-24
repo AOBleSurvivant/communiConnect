@@ -42,4 +42,50 @@ urlpatterns = [
     path('geographic-data/', views.GeographicDataView.as_view(), name='geographic-data'),
     path('verify-geographic/', views.GeographicVerificationView.as_view(), name='verify-geographic'),
     path('dashboard/', views.UserDashboardDataView.as_view(), name='dashboard'),
+
+    # ============================================================================
+    # URLs POUR GROUPES COMMUNAUTAIRES
+    # ============================================================================
+
+    # Groupes
+    path('groups/', views.CommunityGroupListCreateView.as_view(), name='group-list-create'),
+    path('groups/<int:pk>/', views.CommunityGroupDetailView.as_view(), name='group-detail'),
+    path('groups/join/', views.GroupMembershipView.as_view(), name='group-join'),
+    path('groups/<int:group_id>/members/', views.GroupMembershipListView.as_view(), name='group-members'),
+    path('groups/membership/<int:pk>/', views.GroupMembershipActionView.as_view(), name='group-membership-action'),
+
+    # ============================================================================
+    # URLs POUR ÉVÉNEMENTS COMMUNAUTAIRES
+    # ============================================================================
+
+    # Événements
+    path('events/', views.CommunityEventListCreateView.as_view(), name='event-list-create'),
+    path('events/<int:pk>/', views.CommunityEventDetailView.as_view(), name='event-detail'),
+    path('events/join/', views.EventAttendanceView.as_view(), name='event-join'),
+    path('events/<int:event_id>/attendees/', views.EventAttendanceListView.as_view(), name='event-attendees'),
+
+    # ============================================================================
+    # URLs POUR GAMIFICATION ET RÉALISATIONS
+    # ============================================================================
+
+    # Réalisations et scores
+    path('achievements/<int:user_id>/', views.UserAchievementListView.as_view(), name='user-achievements'),
+    path('social-score/<int:user_id>/', views.UserSocialScoreView.as_view(), name='user-social-score'),
+    path('leaderboard/', views.LeaderboardView.as_view(), name='leaderboard'),
+
+    # ============================================================================
+    # URLs POUR SUGGESTIONS INTELLIGENTES
+    # ============================================================================
+
+    # Suggestions
+    path('suggested-groups/', views.SuggestedGroupsView.as_view(), name='suggested-groups'),
+    path('suggested-events/', views.SuggestedEventsView.as_view(), name='suggested-events'),
+    path('suggested-connections/', views.SuggestedConnectionsView.as_view(), name='suggested-connections'),
+
+    # ============================================================================
+    # URLs POUR STATISTIQUES SOCIALES
+    # ============================================================================
+
+    # Statistiques
+    path('social-stats/<int:user_id>/', views.SocialStatsView.as_view(), name='social-stats'),
 ] 

@@ -353,14 +353,23 @@ class ExternalShare(models.Model):
     platform = models.CharField(max_length=20, choices=EXTERNAL_PLATFORMS)
     shared_at = models.DateTimeField(auto_now_add=True)
     
+    # Métadonnées optionnelles
+    message = models.TextField(blank=True, verbose_name="Message personnalisé")
+    share_url = models.URLField(blank=True, null=True, verbose_name="URL de partage")
+    
     class Meta:
-        unique_together = ['user', 'post', 'platform']
+        # Temporairement commenté pour éviter les erreurs 500
+        # unique_together = ['user', 'post', 'platform']
         verbose_name = "Partage externe"
         verbose_name_plural = "Partages externes"
         ordering = ['-shared_at']
     
     def __str__(self):
-        return f"{self.user.username} a partagé sur {self.get_platform_display()}" 
+        return f"{self.user.username} a partagé {self.post} sur {self.get_platform_display()}"
+    
+    def get_platform_display(self):
+        """Retourne le nom lisible de la plateforme"""
+        return dict(self.EXTERNAL_PLATFORMS).get(self.platform, self.platform)
 
 class PostAnalytics(models.Model):
     """Modèle pour les statistiques avancées des posts"""

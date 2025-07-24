@@ -1,6 +1,7 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.permissions import AllowAny
 from django.shortcuts import get_object_or_404
 from .models import Region, Prefecture, Commune, Quartier
 from .serializers import (
@@ -11,10 +12,11 @@ from .serializers import (
 )
 
 
-class RegionViewSet(viewsets.ReadOnlyModelViewSet):
+class RegionViewSet(viewsets.ModelViewSet):
     """API pour les régions de Guinée"""
     queryset = Region.objects.all()
     serializer_class = RegionSerializer
+    permission_classes = [AllowAny]
 
     @action(detail=True, methods=['get'])
     def prefectures(self, request, pk=None):
@@ -25,10 +27,11 @@ class RegionViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(serializer.data)
 
 
-class PrefectureViewSet(viewsets.ReadOnlyModelViewSet):
+class PrefectureViewSet(viewsets.ModelViewSet):
     """API pour les préfectures de Guinée"""
     queryset = Prefecture.objects.all()
     serializer_class = PrefectureSerializer
+    permission_classes = [AllowAny]
 
     @action(detail=True, methods=['get'])
     def communes(self, request, pk=None):
@@ -39,10 +42,11 @@ class PrefectureViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(serializer.data)
 
 
-class CommuneViewSet(viewsets.ReadOnlyModelViewSet):
+class CommuneViewSet(viewsets.ModelViewSet):
     """API pour les communes de Guinée"""
     queryset = Commune.objects.all()
     serializer_class = CommuneSerializer
+    permission_classes = [AllowAny]
 
     @action(detail=True, methods=['get'])
     def quartiers(self, request, pk=None):
@@ -53,10 +57,11 @@ class CommuneViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(serializer.data)
 
 
-class QuartierViewSet(viewsets.ReadOnlyModelViewSet):
+class QuartierViewSet(viewsets.ModelViewSet):
     """API pour les quartiers de Guinée"""
     queryset = Quartier.objects.all()
     serializer_class = QuartierSerializer
+    permission_classes = [AllowAny]
 
     @action(detail=True, methods=['get'])
     def full_address(self, request, pk=None):

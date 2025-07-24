@@ -2,7 +2,8 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from drf_spectacular.utils import extend_schema_field
 from drf_spectacular.types import OpenApiTypes
-from .models import User, UserProfile, GeographicVerification, UserRelationship
+from .models import User, UserProfile, GeographicVerification, UserRelationship, CommunityGroup, GroupMembership, CommunityEvent, EventAttendance, UserAchievement, UserSocialScore
+from django.shortcuts import get_object_or_404
 
 User = get_user_model()
 
@@ -281,3 +282,225 @@ class UserStatsSerializer(serializers.ModelSerializer):
     def get_connections_count(self, obj):
         """Retourne le nombre de connexions"""
         return obj.get_followers_count() + obj.get_following_count() 
+
+# ============================================================================
+# SÉRIALISEURS POUR GROUPES COMMUNAUTAIRES
+# ============================================================================
+
+class CommunityGroupSerializer(serializers.ModelSerializer):
+    """Sérialiseur pour les groupes communautaires"""
+    creator = UserSerializer(read_only=True)
+    admins = UserSerializer(many=True, read_only=True)
+    member_count = serializers.ReadOnlyField()
+    post_count = serializers.ReadOnlyField()
+    is_member = serializers.SerializerMethodField()
+    is_admin = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = CommunityGroup
+        fields = [
+            'id', 'name', 'description', 'group_type', 'privacy_level',
+            'quartier', 'creator', 'admins', 'cover_image', 'profile_image',
+            'member_count', 'post_count', 'created_at', 'updated_at',
+            'is_active', 'is_member', 'is_admin'
+        ]
+        read_only_fields = ['creator', 'member_count', 'post_count', 'created_at', 'updated_at']
+    
+    def get_is_member(self, obj):
+        """Vérifie si l'utilisateur actuel est membre du groupe"""
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return obj.is_member(request.user)
+        return False
+    
+    def get_is_admin(self, obj):
+        """Vérifie si l'utilisateur actuel est admin du groupe"""
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return obj.is_admin(request.user)
+        return False
+
+
+class GroupMembershipSerializer(serializers.ModelSerializer):
+    """Sérialiseur pour les adhésions aux groupes"""
+    user = UserSerializer(read_only=True)
+    group = CommunityGroupSerializer(read_only=True)
+    group_id = serializers.IntegerField(write_only=True)
+    
+    class Meta:
+        model = GroupMembership
+        fields = [
+            'id', 'group', 'group_id', 'user', 'status', 'role',
+            'joined_at', 'updated_at'
+        ]
+        read_only_fields = ['user', 'status', 'role', 'joined_at', 'updated_at']
+    
+    def create(self, validated_data):
+        group_id = validated_data.pop('group_id')
+        group = get_object_or_404(CommunityGroup, id=group_id)
+        validated_data['group'] = group
+        return super().create(validated_data)
+
+
+# ============================================================================
+# SÉRIALISEURS POUR ÉVÉNEMENTS COMMUNAUTAIRES
+# ============================================================================
+
+class CommunityEventSerializer(serializers.ModelSerializer):
+    """Sérialiseur pour les événements communautaires"""
+    organizer = UserSerializer(read_only=True)
+    group = CommunityGroupSerializer(read_only=True)
+    attendee_count = serializers.ReadOnlyField()
+    is_attendee = serializers.SerializerMethodField()
+    can_join = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = CommunityEvent
+        fields = [
+            'id', 'title', 'description', 'event_type', 'status',
+            'start_date', 'end_date', 'quartier', 'location_details',
+            'organizer', 'group', 'cover_image', 'attendee_count',
+            'max_attendees', 'created_at', 'updated_at', 'is_public',
+            'is_attendee', 'can_join'
+        ]
+        read_only_fields = ['organizer', 'attendee_count', 'created_at', 'updated_at']
+    
+    def get_is_attendee(self, obj):
+        """Vérifie si l'utilisateur actuel participe à l'événement"""
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return obj.is_attendee(request.user)
+        return False
+    
+    def get_can_join(self, obj):
+        """Vérifie si l'utilisateur actuel peut rejoindre l'événement"""
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return obj.can_join(request.user)
+        return False
+
+
+class EventAttendanceSerializer(serializers.ModelSerializer):
+    """Sérialiseur pour les participations aux événements"""
+    user = UserSerializer(read_only=True)
+    event = CommunityEventSerializer(read_only=True)
+    event_id = serializers.IntegerField(write_only=True)
+    
+    class Meta:
+        model = EventAttendance
+        fields = [
+            'id', 'event', 'event_id', 'user', 'status',
+            'joined_at', 'updated_at'
+        ]
+        read_only_fields = ['user', 'joined_at', 'updated_at']
+    
+    def create(self, validated_data):
+        event_id = validated_data.pop('event_id')
+        event = get_object_or_404(CommunityEvent, id=event_id)
+        validated_data['event'] = event
+        return super().create(validated_data)
+
+
+# ============================================================================
+# SÉRIALISEURS POUR GAMIFICATION
+# ============================================================================
+
+class UserAchievementSerializer(serializers.ModelSerializer):
+    """Sérialiseur pour les réalisations utilisateur"""
+    user = UserSerializer(read_only=True)
+    
+    class Meta:
+        model = UserAchievement
+        fields = [
+            'id', 'user', 'achievement_type', 'title', 'description',
+            'icon', 'points', 'unlocked_at'
+        ]
+        read_only_fields = ['user', 'unlocked_at']
+
+
+class UserSocialScoreSerializer(serializers.ModelSerializer):
+    """Sérialiseur pour le score social utilisateur"""
+    user = UserSerializer(read_only=True)
+    
+    class Meta:
+        model = UserSocialScore
+        fields = [
+            'id', 'user', 'total_points', 'level', 'achievements_count',
+            'posts_count', 'friends_count', 'groups_count', 'events_count',
+            'likes_received', 'comments_received', 'last_updated'
+        ]
+        read_only_fields = ['user', 'last_updated']
+
+
+# ============================================================================
+# SÉRIALISEURS POUR STATISTIQUES SOCIALES
+# ============================================================================
+
+class SocialStatsSerializer(serializers.Serializer):
+    """Sérialiseur pour les statistiques sociales"""
+    user = UserSerializer()
+    friends_count = serializers.IntegerField()
+    groups_count = serializers.IntegerField()
+    events_count = serializers.IntegerField()
+    posts_count = serializers.IntegerField()
+    achievements_count = serializers.IntegerField()
+    social_score = serializers.IntegerField()
+    level = serializers.IntegerField()
+    
+    class Meta:
+        fields = [
+            'user', 'friends_count', 'groups_count', 'events_count',
+            'posts_count', 'achievements_count', 'social_score', 'level'
+        ]
+
+
+# ============================================================================
+# SÉRIALISEURS POUR SUGGESTIONS
+# ============================================================================
+
+class SuggestedGroupSerializer(serializers.ModelSerializer):
+    """Sérialiseur pour les groupes suggérés"""
+    creator = UserSerializer(read_only=True)
+    member_count = serializers.ReadOnlyField()
+    
+    class Meta:
+        model = CommunityGroup
+        fields = [
+            'id', 'name', 'description', 'group_type', 'privacy_level',
+            'quartier', 'creator', 'member_count', 'cover_image'
+        ]
+
+
+class SuggestedEventSerializer(serializers.ModelSerializer):
+    """Sérialiseur pour les événements suggérés"""
+    organizer = UserSerializer(read_only=True)
+    attendee_count = serializers.ReadOnlyField()
+    
+    class Meta:
+        model = CommunityEvent
+        fields = [
+            'id', 'title', 'description', 'event_type', 'start_date',
+            'end_date', 'quartier', 'organizer', 'attendee_count',
+            'cover_image'
+        ]
+
+
+class SuggestedConnectionSerializer(serializers.ModelSerializer):
+    """Sérialiseur pour les connexions suggérées"""
+    mutual_friends_count = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = User
+        fields = [
+            'id', 'username', 'first_name', 'last_name', 'email',
+            'profile_picture', 'quartier', 'mutual_friends_count'
+        ]
+    
+    def get_mutual_friends_count(self, obj):
+        """Calcule le nombre d'amis en commun"""
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            user_friends = set(request.user.followers.filter(userrelationship__status='accepted').values_list('id', flat=True))
+            obj_friends = set(obj.followers.filter(userrelationship__status='accepted').values_list('id', flat=True))
+            return len(user_friends.intersection(obj_friends))
+        return 0 

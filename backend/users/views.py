@@ -26,6 +26,9 @@ from .serializers import (
     UserRelationshipSerializer, FollowUserSerializer, UnfollowUserSerializer,
     UserSearchSerializer, SuggestedFriendsSerializer, UserStatsSerializer
 )
+from .models import CommunityGroup, GroupMembership, CommunityEvent, EventAttendance, UserAchievement, UserSocialScore
+from .serializers import CommunityGroupSerializer, GroupMembershipSerializer, CommunityEventSerializer, EventAttendanceSerializer, UserAchievementSerializer, UserSocialScoreSerializer, SocialStatsSerializer
+from rest_framework.exceptions import PermissionDenied
 
 User = get_user_model()
 
@@ -114,9 +117,18 @@ class UserLoginView(generics.GenericAPIView):
         email = request.data.get('email')
         password = request.data.get('password')
         
+        # Validation des champs requis
         if not email or not password:
             return Response({
                 'error': 'Email et mot de passe requis'
+            }, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Validation du format email
+        import re
+        email_pattern = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+        if not email_pattern.match(email):
+            return Response({
+                'error': 'Format d\'email invalide'
             }, status=status.HTTP_400_BAD_REQUEST)
         
         # Authentification - essayer d'abord avec l'email, puis avec le username
@@ -745,3 +757,339 @@ class UserRelationshipsStatusView(generics.GenericAPIView):
                 {"error": "Utilisateur introuvable."},
                 status=status.HTTP_404_NOT_FOUND
             ) 
+
+# ============================================================================
+# VUES POUR GROUPES COMMUNAUTAIRES
+# ============================================================================
+
+class CommunityGroupListCreateView(generics.ListCreateAPIView):
+    """Vue pour lister et créer des groupes communautaires"""
+    serializer_class = CommunityGroupSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        user = self.request.user
+        # Groupes publics ou dont l'utilisateur est membre
+        return CommunityGroup.objects.filter(
+            Q(privacy_level='public') |
+            Q(memberships__user=user, memberships__status='approved')
+        ).distinct()
+    
+    def perform_create(self, serializer):
+        serializer.save(creator=self.request.user)
+
+
+class CommunityGroupDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """Vue pour afficher, modifier et supprimer un groupe"""
+    serializer_class = CommunityGroupSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = CommunityGroup.objects.all()
+    
+    def get_queryset(self):
+        user = self.request.user
+        return CommunityGroup.objects.filter(
+            Q(privacy_level='public') |
+            Q(memberships__user=user, memberships__status='approved') |
+            Q(creator=user) |
+            Q(admins=user)
+        ).distinct()
+
+
+class GroupMembershipView(generics.CreateAPIView):
+    """Vue pour rejoindre un groupe"""
+    serializer_class = GroupMembershipSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def perform_create(self, serializer):
+        group = serializer.validated_data['group']
+        user = self.request.user
+        
+        # Vérifier si l'utilisateur peut rejoindre le groupe
+        if group.privacy_level == 'secret':
+            raise PermissionDenied("Ce groupe est secret")
+        
+        # Créer l'adhésion
+        membership = serializer.save(user=user)
+        
+        # Si le groupe est public, approuver automatiquement
+        if group.privacy_level == 'public':
+            membership.approve()
+
+
+class GroupMembershipListView(generics.ListAPIView):
+    """Vue pour lister les membres d'un groupe"""
+    serializer_class = GroupMembershipSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        group_id = self.kwargs.get('group_id')
+        group = get_object_or_404(CommunityGroup, id=group_id)
+        
+        # Vérifier les permissions
+        user = self.request.user
+        if group.privacy_level == 'secret' and not group.is_member(user):
+            raise PermissionDenied("Accès refusé")
+        
+        return GroupMembership.objects.filter(group=group, status='approved')
+
+
+class GroupMembershipActionView(generics.UpdateAPIView):
+    """Vue pour approuver/refuser/bannir des membres"""
+    serializer_class = GroupMembershipSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = GroupMembership.objects.all()
+    
+    def perform_update(self, serializer):
+        membership = serializer.instance
+        action = self.request.data.get('action')
+        
+        # Vérifier que l'utilisateur est admin du groupe
+        if not membership.group.is_admin(self.request.user):
+            raise PermissionDenied("Vous devez être administrateur")
+        
+        if action == 'approve':
+            membership.approve()
+        elif action == 'reject':
+            membership.reject()
+        elif action == 'ban':
+            membership.ban()
+        else:
+            raise ValidationError("Action invalide")
+
+
+# ============================================================================
+# VUES POUR ÉVÉNEMENTS COMMUNAUTAIRES
+# ============================================================================
+
+class CommunityEventListCreateView(generics.ListCreateAPIView):
+    """Vue pour lister et créer des événements communautaires"""
+    serializer_class = CommunityEventSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        user = self.request.user
+        # Événements publics ou organisés par l'utilisateur
+        return CommunityEvent.objects.filter(
+            Q(is_public=True) |
+            Q(organizer=user)
+        ).distinct()
+    
+    def perform_create(self, serializer):
+        serializer.save(organizer=self.request.user)
+
+
+class CommunityEventDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """Vue pour afficher, modifier et supprimer un événement"""
+    serializer_class = CommunityEventSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = CommunityEvent.objects.all()
+    
+    def get_queryset(self):
+        user = self.request.user
+        return CommunityEvent.objects.filter(
+            Q(is_public=True) |
+            Q(organizer=user)
+        ).distinct()
+
+
+class EventAttendanceView(generics.CreateAPIView):
+    """Vue pour rejoindre un événement"""
+    serializer_class = EventAttendanceSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def perform_create(self, serializer):
+        event = serializer.validated_data['event']
+        user = self.request.user
+        
+        # Vérifier si l'utilisateur peut rejoindre l'événement
+        if not event.can_join(user):
+            raise ValidationError("Impossible de rejoindre cet événement")
+        
+        serializer.save(user=user)
+
+
+class EventAttendanceListView(generics.ListAPIView):
+    """Vue pour lister les participants d'un événement"""
+    serializer_class = EventAttendanceSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        event_id = self.kwargs.get('event_id')
+        event = get_object_or_404(CommunityEvent, id=event_id)
+        
+        # Vérifier les permissions
+        user = self.request.user
+        if not event.is_public and event.organizer != user:
+            raise PermissionDenied("Accès refusé")
+        
+        return EventAttendance.objects.filter(event=event)
+
+
+# ============================================================================
+# VUES POUR GAMIFICATION ET RÉALISATIONS
+# ============================================================================
+
+class UserAchievementListView(generics.ListAPIView):
+    """Vue pour lister les réalisations d'un utilisateur"""
+    serializer_class = UserAchievementSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        user_id = self.kwargs.get('user_id', self.request.user.id)
+        return UserAchievement.objects.filter(user_id=user_id)
+
+
+class UserSocialScoreView(generics.RetrieveAPIView):
+    """Vue pour afficher le score social d'un utilisateur"""
+    serializer_class = UserSocialScoreSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_object(self):
+        user_id = self.kwargs.get('user_id', self.request.user.id)
+        user = get_object_or_404(User, id=user_id)
+        social_score, created = UserSocialScore.objects.get_or_create(user=user)
+        
+        if created or (timezone.now() - social_score.last_updated).seconds > 3600:
+            social_score.update_stats()
+        
+        return social_score
+
+
+class LeaderboardView(generics.ListAPIView):
+    """Vue pour afficher le classement des utilisateurs"""
+    serializer_class = UserSocialScoreSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        quartier_id = self.request.query_params.get('quartier')
+        limit = int(self.request.query_params.get('limit', 10))
+        
+        queryset = UserSocialScore.objects.all()
+        
+        if quartier_id:
+            queryset = queryset.filter(user__quartier_id=quartier_id)
+        
+        return queryset.order_by('-total_points')[:limit]
+
+
+# ============================================================================
+# VUES POUR SUGGESTIONS INTELLIGENTES
+# ============================================================================
+
+class SuggestedGroupsView(generics.ListAPIView):
+    """Vue pour suggérer des groupes à un utilisateur"""
+    serializer_class = CommunityGroupSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        user = self.request.user
+        
+        # Groupes dans le même quartier
+        same_quartier_groups = CommunityGroup.objects.filter(
+            quartier=user.quartier,
+            privacy_level='public'
+        ).exclude(
+            memberships__user=user
+        )
+        
+        # Groupes populaires
+        popular_groups = CommunityGroup.objects.filter(
+            privacy_level='public',
+            member_count__gte=10
+        ).exclude(
+            memberships__user=user
+        ).order_by('-member_count')
+        
+        # Combiner et limiter
+        suggested = list(same_quartier_groups) + list(popular_groups)
+        return suggested[:10]
+
+
+class SuggestedEventsView(generics.ListAPIView):
+    """Vue pour suggérer des événements à un utilisateur"""
+    serializer_class = CommunityEventSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        user = self.request.user
+        
+        # Événements dans le même quartier
+        same_quartier_events = CommunityEvent.objects.filter(
+            quartier=user.quartier,
+            is_public=True,
+            start_date__gte=timezone.now()
+        ).exclude(
+            attendances__user=user
+        )
+        
+        # Événements populaires
+        popular_events = CommunityEvent.objects.filter(
+            is_public=True,
+            attendee_count__gte=5,
+            start_date__gte=timezone.now()
+        ).exclude(
+            attendances__user=user
+        ).order_by('-attendee_count')
+        
+        # Combiner et limiter
+        suggested = list(same_quartier_events) + list(popular_events)
+        return suggested[:10]
+
+
+class SuggestedConnectionsView(generics.ListAPIView):
+    """Vue pour suggérer des connexions à un utilisateur"""
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        user = self.request.user
+        
+        # Utilisateurs du même quartier
+        same_quartier_users = User.objects.filter(
+            quartier=user.quartier
+        ).exclude(
+            id=user.id
+        ).exclude(
+            followers__follower=user
+        )
+        
+        # Utilisateurs avec des amis en commun
+        common_friends_users = User.objects.filter(
+            followers__follower__in=user.followers.all()
+        ).exclude(
+            id=user.id
+        ).exclude(
+            followers__follower=user
+        )
+        
+        # Combiner et limiter
+        suggested = list(same_quartier_users) + list(common_friends_users)
+        return suggested[:10]
+
+
+# ============================================================================
+# VUES POUR STATISTIQUES SOCIALES
+# ============================================================================
+
+class SocialStatsView(generics.RetrieveAPIView):
+    """Vue pour afficher les statistiques sociales d'un utilisateur"""
+    serializer_class = SocialStatsSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_object(self):
+        user_id = self.kwargs.get('user_id', self.request.user.id)
+        user = get_object_or_404(User, id=user_id)
+        
+        # Calculer les statistiques
+        stats = {
+            'user': user,
+            'friends_count': user.followers.filter(userrelationship__status='accepted').count(),
+            'groups_count': user.group_memberships.filter(status='approved').count(),
+            'events_count': user.event_attendances.filter(status='going').count(),
+            'posts_count': user.posts.count(),
+            'achievements_count': user.achievements.count(),
+            'social_score': user.social_score.total_points if hasattr(user, 'social_score') else 0,
+            'level': user.social_score.level if hasattr(user, 'social_score') else 1,
+        }
+        
+        return stats 

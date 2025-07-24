@@ -52,7 +52,7 @@ const LiveStream = ({ isOpen, onClose, onLiveStarted, onLiveStopped }) => {
   const [currentTime, setCurrentTime] = useState(0);
   
   // Informations sur l'origine live de la vidéo
-  const [liveInfo, setLiveInfo] = useState(null);
+  const [liveInfo] = useState(null);
   const [showLiveDetails, setShowLiveDetails] = useState(false);
   
   // États pour le chronomètre du live
@@ -79,7 +79,7 @@ const LiveStream = ({ isOpen, onClose, onLiveStarted, onLiveStopped }) => {
     return () => {
       stopCamera();
     };
-  }, [isOpen]); // Retiré stream et recordedVideo de la dépendance
+  }, [isOpen]); // Supprimé stream comme dépendance pour éviter la boucle infinie
 
   useEffect(() => {
     // Nettoyer l'URL de la vidéo enregistrée quand le composant se démonte
@@ -88,18 +88,24 @@ const LiveStream = ({ isOpen, onClose, onLiveStarted, onLiveStopped }) => {
         URL.revokeObjectURL(recordedVideo);
       }
     };
-  }, [recordedVideo]); // Ajouté recordedVideo comme dépendance
+  }, [recordedVideo]);
 
-  // Debug: Surveiller les changements d'état
+  // Debug: Surveiller les changements d'état (réduit pour éviter le spam)
   useEffect(() => {
     console.log('🔄 État recordedVideo changé:', recordedVideo);
     console.log('🔄 État isLive:', isLive);
     console.log('🔄 État videoDuration:', videoDuration);
-  }, [recordedVideo, isLive, videoDuration]);
+  }, [recordedVideo, isLive]); // Supprimé videoDuration pour éviter les logs excessifs
 
 
 
   const startCamera = async () => {
+    // Éviter de redémarrer si un stream existe déjà
+    if (stream || streamRef.current) {
+      console.log('🎥 Caméra déjà active, pas de redémarrage nécessaire');
+      return;
+    }
+
     // Vérifier que l'API getUserMedia est disponible
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
       toast.error('Votre navigateur ne supporte pas l\'accès à la caméra');
@@ -571,13 +577,13 @@ const LiveStream = ({ isOpen, onClose, onLiveStarted, onLiveStopped }) => {
       const duration = videoRef.current.duration;
       console.log('📊 Durée vidéo détectée:', duration);
       
-      // Vérifier que la durée est valide
-      if (isFinite(duration) && duration > 0) {
+      // Vérifier que la durée est valide et éviter les corrections en boucle
+      if (isFinite(duration) && duration > 0 && duration !== Infinity) {
         setVideoDuration(duration);
         console.log('✅ Durée vidéo définie:', duration);
-      } else {
-        console.log('⚠️ Durée vidéo invalide:', duration);
-        // Forcer une durée par défaut si invalide
+      } else if (videoDuration === 0 || videoDuration === Infinity) {
+        // Seulement corriger si la durée actuelle est invalide
+        console.log('⚠️ Durée vidéo invalide, correction nécessaire');
         setVideoDuration(1); // 1 seconde par défaut
         console.log('🔄 Durée forcée à 1 seconde');
       }
@@ -615,12 +621,16 @@ const LiveStream = ({ isOpen, onClose, onLiveStarted, onLiveStopped }) => {
           console.log('✅ Vidéo chargée avec succès');
           const duration = videoRef.current.duration;
           
-          // Gérer la durée invalide
-          if (isFinite(duration) && duration > 0) {
+          // Gérer la durée invalide de manière plus robuste
+          if (isFinite(duration) && duration > 0 && duration !== Infinity) {
             setVideoDuration(duration);
+            console.log('✅ Durée vidéo définie:', duration);
           } else {
-            setVideoDuration(1); // Durée par défaut
-            console.log('🔄 Durée forcée à 1 seconde');
+            // Seulement définir la durée par défaut si elle n'est pas déjà correcte
+            if (videoDuration === 0 || videoDuration === Infinity) {
+              setVideoDuration(1); // Durée par défaut
+              console.log('🔄 Durée forcée à 1 seconde');
+            }
           }
           
           setCurrentTime(0);
@@ -639,15 +649,15 @@ const LiveStream = ({ isOpen, onClose, onLiveStarted, onLiveStopped }) => {
           toast.error('Erreur lors du chargement de la vidéo');
         });
         
-        // Forcer le chargement si pas d'événement
+        // Forcer le chargement si pas d'événement (avec délai plus long)
         setTimeout(() => {
-          if (videoDuration === 0 || !isFinite(videoDuration)) {
-            console.log('🔄 Forçage du chargement vidéo');
+          if (videoDuration === 0 || videoDuration === Infinity) {
+            console.log('🔄 Forçage du chargement vidéo après timeout');
             setVideoDuration(1);
             setCurrentTime(0);
             setIsPlaying(false);
           }
-        }, 1000);
+        }, 2000); // Délai plus long pour éviter les corrections prématurées
       }
     }, 300);
   };

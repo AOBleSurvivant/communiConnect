@@ -191,8 +191,21 @@ const PostCard = ({ post, onUpdate }) => {
     if (isLiking || !post?.id) return;
     
     setIsLiking(true);
+    
+    // Mise à jour optimiste immédiate
+    const wasLiked = post.is_liked_by_user;
+    const newLikeCount = wasLiked ? post.likes_count - 1 : post.likes_count + 1;
+    
+    // Mise à jour optimiste
+    if (onUpdate) {
+      onUpdate(post.id, {
+        is_liked_by_user: !wasLiked,
+        likes_count: newLikeCount
+      });
+    }
+    
     try {
-      if (post.is_liked_by_user) {
+      if (wasLiked) {
         await postsAPI.unlikePost(post.id);
         toast.success('Like retiré');
       } else {
@@ -200,18 +213,24 @@ const PostCard = ({ post, onUpdate }) => {
         toast.success('Post liké !');
       }
       
-      if (onUpdate) {
-        onUpdate();
-      }
+      // Pas besoin de recharger, la mise à jour optimiste est suffisante
     } catch (error) {
       console.error('Erreur lors du like:', error);
+      
+      // En cas d'erreur, annuler la mise à jour optimiste
+      if (onUpdate) {
+        onUpdate(post.id, {
+          is_liked_by_user: wasLiked,
+          likes_count: post.likes_count
+        });
+      }
       
       // Gérer l'erreur 400 "Vous avez déjà liké ce post"
       if (error.response?.status === 400 && error.response?.data?.detail === 'Vous avez déjà liké ce post') {
         toast.error('Vous avez déjà liké ce post');
-        // Forcer la mise à jour pour synchroniser l'état
+        // Forcer la synchronisation avec le serveur
         if (onUpdate) {
-          onUpdate();
+          onUpdate(); // Rechargement complet pour synchroniser
         }
       } else {
         toast.error('Erreur lors du like');

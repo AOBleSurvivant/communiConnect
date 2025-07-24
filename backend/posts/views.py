@@ -225,9 +225,9 @@ class LiveStreamView(generics.GenericAPIView):
             stream_key = LiveStreamingService.generate_stream_key(request.user.id)
             logger.info(f"Clé de stream générée: {stream_key}")
             
-            # Créer un post live avec type 'info' au lieu de 'live'
+            # Créer un post live simple (sans média pour éviter les erreurs)
             post = Post.objects.create(
-                author=request.user,  # Utiliser 'author' au lieu de 'user'
+                author=request.user,
                 quartier=request.user.quartier,
                 content=content,
                 post_type='info',  # Utiliser 'info' au lieu de 'live'
@@ -955,52 +955,60 @@ class ExternalShareView(generics.CreateAPIView):
         from .models import ExternalShare
         
         platform = request.data.get('platform', 'whatsapp')
+        message = request.data.get('message', '')
         
-        # Créer un partage externe avec gestion d'erreur
+        # Vérifier si un partage similaire existe déjà
+        existing_share = ExternalShare.objects.filter(
+            user=request.user,
+            post=post,
+            platform=platform
+        ).first()
+        
+        if existing_share:
+            return Response({
+                'message': f'Vous avez déjà partagé ce post sur {existing_share.get_platform_display()}',
+                'platform': existing_share.platform,
+                'platform_display': existing_share.get_platform_display()
+            }, status=status.HTTP_200_OK)
+        
+        # Créer un nouveau partage externe
         try:
             external_share = ExternalShare.objects.create(
                 user=request.user,
                 post=post,
-                platform=platform
+                platform=platform,
+                message=message
             )
-        except Exception as e:
-            # Si erreur de contrainte unique, récupérer l'existant
-            existing_share = ExternalShare.objects.filter(
-                user=request.user,
-                post=post,
-                platform=platform
-            ).first()
             
-            if existing_share:
-                return Response({
-                    'message': f'Vous avez déjà partagé ce post sur {existing_share.get_platform_display()}',
-                    'platform': existing_share.platform,
-                    'platform_display': existing_share.get_platform_display()
-                }, status=status.HTTP_200_OK)
-            else:
-                raise e
-        
-        # Notifier l'auteur du post
-        if post.author != request.user:
-            try:
-                from notifications.services import create_notification
-                create_notification(
-                    recipient=post.author,
-                    sender=request.user,
-                    notification_type='post_shared_external',
-                    title=f"{request.user.username} a partagé votre post",
-                    message=f"Votre post a été partagé sur {external_share.get_platform_display()}",
-                    extra_data={'post_id': post.id, 'external_share_id': external_share.id}
-                )
-            except Exception as e:
-                # Ignorer les erreurs de notification
-                pass
-        
-        return Response({
-            'message': f'Post partagé sur {external_share.get_platform_display()}',
-            'platform': external_share.platform,
-            'platform_display': external_share.get_platform_display()
-        }, status=201)
+            # Notifier l'auteur du post (optionnel)
+            if post.author != request.user:
+                try:
+                    from notifications.services import create_notification
+                    create_notification(
+                        recipient=post.author,
+                        sender=request.user,
+                        notification_type='post_shared_external',
+                        title=f"{request.user.username} a partagé votre post",
+                        message=f"Votre post a été partagé sur {external_share.get_platform_display()}",
+                        extra_data={'post_id': post.id, 'external_share_id': external_share.id}
+                    )
+                except Exception as e:
+                    # Ignorer les erreurs de notification
+                    logger.warning(f"Erreur notification partage externe: {e}")
+            
+            return Response({
+                'message': f'Post partagé sur {external_share.get_platform_display()}',
+                'platform': external_share.platform,
+                'platform_display': external_share.get_platform_display(),
+                'share_id': external_share.id
+            }, status=status.HTTP_201_CREATED)
+            
+        except Exception as e:
+            logger.error(f"Erreur lors du partage externe: {str(e)}")
+            return Response({
+                'error': 'Erreur lors du partage. Veuillez réessayer.',
+                'details': str(e) if settings.DEBUG else None
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class ExternalSharesListView(generics.ListAPIView):
     """Vue pour lister les partages externes d'un post"""
@@ -1022,9 +1030,13 @@ class PostAnalyticsView(generics.RetrieveAPIView):
         post_id = self.kwargs.get('pk')
         post = get_object_or_404(Post, pk=post_id)
         
-        # Créer ou mettre à jour les analytics
-        from .services import AnalyticsService
-        analytics = AnalyticsService.create_or_update_post_analytics(post)
+        # Créer ou récupérer les analytics
+        from .models import PostAnalytics
+        
+        analytics, created = PostAnalytics.objects.get_or_create(post=post)
+        
+        # Mettre à jour les analytics
+        analytics.update_analytics()
         
         return analytics
 

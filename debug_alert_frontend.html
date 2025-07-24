@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Alertes Frontend</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .debug-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button { padding: 10px 20px; margin: 5px; border: none; border-radius: 5px; cursor: pointer; }
+        .btn-primary { background-color: #007bff; color: white; }
+        .btn-success { background-color: #28a745; color: white; }
+        .btn-danger { background-color: #dc3545; color: white; }
+        pre { background-color: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Debug Alertes Frontend - CommuniConnect</h1>
+    
+    <div class="debug-section info">
+        <h3>1. Test de connexion à l'API</h3>
+        <button class="btn-primary" onclick="testAPI()">Tester l'API</button>
+        <div id="api-result"></div>
+    </div>
+
+    <div class="debug-section info">
+        <h3>2. Test d'authentification</h3>
+        <button class="btn-primary" onclick="testAuth()">Tester l'authentification</button>
+        <div id="auth-result"></div>
+    </div>
+
+    <div class="debug-section info">
+        <h3>3. Test de création d'alerte</h3>
+        <button class="btn-success" onclick="testCreateAlert()">Créer une alerte test</button>
+        <div id="alert-result"></div>
+    </div>
+
+    <div class="debug-section info">
+        <h3>4. Test de récupération d'alertes</h3>
+        <button class="btn-primary" onclick="testGetAlerts()">Récupérer les alertes</button>
+        <div id="get-alerts-result"></div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000/api';
+        let authToken = null;
+
+        function log(message, type = 'info') {
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        function showResult(elementId, content, type = 'info') {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<pre class="${type}">${content}</pre>`;
+        }
+
+        async function testAPI() {
+            try {
+                log('Test de connexion à l\'API...');
+                const response = await fetch(`${API_URL}/health/`);
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('api-result', `✅ API accessible\nStatus: ${response.status}\nRéponse: ${JSON.stringify(data, null, 2)}`, 'success');
+                } else {
+                    showResult('api-result', `❌ Erreur API\nStatus: ${response.status}\nRéponse: ${JSON.stringify(data, null, 2)}`, 'error');
+                }
+            } catch (error) {
+                showResult('api-result', `❌ Erreur connexion: ${error.message}`, 'error');
+            }
+        }
+
+        async function testAuth() {
+            try {
+                log('Test d\'authentification...');
+                
+                // Créer un utilisateur de test
+                const timestamp = Date.now();
+                const userData = {
+                    username: `testuser_${timestamp}`,
+                    email: `test${timestamp}@communiconnect.com`,
+                    password: 'TestPass123!',
+                    password_confirm: 'TestPass123!',
+                    first_name: 'Test',
+                    last_name: 'User'
+                };
+
+                const response = await fetch(`${API_URL}/users/register/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    authToken = data.tokens.access;
+                    showResult('auth-result', `✅ Utilisateur créé et authentifié\nToken: ${authToken.substring(0, 20)}...\nRéponse: ${JSON.stringify(data, null, 2)}`, 'success');
+                } else {
+                    showResult('auth-result', `❌ Erreur création utilisateur\nStatus: ${response.status}\nRéponse: ${JSON.stringify(data, null, 2)}`, 'error');
+                }
+            } catch (error) {
+                showResult('auth-result', `❌ Erreur authentification: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCreateAlert() {
+            if (!authToken) {
+                showResult('alert-result', '❌ Veuillez d\'abord vous authentifier', 'error');
+                return;
+            }
+
+            try {
+                log('Test de création d\'alerte...');
+                
+                const alertData = {
+                    title: 'Test d\'alerte - Fuite de gaz',
+                    description: 'Fuite de gaz détectée dans le quartier. Odeur forte dans la rue principale.',
+                    category: 'gas_leak',
+                    latitude: 48.8566,
+                    longitude: 2.3522,
+                    address: '123 Rue de la Paix',
+                    neighborhood: 'Centre-ville',
+                    city: 'Paris',
+                    postal_code: '75001'
+                };
+
+                const response = await fetch(`${API_URL}/notifications/alerts/`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify(alertData)
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    showResult('alert-result', `✅ Alerte créée avec succès!\nStatus: ${response.status}\nRéponse: ${JSON.stringify(data, null, 2)}`, 'success');
+                } else {
+                    showResult('alert-result', `❌ Erreur création alerte\nStatus: ${response.status}\nRéponse: ${JSON.stringify(data, null, 2)}`, 'error');
+                }
+            } catch (error) {
+                showResult('alert-result', `❌ Erreur création alerte: ${error.message}`, 'error');
+            }
+        }
+
+        async function testGetAlerts() {
+            if (!authToken) {
+                showResult('get-alerts-result', '❌ Veuillez d\'abord vous authentifier', 'error');
+                return;
+            }
+
+            try {
+                log('Test de récupération d\'alertes...');
+                
+                const response = await fetch(`${API_URL}/notifications/alerts/`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    const alerts = data.results || data;
+                    showResult('get-alerts-result', `✅ ${alerts.length} alertes récupérées\nStatus: ${response.status}\nRéponse: ${JSON.stringify(data, null, 2)}`, 'success');
+                } else {
+                    showResult('get-alerts-result', `❌ Erreur récupération alertes\nStatus: ${response.status}\nRéponse: ${JSON.stringify(data, null, 2)}`, 'error');
+                }
+            } catch (error) {
+                showResult('get-alerts-result', `❌ Erreur récupération alertes: ${error.message}`, 'error');
+            }
+        }
+
+        // Test automatique au chargement
+        window.onload = function() {
+            log('Page de debug chargée');
+            testAPI();
+        };
+    </script>
+</body>
+</html> 

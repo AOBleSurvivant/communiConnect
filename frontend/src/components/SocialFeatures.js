@@ -42,7 +42,6 @@ const SocialFeatures = () => {
   const [groups, setGroups] = useState([]);
   const [events, setEvents] = useState([]);
   const [achievements, setAchievements] = useState([]);
-  const [socialStats, setSocialStats] = useState({});
   const [showCreateGroup, setShowCreateGroup] = useState(false);
   const [showCreateEvent, setShowCreateEvent] = useState(false);
 
@@ -51,9 +50,16 @@ const SocialFeatures = () => {
   const [recentActivity, setRecentActivity] = useState([]);
   const [suggestedConnections, setSuggestedConnections] = useState([]);
   const [socialScore, setSocialScore] = useState(0);
+  const [suggestedGroups, setSuggestedGroups] = useState([]);
+  const [suggestedEvents, setSuggestedEvents] = useState([]);
+  const [leaderboard, setLeaderboard] = useState([]);
+  const [socialStats, setSocialStats] = useState({});
 
   useEffect(() => {
     loadSocialData();
+    loadSuggestions();
+    loadLeaderboard();
+    loadSocialStats();
   }, []);
 
   const loadSocialData = async () => {
@@ -116,6 +122,78 @@ const SocialFeatures = () => {
     }
   };
 
+  const loadSuggestions = async () => {
+    try {
+      // Charger les suggestions de groupes
+      const groupsResponse = await fetch('/api/users/suggested-groups/', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      if (groupsResponse.ok) {
+        const groupsData = await groupsResponse.json();
+        setSuggestedGroups(groupsData);
+      }
+
+      // Charger les suggestions d'événements
+      const eventsResponse = await fetch('/api/users/suggested-events/', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      if (eventsResponse.ok) {
+        const eventsData = await eventsResponse.json();
+        setSuggestedEvents(eventsData);
+      }
+
+      // Charger les suggestions de connexions
+      const connectionsResponse = await fetch('/api/users/suggested-connections/', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      if (connectionsResponse.ok) {
+        const connectionsData = await connectionsResponse.json();
+        setSuggestedConnections(connectionsData);
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement des suggestions:', error);
+    }
+  };
+
+  const loadLeaderboard = async () => {
+    try {
+      const response = await fetch('/api/users/leaderboard/?limit=10', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setLeaderboard(data);
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement du classement:', error);
+    }
+  };
+
+  const loadSocialStats = async () => {
+    try {
+      const response = await fetch(`/api/users/social-stats/${user.id}/`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setSocialStats(data);
+        setSocialScore(data.social_score);
+      }
+    } catch (error) {
+      console.error('Erreur lors du chargement des statistiques:', error);
+    }
+  };
+
   const handleAddFriend = async (friendId) => {
     try {
       // Simuler l'ajout d'ami
@@ -127,10 +205,45 @@ const SocialFeatures = () => {
 
   const handleJoinGroup = async (groupId) => {
     try {
-      // Simuler l'adhésion à un groupe
-      toast.success('Demande d\'adhésion envoyée !');
+      const response = await fetch('/api/users/groups/join/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ group_id: groupId })
+      });
+
+      if (response.ok) {
+        toast.success('Demande d\'adhésion envoyée !');
+        loadSuggestions(); // Recharger les suggestions
+      } else {
+        toast.error('Erreur lors de l\'envoi de la demande');
+      }
     } catch (error) {
       toast.error('Erreur lors de l\'envoi de la demande');
+    }
+  };
+
+  const handleJoinEvent = async (eventId) => {
+    try {
+      const response = await fetch('/api/users/events/join/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ event_id: eventId })
+      });
+
+      if (response.ok) {
+        toast.success('Participation confirmée !');
+        loadSuggestions(); // Recharger les suggestions
+      } else {
+        toast.error('Erreur lors de la confirmation');
+      }
+    } catch (error) {
+      toast.error('Erreur lors de la confirmation');
     }
   };
 
@@ -257,6 +370,32 @@ const SocialFeatures = () => {
           ))}
         </div>
       </div>
+
+      {/* Groupes suggérés */}
+      {suggestedGroups.length > 0 && (
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <h3 className="text-lg font-semibold mb-4">Groupes suggérés</h3>
+          <div className="space-y-3">
+            {suggestedGroups.map(group => (
+              <div key={group.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <img src={group.profile_image || "/default-avatar.svg"} alt={group.name} className="w-10 h-10 rounded-full" />
+                  <div>
+                    <p className="font-medium text-sm">{group.name}</p>
+                    <p className="text-xs text-gray-500">{group.member_count} membres • {group.group_type}</p>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => handleJoinGroup(group.id)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Rejoindre
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 
@@ -273,28 +412,47 @@ const SocialFeatures = () => {
             Créer un événement
           </button>
         </div>
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {events.map(event => (
-            <div key={event.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-              <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Calendar className="w-6 h-6 text-blue-600" />
-                </div>
-                <div>
-                  <h4 className="font-semibold">{event.title}</h4>
-                  <p className="text-sm text-gray-600">{event.date} • {event.attendees} participants</p>
-                </div>
-              </div>
+            <div key={event.id} className="p-4 bg-gray-50 rounded-lg">
+              <h4 className="font-semibold mb-2">{event.title}</h4>
+              <p className="text-sm text-gray-600 mb-2">{event.attendees} participants</p>
               <div className="flex items-center space-x-2">
                 <span className="text-xs px-2 py-1 bg-green-100 text-green-800 rounded-full">
                   {event.type}
                 </span>
-                <button className="text-xs text-blue-600 hover:underline">Gérer</button>
+                <span className="text-xs text-gray-500">{event.date}</span>
               </div>
             </div>
           ))}
         </div>
       </div>
+
+      {/* Événements suggérés */}
+      {suggestedEvents.length > 0 && (
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <h3 className="text-lg font-semibold mb-4">Événements suggérés</h3>
+          <div className="space-y-3">
+            {suggestedEvents.map(event => (
+              <div key={event.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <img src={event.cover_image || "/default-avatar.svg"} alt={event.title} className="w-10 h-10 rounded-full" />
+                  <div>
+                    <p className="font-medium text-sm">{event.title}</p>
+                    <p className="text-xs text-gray-500">{event.attendee_count} participants • {event.event_type}</p>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => handleJoinEvent(event.id)}
+                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                >
+                  Participer
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 
@@ -304,39 +462,40 @@ const SocialFeatures = () => {
       <div className="bg-white rounded-lg shadow-sm p-6">
         <h3 className="text-lg font-semibold mb-4">Mon score social</h3>
         <div className="flex items-center space-x-4">
-          <div className="text-3xl font-bold text-blue-600">{socialScore}</div>
-          <div className="flex-1">
-            <div className="w-full bg-gray-200 rounded-full h-2">
-              <div className="bg-blue-600 h-2 rounded-full" style={{ width: `${(socialScore / 1000) * 100}%` }}></div>
-            </div>
-            <p className="text-sm text-gray-600 mt-1">Niveau {Math.floor(socialScore / 100)}</p>
+          <div className="text-center">
+            <div className="text-3xl font-bold text-blue-600">{socialScore}</div>
+            <div className="text-sm text-gray-500">Points totaux</div>
+          </div>
+          <div className="text-center">
+            <div className="text-3xl font-bold text-green-600">{socialStats.level || 1}</div>
+            <div className="text-sm text-gray-500">Niveau</div>
+          </div>
+          <div className="text-center">
+            <div className="text-3xl font-bold text-purple-600">{socialStats.achievements_count || 0}</div>
+            <div className="text-sm text-gray-500">Réalisations</div>
           </div>
         </div>
       </div>
 
-      {/* Statistiques sociales */}
+      {/* Statistiques détaillées */}
       <div className="bg-white rounded-lg shadow-sm p-6">
         <h3 className="text-lg font-semibold mb-4">Mes statistiques</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div className="text-center p-4 bg-blue-50 rounded-lg">
-            <Users className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-            <div className="text-2xl font-bold">{socialStats.friends}</div>
-            <div className="text-sm text-gray-600">Amis</div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-blue-600">{socialStats.friends_count || 0}</div>
+            <div className="text-sm text-gray-500">Amis</div>
           </div>
-          <div className="text-center p-4 bg-green-50 rounded-lg">
-            <GroupIcon className="w-8 h-8 text-green-600 mx-auto mb-2" />
-            <div className="text-2xl font-bold">{socialStats.groups}</div>
-            <div className="text-sm text-gray-600">Groupes</div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-green-600">{socialStats.groups_count || 0}</div>
+            <div className="text-sm text-gray-500">Groupes</div>
           </div>
-          <div className="text-center p-4 bg-purple-50 rounded-lg">
-            <Calendar className="w-8 h-8 text-purple-600 mx-auto mb-2" />
-            <div className="text-2xl font-bold">{socialStats.events}</div>
-            <div className="text-sm text-gray-600">Événements</div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-purple-600">{socialStats.events_count || 0}</div>
+            <div className="text-sm text-gray-500">Événements</div>
           </div>
-          <div className="text-center p-4 bg-orange-50 rounded-lg">
-            <Heart className="w-8 h-8 text-orange-600 mx-auto mb-2" />
-            <div className="text-2xl font-bold">{socialStats.likes}</div>
-            <div className="text-sm text-gray-600">J'aime</div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-orange-600">{socialStats.posts_count || 0}</div>
+            <div className="text-sm text-gray-500">Posts</div>
           </div>
         </div>
       </div>
@@ -347,26 +506,49 @@ const SocialFeatures = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {achievements.map(achievement => (
             <div key={achievement.id} className={`p-4 rounded-lg border-2 ${
-              achievement.unlocked 
-                ? 'bg-green-50 border-green-200' 
-                : 'bg-gray-50 border-gray-200'
+              achievement.unlocked ? 'border-green-200 bg-green-50' : 'border-gray-200 bg-gray-50'
             }`}>
               <div className="flex items-center space-x-3">
                 <div className="text-2xl">{achievement.icon}</div>
                 <div>
-                  <h4 className={`font-semibold ${
-                    achievement.unlocked ? 'text-green-800' : 'text-gray-600'
-                  }`}>
-                    {achievement.name}
-                  </h4>
+                  <h4 className="font-semibold">{achievement.title}</h4>
                   <p className="text-sm text-gray-600">{achievement.description}</p>
+                  {achievement.unlocked && (
+                    <p className="text-xs text-green-600 mt-1">+{achievement.points} points</p>
+                  )}
                 </div>
-                {achievement.unlocked && <CheckCircle className="w-5 h-5 text-green-600" />}
               </div>
             </div>
           ))}
         </div>
       </div>
+
+      {/* Classement */}
+      {leaderboard.length > 0 && (
+        <div className="bg-white rounded-lg shadow-sm p-6">
+          <h3 className="text-lg font-semibold mb-4">Classement du quartier</h3>
+          <div className="space-y-3">
+            {leaderboard.map((user, index) => (
+              <div key={user.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                    {index + 1}
+                  </div>
+                  <img src={user.user.profile_picture || "/default-avatar.svg"} alt={user.user.username} className="w-10 h-10 rounded-full" />
+                  <div>
+                    <p className="font-medium text-sm">{user.user.first_name} {user.user.last_name}</p>
+                    <p className="text-xs text-gray-500">Niveau {user.level}</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-lg font-bold text-blue-600">{user.total_points}</div>
+                  <div className="text-xs text-gray-500">points</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 

@@ -267,3 +267,333 @@ class GeographicVerification(models.Model):
     
     def __str__(self):
         return f"Vérification {self.user.username} - {self.created_at}" 
+
+
+class CommunityGroup(models.Model):
+    """Modèle pour les groupes communautaires"""
+    
+    GROUP_TYPES = [
+        ('neighborhood', 'Quartier'),
+        ('community', 'Communauté'),
+        ('sports', 'Sport'),
+        ('education', 'Éducation'),
+        ('business', 'Commerce'),
+        ('culture', 'Culture'),
+        ('health', 'Santé'),
+        ('environment', 'Environnement'),
+        ('youth', 'Jeunesse'),
+        ('women', 'Femmes'),
+        ('other', 'Autre'),
+    ]
+    
+    PRIVACY_LEVELS = [
+        ('public', 'Public'),
+        ('private', 'Privé'),
+        ('secret', 'Secret'),
+    ]
+    
+    name = models.CharField(max_length=100, verbose_name="Nom du groupe")
+    description = models.TextField(blank=True, verbose_name="Description")
+    group_type = models.CharField(max_length=20, choices=GROUP_TYPES, default='community')
+    privacy_level = models.CharField(max_length=10, choices=PRIVACY_LEVELS, default='public')
+    
+    # Géolocalisation
+    quartier = models.ForeignKey('geography.Quartier', on_delete=models.CASCADE, verbose_name="Quartier")
+    
+    # Créateur et administrateurs
+    creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_groups', verbose_name="Créateur")
+    admins = models.ManyToManyField(User, related_name='administered_groups', blank=True, verbose_name="Administrateurs")
+    
+    # Médias
+    cover_image = models.ImageField(upload_to='groups/covers/', blank=True, null=True, verbose_name="Image de couverture")
+    profile_image = models.ImageField(upload_to='groups/profiles/', blank=True, null=True, verbose_name="Image de profil")
+    
+    # Statistiques
+    member_count = models.PositiveIntegerField(default=0, verbose_name="Nombre de membres")
+    post_count = models.PositiveIntegerField(default=0, verbose_name="Nombre de posts")
+    
+    # Métadonnées
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Date de modification")
+    is_active = models.BooleanField(default=True, verbose_name="Actif")
+    
+    class Meta:
+        verbose_name = "Groupe Communautaire"
+        verbose_name_plural = "Groupes Communautaires"
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return f"{self.name} ({self.quartier.nom})"
+    
+    def get_members(self):
+        """Retourne tous les membres du groupe"""
+        return self.members.all()
+    
+    def get_admins(self):
+        """Retourne tous les administrateurs du groupe"""
+        return self.admins.all()
+    
+    def is_member(self, user):
+        """Vérifie si un utilisateur est membre du groupe"""
+        return self.members.filter(id=user.id).exists()
+    
+    def is_admin(self, user):
+        """Vérifie si un utilisateur est administrateur du groupe"""
+        return self.admins.filter(id=user.id).exists() or self.creator == user
+
+
+class GroupMembership(models.Model):
+    """Modèle pour les adhésions aux groupes"""
+    
+    MEMBERSHIP_STATUS = [
+        ('pending', 'En attente'),
+        ('approved', 'Approuvé'),
+        ('rejected', 'Refusé'),
+        ('banned', 'Banni'),
+    ]
+    
+    ROLE_TYPES = [
+        ('member', 'Membre'),
+        ('moderator', 'Modérateur'),
+        ('admin', 'Administrateur'),
+    ]
+    
+    group = models.ForeignKey(CommunityGroup, on_delete=models.CASCADE, related_name='memberships', verbose_name="Groupe")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='group_memberships', verbose_name="Utilisateur")
+    status = models.CharField(max_length=20, choices=MEMBERSHIP_STATUS, default='pending', verbose_name="Statut")
+    role = models.CharField(max_length=20, choices=ROLE_TYPES, default='member', verbose_name="Rôle")
+    
+    # Métadonnées
+    joined_at = models.DateTimeField(auto_now_add=True, verbose_name="Date d'adhésion")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Date de modification")
+    
+    class Meta:
+        verbose_name = "Adhésion au Groupe"
+        verbose_name_plural = "Adhésions aux Groupes"
+        unique_together = ('group', 'user')
+        ordering = ['-joined_at']
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.group.name}"
+    
+    def approve(self):
+        """Approuve l'adhésion"""
+        self.status = 'approved'
+        self.save(update_fields=['status', 'updated_at'])
+        self.group.member_count = self.group.members.count()
+        self.group.save(update_fields=['member_count'])
+    
+    def reject(self):
+        """Refuse l'adhésion"""
+        self.status = 'rejected'
+        self.save(update_fields=['status', 'updated_at'])
+    
+    def ban(self):
+        """Bannit le membre"""
+        self.status = 'banned'
+        self.save(update_fields=['status', 'updated_at'])
+        self.group.member_count = self.group.members.count()
+        self.group.save(update_fields=['member_count'])
+
+
+class CommunityEvent(models.Model):
+    """Modèle pour les événements communautaires"""
+    
+    EVENT_TYPES = [
+        ('meeting', 'Réunion'),
+        ('celebration', 'Célébration'),
+        ('sports', 'Sport'),
+        ('education', 'Éducation'),
+        ('business', 'Commerce'),
+        ('culture', 'Culture'),
+        ('health', 'Santé'),
+        ('environment', 'Environnement'),
+        ('youth', 'Jeunesse'),
+        ('other', 'Autre'),
+    ]
+    
+    EVENT_STATUS = [
+        ('draft', 'Brouillon'),
+        ('published', 'Publié'),
+        ('ongoing', 'En cours'),
+        ('completed', 'Terminé'),
+        ('cancelled', 'Annulé'),
+    ]
+    
+    title = models.CharField(max_length=200, verbose_name="Titre")
+    description = models.TextField(verbose_name="Description")
+    event_type = models.CharField(max_length=20, choices=EVENT_TYPES, default='meeting')
+    status = models.CharField(max_length=20, choices=EVENT_STATUS, default='draft')
+    
+    # Dates et heures
+    start_date = models.DateTimeField(verbose_name="Date et heure de début")
+    end_date = models.DateTimeField(verbose_name="Date et heure de fin")
+    
+    # Localisation
+    quartier = models.ForeignKey('geography.Quartier', on_delete=models.CASCADE, verbose_name="Quartier")
+    location_details = models.CharField(max_length=500, blank=True, verbose_name="Détails du lieu")
+    
+    # Organisateur et groupe associé
+    organizer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='organized_events', verbose_name="Organisateur")
+    group = models.ForeignKey(CommunityGroup, on_delete=models.CASCADE, related_name='events', blank=True, null=True, verbose_name="Groupe associé")
+    
+    # Médias
+    cover_image = models.ImageField(upload_to='events/covers/', blank=True, null=True, verbose_name="Image de couverture")
+    
+    # Statistiques
+    attendee_count = models.PositiveIntegerField(default=0, verbose_name="Nombre de participants")
+    max_attendees = models.PositiveIntegerField(blank=True, null=True, verbose_name="Nombre maximum de participants")
+    
+    # Métadonnées
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Date de modification")
+    is_public = models.BooleanField(default=True, verbose_name="Public")
+    
+    class Meta:
+        verbose_name = "Événement Communautaire"
+        verbose_name_plural = "Événements Communautaires"
+        ordering = ['-start_date']
+    
+    def __str__(self):
+        return f"{self.title} - {self.start_date.strftime('%d/%m/%Y')}"
+    
+    def get_attendees(self):
+        """Retourne tous les participants"""
+        return self.attendees.all()
+    
+    def is_attendee(self, user):
+        """Vérifie si un utilisateur participe à l'événement"""
+        return self.attendees.filter(id=user.id).exists()
+    
+    def can_join(self, user):
+        """Vérifie si un utilisateur peut rejoindre l'événement"""
+        if not self.is_public:
+            return False
+        if self.max_attendees and self.attendee_count >= self.max_attendees:
+            return False
+        return not self.is_attendee(user)
+
+
+class EventAttendance(models.Model):
+    """Modèle pour les participations aux événements"""
+    
+    ATTENDANCE_STATUS = [
+        ('going', 'Participe'),
+        ('maybe', 'Peut-être'),
+        ('not_going', 'Ne participe pas'),
+    ]
+    
+    event = models.ForeignKey(CommunityEvent, on_delete=models.CASCADE, related_name='attendances', verbose_name="Événement")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='event_attendances', verbose_name="Utilisateur")
+    status = models.CharField(max_length=20, choices=ATTENDANCE_STATUS, default='going', verbose_name="Statut")
+    
+    # Métadonnées
+    joined_at = models.DateTimeField(auto_now_add=True, verbose_name="Date d'inscription")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="Date de modification")
+    
+    class Meta:
+        verbose_name = "Participation à l'Événement"
+        verbose_name_plural = "Participations aux Événements"
+        unique_together = ('event', 'user')
+        ordering = ['-joined_at']
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.event.title}"
+    
+    def save(self, *args, **kwargs):
+        """Sauvegarde avec mise à jour du compteur"""
+        super().save(*args, **kwargs)
+        self.event.attendee_count = self.event.attendances.filter(status='going').count()
+        self.event.save(update_fields=['attendee_count'])
+
+
+class UserAchievement(models.Model):
+    """Modèle pour les réalisations utilisateur (gamification)"""
+    
+    ACHIEVEMENT_TYPES = [
+        ('first_post', 'Premier Post'),
+        ('first_friend', 'Premier Ami'),
+        ('first_group', 'Premier Groupe'),
+        ('first_event', 'Premier Événement'),
+        ('post_milestone', 'Palier de Posts'),
+        ('friend_milestone', 'Palier d\'Amis'),
+        ('group_milestone', 'Palier de Groupes'),
+        ('event_milestone', 'Palier d\'Événements'),
+        ('engagement_milestone', 'Palier d\'Engagement'),
+        ('community_leader', 'Leader Communautaire'),
+    ]
+    
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='achievements', verbose_name="Utilisateur")
+    achievement_type = models.CharField(max_length=30, choices=ACHIEVEMENT_TYPES, verbose_name="Type de réalisation")
+    title = models.CharField(max_length=100, verbose_name="Titre")
+    description = models.TextField(verbose_name="Description")
+    icon = models.CharField(max_length=10, verbose_name="Icône")
+    points = models.PositiveIntegerField(default=0, verbose_name="Points")
+    
+    # Métadonnées
+    unlocked_at = models.DateTimeField(auto_now_add=True, verbose_name="Date de déblocage")
+    
+    class Meta:
+        verbose_name = "Réalisation Utilisateur"
+        verbose_name_plural = "Réalisations Utilisateur"
+        unique_together = ('user', 'achievement_type')
+        ordering = ['-unlocked_at']
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.title}"
+
+
+class UserSocialScore(models.Model):
+    """Modèle pour le score social utilisateur"""
+    
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='social_score', verbose_name="Utilisateur")
+    total_points = models.PositiveIntegerField(default=0, verbose_name="Points totaux")
+    level = models.PositiveIntegerField(default=1, verbose_name="Niveau")
+    achievements_count = models.PositiveIntegerField(default=0, verbose_name="Nombre de réalisations")
+    
+    # Statistiques détaillées
+    posts_count = models.PositiveIntegerField(default=0, verbose_name="Nombre de posts")
+    friends_count = models.PositiveIntegerField(default=0, verbose_name="Nombre d'amis")
+    groups_count = models.PositiveIntegerField(default=0, verbose_name="Nombre de groupes")
+    events_count = models.PositiveIntegerField(default=0, verbose_name="Nombre d'événements")
+    likes_received = models.PositiveIntegerField(default=0, verbose_name="Likes reçus")
+    comments_received = models.PositiveIntegerField(default=0, verbose_name="Commentaires reçus")
+    
+    # Métadonnées
+    last_updated = models.DateTimeField(auto_now=True, verbose_name="Dernière mise à jour")
+    
+    class Meta:
+        verbose_name = "Score Social Utilisateur"
+        verbose_name_plural = "Scores Sociaux Utilisateur"
+    
+    def __str__(self):
+        return f"{self.user.username} - Niveau {self.level} ({self.total_points} points)"
+    
+    def calculate_level(self):
+        """Calcule le niveau basé sur les points"""
+        # Formule : niveau = 1 + (points // 100)
+        self.level = 1 + (self.total_points // 100)
+        return self.level
+    
+    def add_points(self, points):
+        """Ajoute des points et recalcule le niveau"""
+        self.total_points += points
+        self.calculate_level()
+        self.save(update_fields=['total_points', 'level', 'last_updated'])
+    
+    def update_stats(self):
+        """Met à jour toutes les statistiques"""
+        self.posts_count = self.user.posts.count()
+        self.friends_count = self.user.followers.filter(userrelationship__status='accepted').count()
+        self.groups_count = self.user.group_memberships.filter(status='approved').count()
+        self.events_count = self.user.event_attendances.filter(status='going').count()
+        self.achievements_count = self.user.achievements.count()
+        
+        # Calculer les likes et commentaires reçus
+        total_likes = sum(post.likes.count() for post in self.user.posts.all())
+        total_comments = sum(post.comments.count() for post in self.user.posts.all())
+        
+        self.likes_received = total_likes
+        self.comments_received = total_comments
+        
+        self.save() 

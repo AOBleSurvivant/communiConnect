@@ -81,20 +81,60 @@ const Dashboard = () => {
     }
   }, [selectedFilter, searchTerm]);
 
+  // useEffect pour charger les posts au montage et quand l'utilisateur change
   useEffect(() => {
     console.log('👤 useEffect Dashboard - user:', user);
-    if (user) { // Assuming user is available from useAuth
+    if (user) {
       console.log('✅ Utilisateur connecté, appel fetchPosts');
       fetchPosts();
     } else {
       console.log('❌ Utilisateur non connecté');
     }
-  }, [user, fetchPosts]); // Ajouté fetchPosts avec useCallback pour éviter la boucle
+  }, [user]); // Supprimé fetchPosts des dépendances pour éviter la boucle infinie
 
+  // useEffect séparé pour les filtres et la recherche
+  useEffect(() => {
+    if (user) {
+      console.log('🔄 Filtres changés, rechargement des posts');
+      fetchPosts();
+    }
+  }, [selectedFilter, searchTerm, user]); // Déclenché seulement quand les filtres changent
 
+  // Fonction pour mettre à jour un post spécifique (optimiste)
+  const updatePostOptimistically = (postId, updates) => {
+    setPosts(prevPosts => 
+      prevPosts.map(post => 
+        post.id === postId 
+          ? { ...post, ...updates }
+          : post
+      )
+    );
+  };
+
+  // Fonction pour ajouter un nouveau post
+  const addNewPost = (newPost) => {
+    setPosts(prevPosts => [newPost, ...prevPosts]);
+  };
+
+  // Fonction pour supprimer un post
+  const removePost = (postId) => {
+    setPosts(prevPosts => prevPosts.filter(post => post.id !== postId));
+  };
+
+  // Fonction de mise à jour optimisée
+  const handlePostUpdate = (postId, updates) => {
+    if (postId) {
+      // Mise à jour optimiste pour un post spécifique
+      updatePostOptimistically(postId, updates);
+    } else {
+      // Rechargement complet seulement si nécessaire
+      console.log('🔄 Rechargement complet des posts...');
+      fetchPosts();
+    }
+  };
 
   const handlePostCreated = (newPost) => {
-    setPosts(prev => [newPost, ...prev]);
+    addNewPost(newPost);
   };
 
   const handleLiveStarted = (liveData) => {
@@ -250,7 +290,7 @@ const Dashboard = () => {
               <PostCard
                 key={post.id}
                 post={post}
-                onUpdate={fetchPosts}
+                onUpdate={handlePostUpdate}
               />
             ))
           ) : (

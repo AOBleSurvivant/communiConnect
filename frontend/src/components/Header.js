@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { MapPin, User, LogOut, Settings } from 'lucide-react';
+import { MapPin, User, LogOut, Settings, AlertTriangle } from 'lucide-react';
 import NotificationBell from './NotificationBell';
 
 const Header = () => {
@@ -51,6 +51,13 @@ const Header = () => {
                 >
                   Profil
                 </Link>
+                <Link
+                  to="/alerts"
+                  className="text-gray-700 hover:text-primary-600 px-3 py-2 rounded-md text-sm font-medium transition-colors flex items-center"
+                >
+                  <AlertTriangle className="w-4 h-4 mr-1" />
+                  Alertes
+                </Link>
               </>
             )}
           </nav>
@@ -97,6 +104,13 @@ const Header = () => {
                     >
                       <Settings className="w-4 h-4 mr-2" />
                       Notifications
+                    </Link>
+                    <Link
+                      to="/alerts"
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      <AlertTriangle className="w-4 h-4 mr-2" />
+                      Alertes Communautaires
                     </Link>
                     <Link
                       to="/settings"

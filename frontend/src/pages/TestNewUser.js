@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
 
 const TestNewUser = () => {
   const { register, login, isAuthenticated, user } = useAuth();
@@ -68,7 +67,7 @@ const TestNewUser = () => {
       // 4. Test de l'API profile
       addResult('🌐 Étape 4: Test de l\'API profile...', 'info');
       
-      const response = await fetch('http://localhost:8000/api/users/my-profile/', {
+              const response = await fetch('http://127.0.0.1:8000/api/users/my-profile/', {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'

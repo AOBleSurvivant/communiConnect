@@ -12,6 +12,7 @@ import AutoLogin from './pages/AutoLogin';
 import TestNewUser from './pages/TestNewUser';
 import GeographicVerification from './pages/GeographicVerification';
 import Notifications from './pages/Notifications';
+import CommunityAlerts from './components/CommunityAlerts';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -56,6 +57,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Notifications />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/alerts" 
+                element={
+                  <ProtectedRoute>
+                    <CommunityAlerts />
                   </ProtectedRoute>
                 } 
               />

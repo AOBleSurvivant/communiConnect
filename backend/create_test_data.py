@@ -2,209 +2,154 @@
 import os
 import sys
 import django
-from datetime import datetime, timedelta
-import random
 
 # Configuration Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'communiconnect.settings')
 django.setup()
 
+from geography.models import Region, Prefecture, Commune, Quartier
 from django.contrib.auth import get_user_model
-from geography.models import Quartier
-from posts.models import Post, Media, PostComment, PostLike
-from django.utils import timezone
+from notifications.models import CommunityAlert
 
 User = get_user_model()
 
-def create_test_users():
-    """Créer des utilisateurs de test"""
-    quartiers = list(Quartier.objects.all()[:5])  # Prendre les 5 premiers quartiers
+def create_test_data():
+    print("🔧 Création des données de test...")
     
-    test_users = [
-        {
-            'username': 'mariam_diallo',
-            'email': 'mariam.diallo@test.gn',
-            'password': 'test123456',
-            'first_name': 'Mariam',
-            'last_name': 'Diallo',
-            'quartier': quartiers[0] if quartiers else None
-        },
-        {
-            'username': 'ahmed_sylla',
-            'email': 'ahmed.sylla@test.gn',
-            'password': 'test123456',
-            'first_name': 'Ahmed',
-            'last_name': 'Sylla',
-            'quartier': quartiers[1] if len(quartiers) > 1 else quartiers[0]
-        },
-        {
-            'username': 'fatou_toure',
-            'email': 'fatou.toure@test.gn',
-            'password': 'test123456',
-            'first_name': 'Fatou',
-            'last_name': 'Touré',
-            'quartier': quartiers[2] if len(quartiers) > 2 else quartiers[0]
-        },
-        {
-            'username': 'moussa_camara',
-            'email': 'moussa.camara@test.gn',
-            'password': 'test123456',
-            'first_name': 'Moussa',
-            'last_name': 'Camara',
-            'quartier': quartiers[3] if len(quartiers) > 3 else quartiers[0]
-        }
-    ]
-    
-    created_users = []
-    for user_data in test_users:
-        if not User.objects.filter(username=user_data['username']).exists():
-            user = User.objects.create_user(
-                username=user_data['username'],
-                email=user_data['email'],
-                password=user_data['password'],
-                first_name=user_data['first_name'],
-                last_name=user_data['last_name'],
-                quartier=user_data['quartier']
+    # 1. Récupérer ou créer une région de test
+    try:
+        region = Region.objects.filter(nom="Conakry").first()
+        if not region:
+            region = Region.objects.create(
+                nom="Conakry",
+                code="CONAKRY"
             )
-            created_users.append(user)
-            print(f"Utilisateur créé: {user.username} ({user.first_name} {user.last_name})")
+            print(f"✅ Région créée: {region.id} - {region.nom}")
         else:
-            user = User.objects.get(username=user_data['username'])
-            created_users.append(user)
-            print(f"Utilisateur existant: {user.username}")
-    
-    return created_users
-
-def create_test_posts(users):
-    """Créer des posts de test"""
-    if not users:
-        print("Aucun utilisateur disponible pour créer des posts")
+            print(f"✅ Région existante utilisée: {region.id} - {region.nom}")
+    except Exception as e:
+        print(f"❌ Erreur création région: {e}")
         return
     
-    test_posts = [
-        {
-            'content': 'Bonjour à tous ! Je suis ravie de rejoindre cette communauté locale. J\'espère pouvoir contribuer positivement à notre quartier.',
-            'post_type': 'info',
-            'author': users[0]
-        },
-        {
-            'content': 'Quelqu\'un connaît-il un bon mécanicien dans le quartier ? Ma voiture a un problème et j\'ai besoin d\'aide.',
-            'post_type': 'help',
-            'author': users[1]
-        },
-        {
-            'content': 'Rappel : Réunion du comité de quartier ce samedi à 15h à la place du marché. Venez nombreux !',
-            'post_type': 'event',
-            'author': users[2]
-        },
-        {
-            'content': 'Nouvelle initiative : Création d\'un groupe d\'entraide pour les personnes âgées. Si vous êtes intéressés, contactez-moi.',
-            'post_type': 'announcement',
-            'author': users[3]
-        },
-        {
-            'content': 'Que pensez-vous de l\'idée d\'organiser une fête de quartier pour célébrer notre communauté ?',
-            'post_type': 'discussion',
-            'author': users[0]
-        }
-    ]
-    
-    created_posts = []
-    for i, post_data in enumerate(test_posts):
-        # Créer le post avec une date différente pour chaque post
-        post = Post.objects.create(
-            author=post_data['author'],
-            quartier=post_data['author'].quartier,
-            content=post_data['content'],
-            post_type=post_data['post_type'],
-            created_at=timezone.now() - timedelta(days=i+1)  # Posts sur plusieurs jours
-        )
-        created_posts.append(post)
-        print(f"Post créé: {post.content[:50]}... par {post.author.username}")
-    
-    return created_posts
-
-def create_test_comments(posts, users):
-    """Créer des commentaires de test"""
-    if not posts or not users:
-        return
-    
-    test_comments = [
-        "Bienvenue dans la communauté !",
-        "Je peux vous aider avec ça.",
-        "Excellente idée !",
-        "Je serai là !",
-        "Merci pour l'information.",
-        "C'est une très bonne initiative.",
-        "Je suis d'accord avec vous.",
-        "Comment puis-je participer ?"
-    ]
-    
-    for post in posts:
-        # Ajouter 2-3 commentaires par post
-        num_comments = random.randint(2, 3)
-        for i in range(num_comments):
-            comment_author = random.choice(users)
-            comment_content = random.choice(test_comments)
-            
-            PostComment.objects.create(
-                post=post,
-                author=comment_author,
-                content=comment_content
+    # 2. Récupérer ou créer une préfecture de test
+    try:
+        prefecture = Prefecture.objects.filter(region=region, nom="Conakry").first()
+        if not prefecture:
+            prefecture = Prefecture.objects.create(
+                region=region,
+                nom="Conakry",
+                code="CONAKRY"
             )
-            print(f"Commentaire ajouté sur le post de {post.author.username}: {comment_content[:30]}...")
-
-def create_test_likes(posts, users):
-    """Créer des likes de test"""
-    if not posts or not users:
+            print(f"✅ Préfecture créée: {prefecture.id} - {prefecture.nom}")
+        else:
+            print(f"✅ Préfecture existante utilisée: {prefecture.id} - {prefecture.nom}")
+    except Exception as e:
+        print(f"❌ Erreur création préfecture: {e}")
         return
     
-    for post in posts:
-        # 2-4 utilisateurs likent chaque post
-        num_likes = random.randint(2, 4)
-        likers = random.sample(users, min(num_likes, len(users)))
+    # 3. Récupérer ou créer une commune de test
+    try:
+        commune = Commune.objects.filter(prefecture=prefecture, nom="Commune de Kaloum").first()
+        if not commune:
+            commune = Commune.objects.create(
+                prefecture=prefecture,
+                nom="Commune de Kaloum",
+                type="urbaine",
+                code="KALOUM"
+            )
+            print(f"✅ Commune créée: {commune.id} - {commune.nom}")
+        else:
+            print(f"✅ Commune existante utilisée: {commune.id} - {commune.nom}")
+    except Exception as e:
+        print(f"❌ Erreur création commune: {e}")
+        return
+    
+    # 4. Récupérer ou créer un quartier de test
+    try:
+        quartier = Quartier.objects.filter(commune=commune, nom="Quartier Test").first()
+        if not quartier:
+            quartier = Quartier.objects.create(
+                commune=commune,
+                nom="Quartier Test",
+                code="QT01"
+            )
+            print(f"✅ Quartier créé: {quartier.id} - {quartier.nom}")
+        else:
+            print(f"✅ Quartier existant utilisé: {quartier.id} - {quartier.nom}")
+    except Exception as e:
+        print(f"❌ Erreur création quartier: {e}")
+        return
+    
+    # 5. Récupérer ou créer un utilisateur de test
+    try:
+        user = User.objects.filter(username="testuser").first()
+        if not user:
+            user = User.objects.create_user(
+                username="testuser",
+                email="test@example.com",
+                password="testpass123",
+                first_name="Test",
+                last_name="User"
+            )
+            user.quartier = quartier
+            user.save()
+            print(f"✅ Utilisateur créé: {user.username} (ID: {user.id})")
+        else:
+            print(f"✅ Utilisateur existant utilisé: {user.username} (ID: {user.id})")
+    except Exception as e:
+        print(f"❌ Erreur création utilisateur: {e}")
+        return
+    
+    # 6. Créer quelques alertes de test (si elles n'existent pas)
+    try:
+        existing_alerts = CommunityAlert.objects.filter(author=user).count()
+        if existing_alerts == 0:
+            alert1 = CommunityAlert.objects.create(
+                title="Test d'alerte - Fuite de gaz",
+                description="Fuite de gaz détectée dans le quartier",
+                category="gas_leak",
+                status="pending",
+                neighborhood="Centre-ville",
+                city="Conakry",
+                author=user,
+                latitude=9.5370,
+                longitude=-13.6785
+            )
+            print(f"✅ Alerte créée: {alert1.title}")
+            
+            alert2 = CommunityAlert.objects.create(
+                title="Test d'alerte - Coupure d'électricité",
+                description="Coupure d'électricité dans le secteur",
+                category="power_outage",
+                status="confirmed",
+                neighborhood="Hamdallaye",
+                city="Conakry",
+                author=user,
+                latitude=9.5370,
+                longitude=-13.6785
+            )
+            print(f"✅ Alerte créée: {alert2.title}")
+        else:
+            print(f"✅ {existing_alerts} alertes existantes trouvées")
         
-        for liker in likers:
-            if not PostLike.objects.filter(post=post, user=liker).exists():
-                PostLike.objects.create(post=post, user=liker)
-                post.increment_likes()
-                print(f"Like ajouté par {liker.username} sur le post de {post.author.username}")
+    except Exception as e:
+        print(f"❌ Erreur création alertes: {e}")
+    
+    # 7. Afficher les statistiques
+    print(f"\n📊 Statistiques:")
+    print(f"   - Utilisateurs: {User.objects.count()}")
+    print(f"   - Régions: {Region.objects.count()}")
+    print(f"   - Préfectures: {Prefecture.objects.count()}")
+    print(f"   - Communes: {Commune.objects.count()}")
+    print(f"   - Quartiers: {Quartier.objects.count()}")
+    print(f"   - Alertes: {CommunityAlert.objects.count()}")
+    
+    print(f"\n🔑 Informations de connexion:")
+    print(f"   - Username: testuser")
+    print(f"   - Password: testpass123")
+    print(f"   - Email: test@example.com")
+    
+    print(f"\n✅ Données de test créées avec succès!")
 
-def main():
-    print("=== Création des données de test ===")
-    
-    # Vérifier qu'il y a des quartiers
-    if not Quartier.objects.exists():
-        print("Aucun quartier trouvé. Veuillez d'abord importer les données géographiques.")
-        return
-    
-    print(f"Quartiers disponibles: {Quartier.objects.count()}")
-    
-    # Créer les utilisateurs de test
-    users = create_test_users()
-    
-    # Créer les posts de test
-    posts = create_test_posts(users)
-    
-    # Créer les commentaires de test
-    create_test_comments(posts, users)
-    
-    # Créer les likes de test
-    create_test_likes(posts, users)
-    
-    print("\n=== Données de test créées avec succès ===")
-    print(f"Utilisateurs: {len(users)}")
-    print(f"Posts: {len(posts)}")
-    print(f"Commentaires: {PostComment.objects.count()}")
-    print(f"Likes: {PostLike.objects.count()}")
-    
-    print("\n=== Informations de connexion ===")
-    print("Super utilisateur:")
-    print("  Username: admin")
-    print("  Password: admin123456")
-    print("\nUtilisateurs de test:")
-    for user in users:
-        print(f"  {user.username} / test123456")
-
-if __name__ == '__main__':
-    main() 
+if __name__ == "__main__":
+    create_test_data() 

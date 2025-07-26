@@ -12,13 +12,14 @@ import AutoLogin from './pages/AutoLogin';
 import TestNewUser from './pages/TestNewUser';
 import GeographicVerification from './pages/GeographicVerification';
 import Notifications from './pages/Notifications';
+import HelpRequestsPage from './pages/HelpRequestsPage';
 import CommunityAlerts from './components/CommunityAlerts';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   return (
     <AuthProvider>
-      <Router future={{ v7_relativeSplatPath: true }}>
+      <Router future={{ v7_relativeSplatPath: true, v7_startTransition: true }}>
         <div className="min-h-screen flex flex-col">
           <Header />
           <main className="flex-grow">
@@ -57,6 +58,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <Notifications />
+                  </ProtectedRoute>
+                } 
+              />
+              <Route 
+                path="/help-requests" 
+                element={
+                  <ProtectedRoute>
+                    <HelpRequestsPage />
                   </ProtectedRoute>
                 } 
               />

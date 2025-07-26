@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'api',
     'posts',
     'notifications',
+    'help_requests',  # Demandes d'aide communautaire
 ]
 
 MIDDLEWARE = [

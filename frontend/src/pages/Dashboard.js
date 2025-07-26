@@ -92,13 +92,13 @@ const Dashboard = () => {
     }
   }, [user]); // Supprimé fetchPosts des dépendances pour éviter la boucle infinie
 
-  // useEffect séparé pour les filtres et la recherche
+  // useEffect séparé pour les filtres et la recherche - optimisé pour éviter les appels multiples
   useEffect(() => {
-    if (user) {
+    if (user && (selectedFilter !== 'all' || searchTerm)) {
       console.log('🔄 Filtres changés, rechargement des posts');
       fetchPosts();
     }
-  }, [selectedFilter, searchTerm, user]); // Déclenché seulement quand les filtres changent
+  }, [selectedFilter, searchTerm]); // Retiré user des dépendances pour éviter les appels multiples
 
   // Fonction pour mettre à jour un post spécifique (optimiste)
   const updatePostOptimistically = (postId, updates) => {

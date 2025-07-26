@@ -33,6 +33,7 @@
   "author": "Votre Nom",
   "license": "MIT",
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "axios": "^1.10.0"
   }
 }

@@ -33,6 +33,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
     
+    # Demandes d'aide - Correction de l'URL pour éviter le double préfixe
+    path('api/help-requests/', include('help_requests.urls')),
+    
     # Documentation API
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
